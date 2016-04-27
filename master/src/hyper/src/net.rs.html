@@ -882,6 +882,69 @@
 <span id="839">839</span>
 <span id="840">840</span>
 <span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! A collection of traits abstracting over Listeners and Streams.</span>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>any</span>::{<span class='ident'>Any</span>, <span class='ident'>TypeId</span>};
@@ -891,7 +954,7 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>mem</span>;
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;openssl&quot;</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>openssl</span>::<span class='ident'>Openssl</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>openssl</span>::{<span class='ident'>Openssl</span>, <span class='ident'>OpensslClient</span>, <span class='ident'>OpensslServer</span>};
 
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>time</span>::<span class='ident'>Duration</span>;
 
@@ -1484,7 +1547,7 @@
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;openssl&quot;</span>)]</span>
 <span class='attribute'>#[<span class='ident'>doc</span>(<span class='ident'>hidden</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>DefaultConnector</span> <span class='op'>=</span> <span class='ident'>HttpsConnector</span><span class='op'>&lt;</span><span class='self'>self</span>::<span class='ident'>openssl</span>::<span class='ident'>Openssl</span><span class='op'>&gt;</span>;
+<span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>DefaultConnector</span> <span class='op'>=</span> <span class='ident'>HttpsConnector</span><span class='op'>&lt;</span><span class='self'>self</span>::<span class='ident'>openssl</span>::<span class='ident'>OpensslClient</span><span class='op'>&gt;</span>;
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>all</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;security-framework&quot;</span>, <span class='ident'>not</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;openssl&quot;</span>)))]</span>
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>DefaultConnector</span> <span class='op'>=</span> <span class='ident'>HttpsConnector</span><span class='op'>&lt;</span><span class='self'>self</span>::<span class='ident'>security_framework</span>::<span class='ident'>ClientWrapper</span><span class='op'>&gt;</span>;
@@ -1497,11 +1560,12 @@
     <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>Arc</span>;
     <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>time</span>::<span class='ident'>Duration</span>;
 
-    <span class='kw'>use</span> <span class='ident'>openssl</span>::<span class='ident'>ssl</span>::{<span class='ident'>Ssl</span>, <span class='ident'>SslContext</span>, <span class='ident'>SslStream</span>, <span class='ident'>SslMethod</span>, <span class='ident'>SSL_VERIFY_NONE</span>};
+    <span class='kw'>use</span> <span class='ident'>openssl</span>::<span class='ident'>ssl</span>::{<span class='ident'>Ssl</span>, <span class='ident'>SslContext</span>, <span class='ident'>SslStream</span>, <span class='ident'>SslMethod</span>, <span class='ident'>SSL_VERIFY_NONE</span>, <span class='ident'>SSL_VERIFY_PEER</span>};
+    <span class='kw'>use</span> <span class='ident'>openssl</span>::<span class='ident'>ssl</span>::{<span class='ident'>SSL_OP_NO_COMPRESSION</span>, <span class='ident'>SSL_OP_NO_SSLV2</span>, <span class='ident'>SSL_OP_NO_SSLV3</span>, <span class='ident'>SSL_OP_CIPHER_SERVER_PREFERENCE</span>};
     <span class='kw'>use</span> <span class='ident'>openssl</span>::<span class='ident'>ssl</span>::<span class='ident'>error</span>::<span class='ident'>StreamError</span> <span class='kw'>as</span> <span class='ident'>SslIoError</span>;
     <span class='kw'>use</span> <span class='ident'>openssl</span>::<span class='ident'>ssl</span>::<span class='ident'>error</span>::<span class='ident'>SslError</span>;
     <span class='kw'>use</span> <span class='ident'>openssl</span>::<span class='ident'>x509</span>::<span class='ident'>X509FileType</span>;
-    <span class='kw'>use</span> <span class='ident'>super</span>::{<span class='ident'>NetworkStream</span>, <span class='ident'>HttpStream</span>};
+    <span class='kw'>use</span> <span class='ident'>super</span>::{<span class='ident'>NetworkStream</span>, <span class='ident'>HttpStream</span>, <span class='ident'>SslClient</span>, <span class='ident'>SslServer</span>};
 
     <span class='doccomment'>/// An implementation of `Ssl` for OpenSSL.</span>
     <span class='doccomment'>///</span>
@@ -1523,10 +1587,49 @@
         <span class='kw'>pub</span> <span class='ident'>context</span>: <span class='ident'>Arc</span><span class='op'>&lt;</span><span class='ident'>SslContext</span><span class='op'>&gt;</span>
     }
 
+    <span class='attribute'>#[<span class='ident'>doc</span>(<span class='ident'>hidden</span>)]</span>
+    <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>OpensslClient</span>(<span class='kw'>pub</span> <span class='ident'>SslContext</span>);
+    <span class='attribute'>#[<span class='ident'>doc</span>(<span class='ident'>hidden</span>)]</span>
+    <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>OpensslServer</span>(<span class='kw'>pub</span> <span class='ident'>SslContext</span>);
+
+    <span class='doccomment'>/// see https://wiki.mozilla.org/Security/Server_Side_TLS</span>
+    <span class='kw'>const</span> <span class='ident'>DEFAULT_CIPHERS</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='macro'>concat</span><span class='macro'>!</span>(
+        <span class='string'>&quot;ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:&quot;</span>,
+        <span class='string'>&quot;ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:&quot;</span>,
+        <span class='string'>&quot;ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:&quot;</span>,
+        <span class='string'>&quot;ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:&quot;</span>,
+        <span class='string'>&quot;ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256&quot;</span>
+    );
+
+    <span class='doccomment'>/// default context options</span>
+    <span class='kw'>fn</span> <span class='ident'>context</span>() <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>SslContext</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ctx</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>SslContext</span>::<span class='ident'>new</span>(<span class='ident'>SslMethod</span>::<span class='ident'>Sslv23</span>));
+        <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>set_cipher_list</span>(<span class='ident'>DEFAULT_CIPHERS</span>));
+        <span class='ident'>ctx</span>.<span class='ident'>set_options</span>(<span class='ident'>SSL_OP_NO_COMPRESSION</span> <span class='op'>|</span> <span class='ident'>SSL_OP_NO_SSLV2</span> <span class='op'>|</span> <span class='ident'>SSL_OP_NO_SSLV3</span>);
+        <span class='prelude-val'>Ok</span>(<span class='ident'>ctx</span>)
+    }
+
+    <span class='kw'>impl</span> <span class='ident'>Default</span> <span class='kw'>for</span> <span class='ident'>OpensslClient</span> {
+        <span class='kw'>fn</span> <span class='ident'>default</span>() <span class='op'>-&gt;</span> <span class='ident'>OpensslClient</span> {
+            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ctx</span> <span class='op'>=</span> <span class='ident'>context</span>().<span class='ident'>unwrap</span>();
+            <span class='ident'>ctx</span>.<span class='ident'>set_verify</span>(<span class='ident'>SSL_VERIFY_PEER</span>, <span class='prelude-val'>None</span>);
+            <span class='ident'>OpensslClient</span>(<span class='ident'>ctx</span>)
+        }
+    }
+
+    <span class='kw'>impl</span> <span class='ident'>Default</span> <span class='kw'>for</span> <span class='ident'>OpensslServer</span> {
+        <span class='kw'>fn</span> <span class='ident'>default</span>() <span class='op'>-&gt;</span> <span class='ident'>OpensslServer</span> {
+            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ctx</span> <span class='op'>=</span> <span class='ident'>context</span>().<span class='ident'>unwrap</span>();
+            <span class='ident'>ctx</span>.<span class='ident'>set_verify</span>(<span class='ident'>SSL_VERIFY_NONE</span>, <span class='prelude-val'>None</span>);
+            <span class='ident'>ctx</span>.<span class='ident'>set_options</span>(<span class='ident'>SSL_OP_CIPHER_SERVER_PREFERENCE</span>);
+            <span class='ident'>OpensslServer</span>(<span class='ident'>ctx</span>)
+        }
+    }
+
     <span class='kw'>impl</span> <span class='ident'>Default</span> <span class='kw'>for</span> <span class='ident'>Openssl</span> {
         <span class='kw'>fn</span> <span class='ident'>default</span>() <span class='op'>-&gt;</span> <span class='ident'>Openssl</span> {
             <span class='ident'>Openssl</span> {
-                <span class='ident'>context</span>: <span class='ident'>Arc</span>::<span class='ident'>new</span>(<span class='ident'>SslContext</span>::<span class='ident'>new</span>(<span class='ident'>SslMethod</span>::<span class='ident'>Sslv23</span>).<span class='ident'>unwrap_or_else</span>(<span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span> {
+                <span class='ident'>context</span>: <span class='ident'>Arc</span>::<span class='ident'>new</span>(<span class='ident'>context</span>().<span class='ident'>unwrap_or_else</span>(<span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span> {
                     <span class='comment'>// if we cannot create a SslContext, that&#39;s because of a</span>
                     <span class='comment'>// serious problem. just crash.</span>
                     <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>e</span>)
@@ -1539,8 +1642,7 @@
         <span class='doccomment'>/// Ease creating an `Openssl` with a certificate and key.</span>
         <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_cert_and_key</span><span class='op'>&lt;</span><span class='ident'>C</span>, <span class='ident'>K</span><span class='op'>&gt;</span>(<span class='ident'>cert</span>: <span class='ident'>C</span>, <span class='ident'>key</span>: <span class='ident'>K</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Openssl</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span>
         <span class='kw'>where</span> <span class='ident'>C</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>Path</span><span class='op'>&gt;</span>, <span class='ident'>K</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>Path</span><span class='op'>&gt;</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ctx</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>SslContext</span>::<span class='ident'>new</span>(<span class='ident'>SslMethod</span>::<span class='ident'>Sslv23</span>));
-            <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>set_cipher_list</span>(<span class='string'>&quot;DEFAULT&quot;</span>));
+            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ctx</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>context</span>());
             <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>set_certificate_file</span>(<span class='ident'>cert</span>.<span class='ident'>as_ref</span>(), <span class='ident'>X509FileType</span>::<span class='ident'>PEM</span>));
             <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>set_private_key_file</span>(<span class='ident'>key</span>.<span class='ident'>as_ref</span>(), <span class='ident'>X509FileType</span>::<span class='ident'>PEM</span>));
             <span class='ident'>ctx</span>.<span class='ident'>set_verify</span>(<span class='ident'>SSL_VERIFY_NONE</span>, <span class='prelude-val'>None</span>);
@@ -1559,6 +1661,30 @@
 
         <span class='kw'>fn</span> <span class='ident'>wrap_server</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>stream</span>: <span class='ident'>HttpStream</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Self</span>::<span class='ident'>Stream</span><span class='op'>&gt;</span> {
             <span class='kw'>match</span> <span class='ident'>SslStream</span>::<span class='ident'>accept</span>(<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='self'>self</span>.<span class='ident'>context</span>, <span class='ident'>stream</span>) {
+                <span class='prelude-val'>Ok</span>(<span class='ident'>ssl_stream</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>ssl_stream</span>),
+                <span class='prelude-val'>Err</span>(<span class='ident'>SslIoError</span>(<span class='ident'>e</span>)) <span class='op'>=&gt;</span> {
+                    <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>ConnectionAborted</span>, <span class='ident'>e</span>).<span class='ident'>into</span>())
+                },
+                <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>e</span>.<span class='ident'>into</span>())
+            }
+        }
+    }
+
+    <span class='kw'>impl</span> <span class='ident'>SslClient</span> <span class='kw'>for</span> <span class='ident'>OpensslClient</span> {
+        <span class='kw'>type</span> <span class='ident'>Stream</span> <span class='op'>=</span> <span class='ident'>SslStream</span><span class='op'>&lt;</span><span class='ident'>HttpStream</span><span class='op'>&gt;</span>;
+
+        <span class='kw'>fn</span> <span class='ident'>wrap_client</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>stream</span>: <span class='ident'>HttpStream</span>, <span class='ident'>host</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Self</span>::<span class='ident'>Stream</span><span class='op'>&gt;</span> {
+            <span class='kw'>let</span> <span class='ident'>ssl</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>Ssl</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='number'>0</span>));
+            <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>ssl</span>.<span class='ident'>set_hostname</span>(<span class='ident'>host</span>));
+            <span class='ident'>SslStream</span>::<span class='ident'>connect</span>(<span class='ident'>ssl</span>, <span class='ident'>stream</span>).<span class='ident'>map_err</span>(<span class='ident'>From</span>::<span class='ident'>from</span>)
+        }
+    }
+
+    <span class='kw'>impl</span> <span class='ident'>SslServer</span> <span class='kw'>for</span> <span class='ident'>OpensslServer</span> {
+        <span class='kw'>type</span> <span class='ident'>Stream</span> <span class='op'>=</span> <span class='ident'>SslStream</span><span class='op'>&lt;</span><span class='ident'>HttpStream</span><span class='op'>&gt;</span>;
+
+        <span class='kw'>fn</span> <span class='ident'>wrap_server</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>stream</span>: <span class='ident'>HttpStream</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Self</span>::<span class='ident'>Stream</span><span class='op'>&gt;</span> {
+            <span class='kw'>match</span> <span class='ident'>SslStream</span>::<span class='ident'>accept</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='number'>0</span>, <span class='ident'>stream</span>) {
                 <span class='prelude-val'>Ok</span>(<span class='ident'>ssl_stream</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>ssl_stream</span>),
                 <span class='prelude-val'>Err</span>(<span class='ident'>SslIoError</span>(<span class='ident'>e</span>)) <span class='op'>=&gt;</span> {
                     <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>ConnectionAborted</span>, <span class='ident'>e</span>).<span class='ident'>into</span>())
