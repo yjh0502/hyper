@@ -623,6 +623,17 @@
 <span id="580">580</span>
 <span id="581">581</span>
 <span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! HTTP Client</span>
 <span class='doccomment'>//!</span>
@@ -897,13 +908,25 @@
 
         <span class='kw'>loop</span> {
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>req</span> <span class='op'>=</span> {
-                <span class='kw'>let</span> (<span class='ident'>scheme</span>, <span class='ident'>host</span>, <span class='ident'>port</span>) <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>client</span>.<span class='ident'>proxy</span> {
-                    <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>proxy</span>) <span class='op'>=&gt;</span> (<span class='ident'>proxy</span>.<span class='number'>0</span>.<span class='ident'>as_ref</span>(), <span class='ident'>proxy</span>.<span class='number'>1</span>.<span class='ident'>as_ref</span>(), <span class='ident'>proxy</span>.<span class='number'>2</span>),
-                    <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> {
-                        <span class='kw'>let</span> <span class='ident'>hp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>get_host_and_port</span>(<span class='kw-2'>&amp;</span><span class='ident'>url</span>));
-                        (<span class='ident'>url</span>.<span class='ident'>scheme</span>(), <span class='ident'>hp</span>.<span class='number'>0</span>, <span class='ident'>hp</span>.<span class='number'>1</span>)
-                    }
+                <span class='kw'>let</span> (<span class='ident'>host</span>, <span class='ident'>port</span>) <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>get_host_and_port</span>(<span class='kw-2'>&amp;</span><span class='ident'>url</span>));
+                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>is_proxied</span> <span class='op'>=</span> <span class='boolval'>false</span>;
+                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>message</span> <span class='op'>=</span> {
+                    <span class='kw'>let</span> (<span class='ident'>scheme</span>, <span class='ident'>host</span>, <span class='ident'>port</span>) <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>client</span>.<span class='ident'>proxy</span> {
+                        <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>proxy</span>) <span class='op'>=&gt;</span> {
+                            <span class='ident'>is_proxied</span> <span class='op'>=</span> <span class='boolval'>true</span>;
+                            (<span class='ident'>proxy</span>.<span class='number'>0</span>.<span class='ident'>as_ref</span>(), <span class='ident'>proxy</span>.<span class='number'>1</span>.<span class='ident'>as_ref</span>(), <span class='ident'>proxy</span>.<span class='number'>2</span>)
+                        },
+                        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> {
+                            (<span class='ident'>url</span>.<span class='ident'>scheme</span>(), <span class='ident'>host</span>, <span class='ident'>port</span>)
+                        }
+                    };
+                    <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>client</span>.<span class='ident'>protocol</span>.<span class='ident'>new_message</span>(<span class='kw-2'>&amp;</span><span class='ident'>host</span>, <span class='ident'>port</span>, <span class='ident'>scheme</span>))
                 };
+
+                <span class='kw'>if</span> <span class='ident'>is_proxied</span> {
+                    <span class='ident'>message</span>.<span class='ident'>set_proxied</span>(<span class='boolval'>true</span>);
+                }
+
                 <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>headers</span> {
                     <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>headers</span>) <span class='op'>=&gt;</span> <span class='ident'>headers</span>.<span class='ident'>clone</span>(),
                     <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='ident'>Headers</span>::<span class='ident'>new</span>(),
@@ -912,7 +935,6 @@
                     <span class='ident'>hostname</span>: <span class='ident'>host</span>.<span class='ident'>to_owned</span>(),
                     <span class='ident'>port</span>: <span class='prelude-val'>Some</span>(<span class='ident'>port</span>),
                 });
-                <span class='kw'>let</span> <span class='ident'>message</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>client</span>.<span class='ident'>protocol</span>.<span class='ident'>new_message</span>(<span class='kw-2'>&amp;</span><span class='ident'>host</span>, <span class='ident'>port</span>, <span class='ident'>scheme</span>));
                 <span class='ident'>Request</span>::<span class='ident'>with_headers_and_message</span>(<span class='ident'>method</span>.<span class='ident'>clone</span>(), <span class='ident'>url</span>.<span class='ident'>clone</span>(), <span class='ident'>headers</span>, <span class='ident'>message</span>)
             };
 
@@ -1146,7 +1168,7 @@
             <span class='kw'>let</span> <span class='ident'>s</span> <span class='op'>=</span> ::<span class='ident'>std</span>::<span class='ident'>str</span>::<span class='ident'>from_utf8</span>(<span class='kw-2'>&amp;</span><span class='ident'>stream</span>.<span class='ident'>write</span>).<span class='ident'>unwrap</span>();
             <span class='kw'>let</span> <span class='ident'>request_line</span> <span class='op'>=</span> <span class='string'>&quot;GET http://127.0.0.1/foo/bar HTTP/1.1\r\n&quot;</span>;
             <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='ident'>s</span>[..<span class='ident'>request_line</span>.<span class='ident'>len</span>()], <span class='ident'>request_line</span>);
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>s</span>.<span class='ident'>contains</span>(<span class='string'>&quot;Host: example.proxy:8008\r\n&quot;</span>));
+            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>s</span>.<span class='ident'>contains</span>(<span class='string'>&quot;Host: 127.0.0.1\r\n&quot;</span>));
         }
 
     }
