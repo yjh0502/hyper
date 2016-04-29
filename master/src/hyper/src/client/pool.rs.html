@@ -322,6 +322,7 @@
 <span id="279">279</span>
 <span id="280">280</span>
 <span id="281">281</span>
+<span id="282">282</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Client Connection Pooling</span>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>borrow</span>::<span class='ident'>ToOwned</span>;
@@ -452,6 +453,7 @@
 }
 
 <span class='doccomment'>/// A Stream that will try to be returned to the Pool when dropped.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>PooledStream</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> {
     <span class='ident'>inner</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>PooledStreamInner</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;&gt;</span>,
     <span class='ident'>is_closed</span>: <span class='ident'>bool</span>,
