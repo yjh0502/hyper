@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["channel",""]],"struct":[["Control","A notifier to wakeup a socket after having used `Next::wait()`"],["Decoder","Wraps a `Transport` to provide HTTP decoding when reading."],["Encoder","Wraps a `Transport` to provide HTTP encoding when writing."],["Next","Used to signal desired events when working with asynchronous IO."]]});
