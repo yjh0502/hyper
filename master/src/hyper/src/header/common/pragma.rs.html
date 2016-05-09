@@ -115,13 +115,11 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ascii</span>::<span class='ident'>AsciiExt</span>;
 
-<span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Header</span>, <span class='ident'>HeaderFormat</span>, <span class='ident'>parsing</span>};
+<span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Header</span>, <span class='ident'>parsing</span>};
 
 <span class='doccomment'>/// The `Pragma` header defined by HTTP/1.0.</span>
 <span class='doccomment'>///</span>
@@ -172,9 +170,7 @@
             }
         })
     }
-}
 
-<span class='kw'>impl</span> <span class='ident'>HeaderFormat</span> <span class='kw'>for</span> <span class='ident'>Pragma</span> {
     <span class='kw'>fn</span> <span class='ident'>fmt_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
         <span class='ident'>f</span>.<span class='ident'>write_str</span>(<span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
             <span class='ident'>Pragma</span>::<span class='ident'>NoCache</span> <span class='op'>=&gt;</span> <span class='string'>&quot;no-cache&quot;</span>,
