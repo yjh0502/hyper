@@ -410,35 +410,6 @@
 <span id="367">367</span>
 <span id="368">368</span>
 <span id="369">369</span>
-<span id="370">370</span>
-<span id="371">371</span>
-<span id="372">372</span>
-<span id="373">373</span>
-<span id="374">374</span>
-<span id="375">375</span>
-<span id="376">376</span>
-<span id="377">377</span>
-<span id="378">378</span>
-<span id="379">379</span>
-<span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
-<span id="383">383</span>
-<span id="384">384</span>
-<span id="385">385</span>
-<span id="386">386</span>
-<span id="387">387</span>
-<span id="388">388</span>
-<span id="389">389</span>
-<span id="390">390</span>
-<span id="391">391</span>
-<span id="392">392</span>
-<span id="393">393</span>
-<span id="394">394</span>
-<span id="395">395</span>
-<span id="396">396</span>
-<span id="397">397</span>
-<span id="398">398</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! HTTP Server</span>
 <span class='doccomment'>//!</span>
@@ -446,10 +417,9 @@
 <span class='doccomment'>//! them off to a `Handler`.</span>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>net</span>::<span class='ident'>SocketAddr</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::{<span class='ident'>Arc</span>, <span class='ident'>mpsc</span>};
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>Arc</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>atomic</span>::{<span class='ident'>AtomicBool</span>, <span class='ident'>Ordering</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>time</span>::<span class='ident'>Duration</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>thread</span>;
 
 <span class='kw'>use</span> <span class='ident'>rotor</span>::<span class='ident'>mio</span>::{<span class='ident'>EventSet</span>, <span class='ident'>PollOpt</span>};
 <span class='kw'>use</span> <span class='ident'>rotor</span>::{<span class='self'>self</span>, <span class='ident'>Scope</span>};
@@ -458,12 +428,23 @@
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>response</span>::<span class='ident'>Response</span>;
 
 <span class='kw'>use</span> <span class='ident'>http</span>::{<span class='self'>self</span>, <span class='ident'>Next</span>};
-<span class='kw'>use</span> <span class='ident'>net</span>::{<span class='ident'>Accept</span>, <span class='ident'>HttpListener</span>, <span class='ident'>HttpsListener</span>, <span class='ident'>Ssl</span>, <span class='ident'>Transport</span>};
+<span class='kw'>use</span> <span class='ident'>net</span>::{<span class='ident'>Accept</span>, <span class='ident'>HttpListener</span>, <span class='ident'>HttpsListener</span>, <span class='ident'>SslServer</span>, <span class='ident'>Transport</span>};
 
 
 <span class='kw'>mod</span> <span class='ident'>request</span>;
 <span class='kw'>mod</span> <span class='ident'>response</span>;
 <span class='kw'>mod</span> <span class='ident'>message</span>;
+
+<span class='doccomment'>/// A configured `Server` ready to run.</span>
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>ServerLoop</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>H</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>A</span>: <span class='ident'>Accept</span>, <span class='ident'>H</span>: <span class='ident'>HandlerFactory</span><span class='op'>&lt;</span><span class='ident'>A</span>::<span class='ident'>Output</span><span class='op'>&gt;</span> {
+    <span class='ident'>inner</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span>(<span class='ident'>rotor</span>::<span class='ident'>Loop</span><span class='op'>&lt;</span><span class='ident'>ServerFsm</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>H</span><span class='op'>&gt;&gt;</span>, <span class='ident'>Context</span><span class='op'>&lt;</span><span class='ident'>H</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>,
+}
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Accept</span>, <span class='ident'>H</span>: <span class='ident'>HandlerFactory</span><span class='op'>&lt;</span><span class='ident'>A</span>::<span class='ident'>Output</span><span class='op'>&gt;&gt;</span> <span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='kw'>for</span> <span class='ident'>ServerLoop</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>H</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
+        <span class='ident'>f</span>.<span class='ident'>pad</span>(<span class='string'>&quot;ServerLoop&quot;</span>)
+    }
+}
 
 <span class='doccomment'>/// A Server that can accept incoming network requests.</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
@@ -511,8 +492,8 @@
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Server</span><span class='op'>&lt;</span><span class='ident'>HttpListener</span><span class='op'>&gt;</span> {
-    <span class='doccomment'>/// Creates a new HTTP server listening on the provided address.</span>
+<span class='kw'>impl</span> <span class='ident'>Server</span><span class='op'>&lt;</span><span class='ident'>HttpListener</span><span class='op'>&gt;</span> { <span class='comment'>//&lt;H: HandlerFactory&lt;&lt;HttpListener as Accept&gt;::Output&gt;&gt; Server&lt;HttpListener, H&gt; {</span>
+    <span class='doccomment'>/// Creates a new HTTP server config listening on the provided address.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>http</span>(<span class='ident'>addr</span>: <span class='kw-2'>&amp;</span><span class='ident'>SocketAddr</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Server</span><span class='op'>&lt;</span><span class='ident'>HttpListener</span><span class='op'>&gt;&gt;</span> {
         <span class='kw'>use</span> ::<span class='ident'>rotor</span>::<span class='ident'>mio</span>::<span class='ident'>tcp</span>::<span class='ident'>TcpListener</span>;
         <span class='ident'>TcpListener</span>::<span class='ident'>bind</span>(<span class='ident'>addr</span>)
@@ -523,8 +504,8 @@
 }
 
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>Ssl</span><span class='op'>&gt;</span> <span class='ident'>Server</span><span class='op'>&lt;</span><span class='ident'>HttpsListener</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;&gt;</span> {
-    <span class='doccomment'>/// Creates a new server that will handle `HttpStream`s over SSL.</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>SslServer</span><span class='op'>&gt;</span> <span class='ident'>Server</span><span class='op'>&lt;</span><span class='ident'>HttpsListener</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;&gt;</span> {
+    <span class='doccomment'>/// Creates a new server config that will handle `HttpStream`s over SSL.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// You can use any SSL implementation, as long as implements `hyper::net::Ssl`.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>https</span>(<span class='ident'>addr</span>: <span class='kw-2'>&amp;</span><span class='ident'>SocketAddr</span>, <span class='ident'>ssl</span>: <span class='ident'>S</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Server</span><span class='op'>&lt;</span><span class='ident'>HttpsListener</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span> {
@@ -535,38 +516,59 @@
 }
 
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Accept</span> <span class='op'>+</span> <span class='ident'>Send</span> <span class='op'>+</span> <span class='lifetime'>&#39;static</span><span class='op'>&gt;</span> <span class='ident'>Server</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>A</span>::<span class='ident'>Output</span>: <span class='ident'>Transport</span>  {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Accept</span><span class='op'>&gt;</span> <span class='ident'>Server</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>A</span>::<span class='ident'>Output</span>: <span class='ident'>Transport</span>  {
     <span class='doccomment'>/// Binds to a socket and starts handling connections.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>handle</span><span class='op'>&lt;</span><span class='ident'>H</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>factory</span>: <span class='ident'>H</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Listening</span><span class='op'>&gt;</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>handle</span><span class='op'>&lt;</span><span class='ident'>H</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>factory</span>: <span class='ident'>H</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(<span class='ident'>Listening</span>, <span class='ident'>ServerLoop</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>H</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>
     <span class='kw'>where</span> <span class='ident'>H</span>: <span class='ident'>HandlerFactory</span><span class='op'>&lt;</span><span class='ident'>A</span>::<span class='ident'>Output</span><span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>addr</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>listener</span>.<span class='ident'>local_addr</span>());
-        <span class='kw'>let</span> (<span class='ident'>notifier_tx</span>, <span class='ident'>notifier_rx</span>) <span class='op'>=</span> <span class='ident'>mpsc</span>::<span class='ident'>channel</span>();
         <span class='kw'>let</span> <span class='ident'>shutdown</span> <span class='op'>=</span> <span class='ident'>Arc</span>::<span class='ident'>new</span>(<span class='ident'>AtomicBool</span>::<span class='ident'>new</span>(<span class='boolval'>false</span>));
         <span class='kw'>let</span> <span class='ident'>shutdown_rx</span> <span class='op'>=</span> <span class='ident'>shutdown</span>.<span class='ident'>clone</span>();
-        <span class='kw'>let</span> <span class='ident'>handle</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>thread</span>::<span class='ident'>Builder</span>::<span class='ident'>new</span>().<span class='ident'>name</span>(<span class='string'>&quot;hyper-server&quot;</span>.<span class='ident'>to_owned</span>()).<span class='ident'>spawn</span>(<span class='kw'>move</span> <span class='op'>||</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>config</span> <span class='op'>=</span> <span class='ident'>rotor</span>::<span class='ident'>Config</span>::<span class='ident'>new</span>();
-            <span class='ident'>config</span>.<span class='ident'>slab_capacity</span>(<span class='self'>self</span>.<span class='ident'>max_sockets</span>);
-            <span class='ident'>config</span>.<span class='ident'>mio</span>().<span class='ident'>notify_capacity</span>(<span class='self'>self</span>.<span class='ident'>max_sockets</span>);
-            <span class='kw'>let</span> <span class='ident'>keep_alive</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>keep_alive</span>;
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>loop_</span> <span class='op'>=</span> <span class='ident'>rotor</span>::<span class='ident'>Loop</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>config</span>).<span class='ident'>unwrap</span>();
+
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>config</span> <span class='op'>=</span> <span class='ident'>rotor</span>::<span class='ident'>Config</span>::<span class='ident'>new</span>();
+        <span class='ident'>config</span>.<span class='ident'>slab_capacity</span>(<span class='self'>self</span>.<span class='ident'>max_sockets</span>);
+        <span class='ident'>config</span>.<span class='ident'>mio</span>().<span class='ident'>notify_capacity</span>(<span class='self'>self</span>.<span class='ident'>max_sockets</span>);
+        <span class='kw'>let</span> <span class='ident'>keep_alive</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>keep_alive</span>;
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>loop_</span> <span class='op'>=</span> <span class='ident'>rotor</span>::<span class='ident'>Loop</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>config</span>).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>notifier</span> <span class='op'>=</span> <span class='prelude-val'>None</span>;
+        {
+            <span class='kw'>let</span> <span class='ident'>notifier</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>notifier</span>;
             <span class='ident'>loop_</span>.<span class='ident'>add_machine_with</span>(<span class='kw'>move</span> <span class='op'>|</span><span class='ident'>scope</span><span class='op'>|</span> {
-                <span class='macro'>rotor_try</span><span class='macro'>!</span>(<span class='ident'>notifier_tx</span>.<span class='ident'>send</span>(<span class='ident'>scope</span>.<span class='ident'>notifier</span>()));
+                <span class='op'>*</span><span class='ident'>notifier</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>scope</span>.<span class='ident'>notifier</span>());
                 <span class='macro'>rotor_try</span><span class='macro'>!</span>(<span class='ident'>scope</span>.<span class='ident'>register</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>listener</span>, <span class='ident'>EventSet</span>::<span class='ident'>readable</span>(), <span class='ident'>PollOpt</span>::<span class='ident'>level</span>()));
                 <span class='ident'>rotor</span>::<span class='ident'>Response</span>::<span class='ident'>ok</span>(<span class='ident'>ServerFsm</span>::<span class='ident'>Listener</span>::<span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>H</span><span class='op'>&gt;</span>(<span class='self'>self</span>.<span class='ident'>listener</span>, <span class='ident'>shutdown_rx</span>))
             }).<span class='ident'>unwrap</span>();
-            <span class='ident'>loop_</span>.<span class='ident'>run</span>(<span class='ident'>Context</span> {
-                <span class='ident'>keep_alive</span>: <span class='ident'>keep_alive</span>,
-                <span class='ident'>factory</span>: <span class='ident'>factory</span>,
-            }).<span class='ident'>unwrap</span>();
-        }));
+        }
+        <span class='kw'>let</span> <span class='ident'>notifier</span> <span class='op'>=</span> <span class='ident'>notifier</span>.<span class='ident'>expect</span>(<span class='string'>&quot;loop.add_machine failed&quot;</span>);
 
-        <span class='kw'>let</span> <span class='ident'>notifier</span> <span class='op'>=</span> <span class='ident'>notifier_rx</span>.<span class='ident'>recv</span>().<span class='ident'>unwrap</span>();
-
-        <span class='prelude-val'>Ok</span>(<span class='ident'>Listening</span> {
+        <span class='kw'>let</span> <span class='ident'>listening</span> <span class='op'>=</span> <span class='ident'>Listening</span> {
             <span class='ident'>addr</span>: <span class='ident'>addr</span>,
             <span class='ident'>shutdown</span>: (<span class='ident'>shutdown</span>, <span class='ident'>notifier</span>),
-            <span class='ident'>handle</span>: <span class='prelude-val'>Some</span>(<span class='ident'>handle</span>),
-        })
+        };
+        <span class='kw'>let</span> <span class='ident'>server</span> <span class='op'>=</span> <span class='ident'>ServerLoop</span> {
+            <span class='ident'>inner</span>: <span class='prelude-val'>Some</span>((<span class='ident'>loop_</span>, <span class='ident'>Context</span> {
+                <span class='ident'>keep_alive</span>: <span class='ident'>keep_alive</span>,
+                <span class='ident'>factory</span>: <span class='ident'>factory</span>
+            }))
+        };
+        <span class='prelude-val'>Ok</span>((<span class='ident'>listening</span>, <span class='ident'>server</span>))
+    }
+}
+
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Accept</span>, <span class='ident'>H</span>: <span class='ident'>HandlerFactory</span><span class='op'>&lt;</span><span class='ident'>A</span>::<span class='ident'>Output</span><span class='op'>&gt;&gt;</span> <span class='ident'>ServerLoop</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>H</span><span class='op'>&gt;</span> {
+    <span class='doccomment'>/// Runs the server forever in this loop.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// This will block the current thread.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>run</span>(<span class='self'>self</span>) {
+        <span class='comment'>// drop will take care of it.</span>
+    }
+}
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Accept</span>, <span class='ident'>H</span>: <span class='ident'>HandlerFactory</span><span class='op'>&lt;</span><span class='ident'>A</span>::<span class='ident'>Output</span><span class='op'>&gt;&gt;</span> <span class='ident'>Drop</span> <span class='kw'>for</span> <span class='ident'>ServerLoop</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>H</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>drop</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
+        <span class='self'>self</span>.<span class='ident'>inner</span>.<span class='ident'>take</span>().<span class='ident'>map</span>(<span class='op'>|</span>(<span class='ident'>loop_</span>, <span class='ident'>ctx</span>)<span class='op'>|</span> {
+            <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>loop_</span>.<span class='ident'>run</span>(<span class='ident'>ctx</span>);
+        });
     }
 }
 
@@ -586,7 +588,6 @@
 <span class='kw'>enum</span> <span class='ident'>ServerFsm</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>H</span><span class='op'>&gt;</span>
 <span class='kw'>where</span> <span class='ident'>A</span>: <span class='ident'>Accept</span>,
       <span class='ident'>A</span>::<span class='ident'>Output</span>: <span class='ident'>Transport</span>,
-      <span class='comment'>//F: http::MessageHandlerFactory&lt;A::Output, Output=message::Message&lt;H::Output, A::Output&gt;&gt;,</span>
       <span class='ident'>H</span>: <span class='ident'>HandlerFactory</span><span class='op'>&lt;</span><span class='ident'>A</span>::<span class='ident'>Output</span><span class='op'>&gt;</span> {
     <span class='ident'>Listener</span>(<span class='ident'>A</span>, <span class='ident'>Arc</span><span class='op'>&lt;</span><span class='ident'>AtomicBool</span><span class='op'>&gt;</span>),
     <span class='ident'>Conn</span>(<span class='ident'>http</span>::<span class='ident'>Conn</span><span class='op'>&lt;</span>(), <span class='ident'>A</span>::<span class='ident'>Output</span>, <span class='ident'>message</span>::<span class='ident'>Message</span><span class='op'>&lt;</span><span class='ident'>H</span>::<span class='ident'>Output</span>, <span class='ident'>A</span>::<span class='ident'>Output</span><span class='op'>&gt;&gt;</span>)
@@ -698,37 +699,34 @@
 
 <span class='doccomment'>/// A handle of the running server.</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Listening</span> {
-    <span class='doccomment'>/// The address this server is listening on.</span>
-    <span class='kw'>pub</span> <span class='ident'>addr</span>: <span class='ident'>SocketAddr</span>,
+    <span class='ident'>addr</span>: <span class='ident'>SocketAddr</span>,
     <span class='ident'>shutdown</span>: (<span class='ident'>Arc</span><span class='op'>&lt;</span><span class='ident'>AtomicBool</span><span class='op'>&gt;</span>, <span class='ident'>rotor</span>::<span class='ident'>Notifier</span>),
-    <span class='ident'>handle</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span>::<span class='ident'>std</span>::<span class='ident'>thread</span>::<span class='ident'>JoinHandle</span><span class='op'>&lt;</span>()<span class='op'>&gt;&gt;</span>,
 }
 
 <span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='kw'>for</span> <span class='ident'>Listening</span> {
     <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
         <span class='ident'>f</span>.<span class='ident'>debug_struct</span>(<span class='string'>&quot;Listening&quot;</span>)
             .<span class='ident'>field</span>(<span class='string'>&quot;addr&quot;</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>addr</span>)
+            .<span class='ident'>field</span>(<span class='string'>&quot;closed&quot;</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>shutdown</span>.<span class='number'>0</span>.<span class='ident'>load</span>(<span class='ident'>Ordering</span>::<span class='ident'>Relaxed</span>))
             .<span class='ident'>finish</span>()
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Drop</span> <span class='kw'>for</span> <span class='ident'>Listening</span> {
-    <span class='kw'>fn</span> <span class='ident'>drop</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='self'>self</span>.<span class='ident'>handle</span>.<span class='ident'>take</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>handle</span><span class='op'>|</span> {
-            <span class='ident'>handle</span>.<span class='ident'>join</span>().<span class='ident'>unwrap</span>();
-        });
+<span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Display</span> <span class='kw'>for</span> <span class='ident'>Listening</span> {
+    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
+        <span class='ident'>fmt</span>::<span class='ident'>Display</span>::<span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>addr</span>, <span class='ident'>f</span>)
     }
 }
 
 <span class='kw'>impl</span> <span class='ident'>Listening</span> {
-    <span class='doccomment'>/// Starts the Server, blocking until it is shutdown.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>forever</span>(<span class='self'>self</span>) {
-
+    <span class='doccomment'>/// The address this server is listening on.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>addr</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>SocketAddr</span> {
+        <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>addr</span>
     }
 
     <span class='doccomment'>/// Stop the server from listening to its socket address.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>close</span>(<span class='self'>self</span>) {
-        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;closing server&quot;</span>);
+        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;closing server {}&quot;</span>, <span class='self'>self</span>);
         <span class='self'>self</span>.<span class='ident'>shutdown</span>.<span class='number'>0</span>.<span class='ident'>store</span>(<span class='boolval'>true</span>, <span class='ident'>Ordering</span>::<span class='ident'>Release</span>);
         <span class='self'>self</span>.<span class='ident'>shutdown</span>.<span class='number'>1</span>.<span class='ident'>wakeup</span>().<span class='ident'>unwrap</span>();
     }
@@ -763,7 +761,7 @@
 
 
 <span class='doccomment'>/// Used to create a `Handler` when a new message is received by the server.</span>
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>HandlerFactory</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Transport</span><span class='op'>&gt;</span>: <span class='ident'>Send</span> <span class='op'>+</span> <span class='lifetime'>&#39;static</span> {
+<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>HandlerFactory</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Transport</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// The `Handler` to use for the incoming message.</span>
     <span class='kw'>type</span> <span class='ident'>Output</span>: <span class='ident'>Handler</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
     <span class='doccomment'>/// Creates the associated `Handler`.</span>
@@ -771,7 +769,7 @@
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>F</span>, <span class='ident'>H</span>, <span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>HandlerFactory</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>F</span>
-<span class='kw'>where</span> <span class='ident'>F</span>: <span class='ident'>FnMut</span>(<span class='ident'>http</span>::<span class='ident'>Control</span>) <span class='op'>-&gt;</span> <span class='ident'>H</span> <span class='op'>+</span> <span class='ident'>Send</span> <span class='op'>+</span> <span class='lifetime'>&#39;static</span>, <span class='ident'>H</span>: <span class='ident'>Handler</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>T</span>: <span class='ident'>Transport</span> {
+<span class='kw'>where</span> <span class='ident'>F</span>: <span class='ident'>FnMut</span>(<span class='ident'>http</span>::<span class='ident'>Control</span>) <span class='op'>-&gt;</span> <span class='ident'>H</span>, <span class='ident'>H</span>: <span class='ident'>Handler</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>T</span>: <span class='ident'>Transport</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>H</span>;
     <span class='kw'>fn</span> <span class='ident'>create</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>ctrl</span>: <span class='ident'>http</span>::<span class='ident'>Control</span>) <span class='op'>-&gt;</span> <span class='ident'>H</span> {
         <span class='self'>self</span>(<span class='ident'>ctrl</span>)
@@ -780,63 +778,7 @@
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='comment'>/*
-    use header::Headers;
-    use method::Method;
-    use mock::MockStream;
-    use status::StatusCode;
-    use uri::RequestUri;
 
-    use super::{Request, Response, Fresh, Handler, Worker};
-
-    #[test]
-    fn test_check_continue_default() {
-        let mut mock = MockStream::with_input(b&quot;\
-            POST /upload HTTP/1.1\r\n\
-            Host: example.domain\r\n\
-            Expect: 100-continue\r\n\
-            Content-Length: 10\r\n\
-            \r\n\
-            1234567890\
-        &quot;);
-
-        fn handle(_: Request, res: Response&lt;Fresh&gt;) {
-            res.start().unwrap().end().unwrap();
-        }
-
-        Worker::new(handle, Default::default()).handle_connection(&amp;mut mock);
-        let cont = b&quot;HTTP/1.1 100 Continue\r\n\r\n&quot;;
-        assert_eq!(&amp;mock.write[..cont.len()], cont);
-        let res = b&quot;HTTP/1.1 200 OK\r\n&quot;;
-        assert_eq!(&amp;mock.write[cont.len()..cont.len() + res.len()], res);
-    }
-
-    #[test]
-    fn test_check_continue_reject() {
-        struct Reject;
-        impl Handler for Reject {
-            fn handle(&amp;self, _: Request, res: Response&lt;Fresh&gt;) {
-                res.start().unwrap().end().unwrap();
-            }
-
-            fn check_continue(&amp;self, _: (&amp;Method, &amp;RequestUri, &amp;Headers)) -&gt; StatusCode {
-                StatusCode::ExpectationFailed
-            }
-        }
-
-        let mut mock = MockStream::with_input(b&quot;\
-            POST /upload HTTP/1.1\r\n\
-            Host: example.domain\r\n\
-            Expect: 100-continue\r\n\
-            Content-Length: 10\r\n\
-            \r\n\
-            1234567890\
-        &quot;);
-
-        Worker::new(Reject, Default::default()).handle_connection(&amp;mut mock);
-        assert_eq!(mock.write, &amp;b&quot;HTTP/1.1 417 Expectation Failed\r\n\r\n&quot;[..]);
-    }
-    */</span>
 }
 </pre>
 </section>

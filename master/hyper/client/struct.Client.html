@@ -57,7 +57,7 @@
 <pre><code class="language-dont_run"># use hyper::Client;
 let client = Client::configure()
     .keep_alive(true)
-    .max_sockets(60_000)
+    .max_sockets(10_000)
     .build().unwrap();
 </code></pre>
 </div></div><h3 class='impl'><code>impl&lt;H: <a class='trait' href='../../hyper/client/trait.Handler.html' title='hyper::client::Handler'>Handler</a>&lt;DefaultConnector::Output&gt;&gt; <a class='struct' href='../../hyper/client/struct.Client.html' title='hyper::client::Client'>Client</a>&lt;H&gt;</code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='type' href='../../hyper/error/type.Result.html' title='hyper::error::Result'>Result</a>&lt;<a class='struct' href='../../hyper/client/struct.Client.html' title='hyper::client::Client'>Client</a>&lt;H&gt;&gt;</code></h4>
