@@ -715,7 +715,7 @@
 }
 
 <span class='doccomment'>/// A notifier to wakeup a socket after having used `Next::wait()`</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>, <span class='ident'>Clone</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Control</span> {
     <span class='ident'>tx</span>: <span class='self'>self</span>::<span class='ident'>channel</span>::<span class='ident'>Sender</span><span class='op'>&lt;</span><span class='ident'>Next</span><span class='op'>&gt;</span>,
 }
