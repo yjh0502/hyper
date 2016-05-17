@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["HttpConnector","A connector for the `http` scheme."],["HttpsConnector","A connector that can protect HTTP streams using SSL."]],"trait":[["Connect","A connector creates a Transport to a remote address.."]]});
