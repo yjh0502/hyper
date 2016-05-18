@@ -332,15 +332,13 @@
 <span id="289">289</span>
 <span id="290">290</span>
 <span id="291">291</span>
-<span id="292">292</span>
-<span id="293">293</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>any</span>::<span class='ident'>Any</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='self'>self</span>, <span class='ident'>Display</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::{<span class='ident'>FromStr</span>, <span class='ident'>from_utf8</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ops</span>::{<span class='ident'>Deref</span>, <span class='ident'>DerefMut</span>};
 <span class='kw'>use</span> <span class='ident'>serialize</span>::<span class='ident'>base64</span>::{<span class='ident'>ToBase64</span>, <span class='ident'>FromBase64</span>, <span class='ident'>Standard</span>, <span class='ident'>Config</span>, <span class='ident'>Newline</span>};
-<span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Header</span>, <span class='ident'>HeaderFormat</span>};
+<span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Header</span>};
 
 <span class='doccomment'>/// `Authorization` header, defined in [RFC7235](https://tools.ietf.org/html/rfc7235#section-4.2)</span>
 <span class='doccomment'>///</span>
@@ -434,9 +432,7 @@
             }
         }
     }
-}
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>Scheme</span> <span class='op'>+</span> <span class='ident'>Any</span><span class='op'>&gt;</span> <span class='ident'>HeaderFormat</span> <span class='kw'>for</span> <span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='op'>&lt;</span><span class='ident'>S</span> <span class='kw'>as</span> <span class='ident'>FromStr</span><span class='op'>&gt;</span>::<span class='prelude-val'>Err</span>: <span class='lifetime'>&#39;static</span> {
     <span class='kw'>fn</span> <span class='ident'>fmt_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>scheme</span>) <span class='op'>=</span> <span class='op'>&lt;</span><span class='ident'>S</span> <span class='kw'>as</span> <span class='ident'>Scheme</span><span class='op'>&gt;</span>::<span class='ident'>scheme</span>() {
             <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{} &quot;</span>, <span class='ident'>scheme</span>))
