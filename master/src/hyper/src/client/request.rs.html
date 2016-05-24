@@ -239,204 +239,436 @@
 <span id="196">196</span>
 <span id="197">197</span>
 <span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Client Requests</span>
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>marker</span>::<span class='ident'>PhantomData</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='self'>self</span>, <span class='ident'>Write</span>};
 
-<span class='kw'>use</span> <span class='ident'>header</span>::<span class='ident'>Headers</span>;
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>RequestHead</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>time</span>::<span class='ident'>Duration</span>;
+
+<span class='kw'>use</span> <span class='ident'>url</span>::<span class='ident'>Url</span>;
+
 <span class='kw'>use</span> <span class='ident'>method</span>::<span class='ident'>Method</span>;
-<span class='kw'>use</span> <span class='ident'>uri</span>::<span class='ident'>RequestUri</span>;
-<span class='kw'>use</span> <span class='ident'>version</span>::<span class='ident'>HttpVersion</span>;
+<span class='kw'>use</span> <span class='ident'>header</span>::<span class='ident'>Headers</span>;
+<span class='kw'>use</span> <span class='ident'>header</span>::<span class='ident'>Host</span>;
+<span class='kw'>use</span> <span class='ident'>net</span>::{<span class='ident'>NetworkStream</span>, <span class='ident'>NetworkConnector</span>, <span class='ident'>DefaultConnector</span>, <span class='ident'>Fresh</span>, <span class='ident'>Streaming</span>};
+<span class='kw'>use</span> <span class='ident'>version</span>;
+<span class='kw'>use</span> <span class='ident'>client</span>::{<span class='ident'>Response</span>, <span class='ident'>get_host_and_port</span>};
 
+<span class='kw'>use</span> <span class='ident'>http</span>::{<span class='ident'>HttpMessage</span>, <span class='ident'>RequestHead</span>};
+<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>h1</span>::<span class='ident'>Http11Message</span>;
 
 
 <span class='doccomment'>/// A client request to a remote server.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Request</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='ident'>head</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='ident'>RequestHead</span>
+<span class='doccomment'>/// The W type tracks the state of the request, Fresh vs Streaming.</span>
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Request</span><span class='op'>&lt;</span><span class='ident'>W</span><span class='op'>&gt;</span> {
+    <span class='doccomment'>/// The target URI for this request.</span>
+    <span class='kw'>pub</span> <span class='ident'>url</span>: <span class='ident'>Url</span>,
+
+    <span class='doccomment'>/// The HTTP version of this request.</span>
+    <span class='kw'>pub</span> <span class='ident'>version</span>: <span class='ident'>version</span>::<span class='ident'>HttpVersion</span>,
+
+    <span class='ident'>message</span>: <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>HttpMessage</span><span class='op'>&gt;</span>,
+    <span class='ident'>headers</span>: <span class='ident'>Headers</span>,
+    <span class='ident'>method</span>: <span class='ident'>Method</span>,
+
+    <span class='ident'>_marker</span>: <span class='ident'>PhantomData</span><span class='op'>&lt;</span><span class='ident'>W</span><span class='op'>&gt;</span>,
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Request</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='doccomment'>/// Read the Request Url.</span>
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>uri</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>RequestUri</span> { <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>head</span>.<span class='ident'>subject</span>.<span class='number'>1</span> }
-
-    <span class='doccomment'>/// Readthe Request Version.</span>
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>version</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>HttpVersion</span> { <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>head</span>.<span class='ident'>version</span> }
-
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>W</span><span class='op'>&gt;</span> <span class='ident'>Request</span><span class='op'>&lt;</span><span class='ident'>W</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Read the Request headers.</span>
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>headers</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>Headers</span> { <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>head</span>.<span class='ident'>headers</span> }
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>headers</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>Headers</span> { <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>headers</span> }
 
     <span class='doccomment'>/// Read the Request method.</span>
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>method</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>Method</span> { <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>head</span>.<span class='ident'>subject</span>.<span class='number'>0</span> }
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>method</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Method</span> { <span class='self'>self</span>.<span class='ident'>method</span>.<span class='ident'>clone</span>() }
 
-    <span class='doccomment'>/// Set the Method of this request.</span>
+    <span class='doccomment'>/// Set the write timeout.</span>
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_method</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>method</span>: <span class='ident'>Method</span>) { <span class='self'>self</span>.<span class='ident'>head</span>.<span class='ident'>subject</span>.<span class='number'>0</span> <span class='op'>=</span> <span class='ident'>method</span>; }
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_write_timeout</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>dur</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Duration</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>message</span>.<span class='ident'>set_write_timeout</span>(<span class='ident'>dur</span>)
+    }
+
+    <span class='doccomment'>/// Set the read timeout.</span>
+    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_read_timeout</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>dur</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Duration</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>message</span>.<span class='ident'>set_read_timeout</span>(<span class='ident'>dur</span>)
+    }
+}
+
+<span class='kw'>impl</span> <span class='ident'>Request</span><span class='op'>&lt;</span><span class='ident'>Fresh</span><span class='op'>&gt;</span> {
+    <span class='doccomment'>/// Create a new `Request&lt;Fresh&gt;` that will use the given `HttpMessage` for its communication</span>
+    <span class='doccomment'>/// with the server. This implies that the given `HttpMessage` instance has already been</span>
+    <span class='doccomment'>/// properly initialized by the caller (e.g. a TCP connection&#39;s already established).</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_message</span>(<span class='ident'>method</span>: <span class='ident'>Method</span>, <span class='ident'>url</span>: <span class='ident'>Url</span>, <span class='ident'>message</span>: <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>HttpMessage</span><span class='op'>&gt;</span>)
+            <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Request</span><span class='op'>&lt;</span><span class='ident'>Fresh</span><span class='op'>&gt;&gt;</span> {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='ident'>Headers</span>::<span class='ident'>new</span>();
+        {
+            <span class='kw'>let</span> (<span class='ident'>host</span>, <span class='ident'>port</span>) <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>get_host_and_port</span>(<span class='kw-2'>&amp;</span><span class='ident'>url</span>));
+            <span class='ident'>headers</span>.<span class='ident'>set</span>(<span class='ident'>Host</span> {
+                <span class='ident'>hostname</span>: <span class='ident'>host</span>.<span class='ident'>to_owned</span>(),
+                <span class='ident'>port</span>: <span class='prelude-val'>Some</span>(<span class='ident'>port</span>),
+            });
+        }
+
+        <span class='prelude-val'>Ok</span>(<span class='ident'>Request</span>::<span class='ident'>with_headers_and_message</span>(<span class='ident'>method</span>, <span class='ident'>url</span>, <span class='ident'>headers</span>, <span class='ident'>message</span>))
+    }
+
+    <span class='attribute'>#[<span class='ident'>doc</span>(<span class='ident'>hidden</span>)]</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_headers_and_message</span>(<span class='ident'>method</span>: <span class='ident'>Method</span>, <span class='ident'>url</span>: <span class='ident'>Url</span>, <span class='ident'>headers</span>: <span class='ident'>Headers</span>,  <span class='ident'>message</span>: <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>HttpMessage</span><span class='op'>&gt;</span>)
+                <span class='op'>-&gt;</span> <span class='ident'>Request</span><span class='op'>&lt;</span><span class='ident'>Fresh</span><span class='op'>&gt;</span> {
+        <span class='ident'>Request</span> {
+            <span class='ident'>method</span>: <span class='ident'>method</span>,
+            <span class='ident'>headers</span>: <span class='ident'>headers</span>,
+            <span class='ident'>url</span>: <span class='ident'>url</span>,
+            <span class='ident'>version</span>: <span class='ident'>version</span>::<span class='ident'>HttpVersion</span>::<span class='ident'>Http11</span>,
+            <span class='ident'>message</span>: <span class='ident'>message</span>,
+            <span class='ident'>_marker</span>: <span class='ident'>PhantomData</span>,
+        }
+    }
+
+    <span class='doccomment'>/// Create a new client request.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>method</span>: <span class='ident'>Method</span>, <span class='ident'>url</span>: <span class='ident'>Url</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Request</span><span class='op'>&lt;</span><span class='ident'>Fresh</span><span class='op'>&gt;&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>conn</span> <span class='op'>=</span> <span class='ident'>DefaultConnector</span>::<span class='ident'>default</span>();
+        <span class='ident'>Request</span>::<span class='ident'>with_connector</span>(<span class='ident'>method</span>, <span class='ident'>url</span>, <span class='kw-2'>&amp;</span><span class='ident'>conn</span>)
+    }
+
+    <span class='doccomment'>/// Create a new client request with a specific underlying NetworkStream.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_connector</span><span class='op'>&lt;</span><span class='ident'>C</span>, <span class='ident'>S</span><span class='op'>&gt;</span>(<span class='ident'>method</span>: <span class='ident'>Method</span>, <span class='ident'>url</span>: <span class='ident'>Url</span>, <span class='ident'>connector</span>: <span class='kw-2'>&amp;</span><span class='ident'>C</span>)
+        <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Request</span><span class='op'>&lt;</span><span class='ident'>Fresh</span><span class='op'>&gt;&gt;</span> <span class='kw'>where</span>
+        <span class='ident'>C</span>: <span class='ident'>NetworkConnector</span><span class='op'>&lt;</span><span class='ident'>Stream</span><span class='op'>=</span><span class='ident'>S</span><span class='op'>&gt;</span>,
+        <span class='ident'>S</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>NetworkStream</span> <span class='op'>+</span> <span class='ident'>Send</span><span class='op'>&gt;&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>stream</span> <span class='op'>=</span> {
+            <span class='kw'>let</span> (<span class='ident'>host</span>, <span class='ident'>port</span>) <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>get_host_and_port</span>(<span class='kw-2'>&amp;</span><span class='ident'>url</span>));
+            <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>connector</span>.<span class='ident'>connect</span>(<span class='ident'>host</span>, <span class='ident'>port</span>, <span class='ident'>url</span>.<span class='ident'>scheme</span>())).<span class='ident'>into</span>()
+        };
+
+        <span class='ident'>Request</span>::<span class='ident'>with_message</span>(<span class='ident'>method</span>, <span class='ident'>url</span>, <span class='ident'>Box</span>::<span class='ident'>new</span>(<span class='ident'>Http11Message</span>::<span class='ident'>with_stream</span>(<span class='ident'>stream</span>)))
+    }
+
+    <span class='doccomment'>/// Consume a Fresh Request, writing the headers and method,</span>
+    <span class='doccomment'>/// returning a Streaming Request.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>start</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Request</span><span class='op'>&lt;</span><span class='ident'>Streaming</span><span class='op'>&gt;&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>head</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>message</span>.<span class='ident'>set_outgoing</span>(<span class='ident'>RequestHead</span> {
+            <span class='ident'>headers</span>: <span class='self'>self</span>.<span class='ident'>headers</span>,
+            <span class='ident'>method</span>: <span class='self'>self</span>.<span class='ident'>method</span>,
+            <span class='ident'>url</span>: <span class='self'>self</span>.<span class='ident'>url</span>,
+        }) {
+            <span class='prelude-val'>Ok</span>(<span class='ident'>head</span>) <span class='op'>=&gt;</span> <span class='ident'>head</span>,
+            <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> {
+                <span class='kw'>let</span> _ <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>message</span>.<span class='ident'>close_connection</span>();
+                <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>From</span>::<span class='ident'>from</span>(<span class='ident'>e</span>));
+            }
+        };
+
+        <span class='prelude-val'>Ok</span>(<span class='ident'>Request</span> {
+            <span class='ident'>method</span>: <span class='ident'>head</span>.<span class='ident'>method</span>,
+            <span class='ident'>headers</span>: <span class='ident'>head</span>.<span class='ident'>headers</span>,
+            <span class='ident'>url</span>: <span class='ident'>head</span>.<span class='ident'>url</span>,
+            <span class='ident'>version</span>: <span class='self'>self</span>.<span class='ident'>version</span>,
+            <span class='ident'>message</span>: <span class='self'>self</span>.<span class='ident'>message</span>,
+            <span class='ident'>_marker</span>: <span class='ident'>PhantomData</span>,
+        })
+    }
 
     <span class='doccomment'>/// Get a mutable reference to the Request headers.</span>
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>headers_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Headers</span> { <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>head</span>.<span class='ident'>headers</span> }
-
-    <span class='doccomment'>/// Set the `RequestUri` of this request.</span>
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_uri</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>uri</span>: <span class='ident'>RequestUri</span>) { <span class='self'>self</span>.<span class='ident'>head</span>.<span class='ident'>subject</span>.<span class='number'>1</span> <span class='op'>=</span> <span class='ident'>uri</span>; }
-
-    <span class='doccomment'>/// Set the `HttpVersion` of this request.</span>
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_version</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>version</span>: <span class='ident'>HttpVersion</span>) { <span class='self'>self</span>.<span class='ident'>head</span>.<span class='ident'>version</span> <span class='op'>=</span> <span class='ident'>version</span>; }
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>headers_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Headers</span> { <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>headers</span> }
 }
 
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>head</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>RequestHead</span>) <span class='op'>-&gt;</span> <span class='ident'>Request</span> {
-    <span class='ident'>Request</span> { <span class='ident'>head</span>: <span class='ident'>head</span> }
+
+
+<span class='kw'>impl</span> <span class='ident'>Request</span><span class='op'>&lt;</span><span class='ident'>Streaming</span><span class='op'>&gt;</span> {
+    <span class='doccomment'>/// Completes writing the request, and returns a response to read from.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Consumes the Request.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>send</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Response</span><span class='op'>&gt;</span> {
+        <span class='ident'>Response</span>::<span class='ident'>with_message</span>(<span class='self'>self</span>.<span class='ident'>url</span>, <span class='self'>self</span>.<span class='ident'>message</span>)
+    }
+}
+
+<span class='kw'>impl</span> <span class='ident'>Write</span> <span class='kw'>for</span> <span class='ident'>Request</span><span class='op'>&lt;</span><span class='ident'>Streaming</span><span class='op'>&gt;</span> {
+    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>write</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>msg</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> {
+        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>message</span>.<span class='ident'>write</span>(<span class='ident'>msg</span>) {
+            <span class='prelude-val'>Ok</span>(<span class='ident'>n</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>n</span>),
+            <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> {
+                <span class='kw'>let</span> _ <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>message</span>.<span class='ident'>close_connection</span>();
+                <span class='prelude-val'>Err</span>(<span class='ident'>e</span>)
+            }
+        }
+    }
+
+    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>flush</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
+        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>message</span>.<span class='ident'>flush</span>() {
+            <span class='prelude-val'>Ok</span>(<span class='ident'>r</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>r</span>),
+            <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> {
+                <span class='kw'>let</span> _ <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>message</span>.<span class='ident'>close_connection</span>();
+                <span class='prelude-val'>Err</span>(<span class='ident'>e</span>)
+            }
+        }
+    }
 }
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='comment'>/*
-    use std::io::Write;
-    use std::str::from_utf8;
-    use url::Url;
-    use method::Method::{Get, Head, Post};
-    use mock::{MockStream, MockConnector};
-    use net::Fresh;
-    use header::{ContentLength,TransferEncoding,Encoding};
-    use url::form_urlencoded;
-    use super::Request;
-    use http::h1::Http11Message;
+    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::<span class='ident'>Write</span>;
+    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::<span class='ident'>from_utf8</span>;
+    <span class='kw'>use</span> <span class='ident'>url</span>::<span class='ident'>Url</span>;
+    <span class='kw'>use</span> <span class='ident'>method</span>::<span class='ident'>Method</span>::{<span class='ident'>Get</span>, <span class='ident'>Head</span>, <span class='ident'>Post</span>};
+    <span class='kw'>use</span> <span class='ident'>mock</span>::{<span class='ident'>MockStream</span>, <span class='ident'>MockConnector</span>};
+    <span class='kw'>use</span> <span class='ident'>net</span>::<span class='ident'>Fresh</span>;
+    <span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>ContentLength</span>,<span class='ident'>TransferEncoding</span>,<span class='ident'>Encoding</span>};
+    <span class='kw'>use</span> <span class='ident'>url</span>::<span class='ident'>form_urlencoded</span>;
+    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>Request</span>;
+    <span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>h1</span>::<span class='ident'>Http11Message</span>;
 
-    fn run_request(req: Request&lt;Fresh&gt;) -&gt; Vec&lt;u8&gt; {
-        let req = req.start().unwrap();
-        let message = req.message;
-        let mut message = message.downcast::&lt;Http11Message&gt;().ok().unwrap();
-        message.flush_outgoing().unwrap();
-        let stream = *message
-            .into_inner().downcast::&lt;MockStream&gt;().ok().unwrap();
-        stream.write
+    <span class='kw'>fn</span> <span class='ident'>run_request</span>(<span class='ident'>req</span>: <span class='ident'>Request</span><span class='op'>&lt;</span><span class='ident'>Fresh</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>req</span> <span class='op'>=</span> <span class='ident'>req</span>.<span class='ident'>start</span>().<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='ident'>message</span> <span class='op'>=</span> <span class='ident'>req</span>.<span class='ident'>message</span>;
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>message</span> <span class='op'>=</span> <span class='ident'>message</span>.<span class='ident'>downcast</span>::<span class='op'>&lt;</span><span class='ident'>Http11Message</span><span class='op'>&gt;</span>().<span class='ident'>ok</span>().<span class='ident'>unwrap</span>();
+        <span class='ident'>message</span>.<span class='ident'>flush_outgoing</span>().<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='ident'>stream</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>message</span>
+            .<span class='ident'>into_inner</span>().<span class='ident'>downcast</span>::<span class='op'>&lt;</span><span class='ident'>MockStream</span><span class='op'>&gt;</span>().<span class='ident'>ok</span>().<span class='ident'>unwrap</span>();
+        <span class='ident'>stream</span>.<span class='ident'>write</span>
     }
 
-    fn assert_no_body(s: &amp;str) {
-        assert!(!s.contains(&quot;Content-Length:&quot;));
-        assert!(!s.contains(&quot;Transfer-Encoding:&quot;));
+    <span class='kw'>fn</span> <span class='ident'>assert_no_body</span>(<span class='ident'>s</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) {
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>s</span>.<span class='ident'>contains</span>(<span class='string'>&quot;Content-Length:&quot;</span>));
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>s</span>.<span class='ident'>contains</span>(<span class='string'>&quot;Transfer-Encoding:&quot;</span>));
     }
 
-    #[test]
-    fn test_get_empty_body() {
-        let req = Request::with_connector(
-            Get, Url::parse(&quot;http://example.dom&quot;).unwrap(), &amp;mut MockConnector
-        ).unwrap();
-        let bytes = run_request(req);
-        let s = from_utf8(&amp;bytes[..]).unwrap();
-        assert_no_body(s);
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_get_empty_body</span>() {
+        <span class='kw'>let</span> <span class='ident'>req</span> <span class='op'>=</span> <span class='ident'>Request</span>::<span class='ident'>with_connector</span>(
+            <span class='ident'>Get</span>, <span class='ident'>Url</span>::<span class='ident'>parse</span>(<span class='string'>&quot;http://example.dom&quot;</span>).<span class='ident'>unwrap</span>(), <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>MockConnector</span>
+        ).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='ident'>bytes</span> <span class='op'>=</span> <span class='ident'>run_request</span>(<span class='ident'>req</span>);
+        <span class='kw'>let</span> <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>from_utf8</span>(<span class='kw-2'>&amp;</span><span class='ident'>bytes</span>[..]).<span class='ident'>unwrap</span>();
+        <span class='ident'>assert_no_body</span>(<span class='ident'>s</span>);
     }
 
-    #[test]
-    fn test_head_empty_body() {
-        let req = Request::with_connector(
-            Head, Url::parse(&quot;http://example.dom&quot;).unwrap(), &amp;mut MockConnector
-        ).unwrap();
-        let bytes = run_request(req);
-        let s = from_utf8(&amp;bytes[..]).unwrap();
-        assert_no_body(s);
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_head_empty_body</span>() {
+        <span class='kw'>let</span> <span class='ident'>req</span> <span class='op'>=</span> <span class='ident'>Request</span>::<span class='ident'>with_connector</span>(
+            <span class='ident'>Head</span>, <span class='ident'>Url</span>::<span class='ident'>parse</span>(<span class='string'>&quot;http://example.dom&quot;</span>).<span class='ident'>unwrap</span>(), <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>MockConnector</span>
+        ).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='ident'>bytes</span> <span class='op'>=</span> <span class='ident'>run_request</span>(<span class='ident'>req</span>);
+        <span class='kw'>let</span> <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>from_utf8</span>(<span class='kw-2'>&amp;</span><span class='ident'>bytes</span>[..]).<span class='ident'>unwrap</span>();
+        <span class='ident'>assert_no_body</span>(<span class='ident'>s</span>);
     }
 
-    #[test]
-    fn test_url_query() {
-        let url = Url::parse(&quot;http://example.dom?q=value&quot;).unwrap();
-        let req = Request::with_connector(
-            Get, url, &amp;mut MockConnector
-        ).unwrap();
-        let bytes = run_request(req);
-        let s = from_utf8(&amp;bytes[..]).unwrap();
-        assert!(s.contains(&quot;?q=value&quot;));
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_url_query</span>() {
+        <span class='kw'>let</span> <span class='ident'>url</span> <span class='op'>=</span> <span class='ident'>Url</span>::<span class='ident'>parse</span>(<span class='string'>&quot;http://example.dom?q=value&quot;</span>).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='ident'>req</span> <span class='op'>=</span> <span class='ident'>Request</span>::<span class='ident'>with_connector</span>(
+            <span class='ident'>Get</span>, <span class='ident'>url</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>MockConnector</span>
+        ).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='ident'>bytes</span> <span class='op'>=</span> <span class='ident'>run_request</span>(<span class='ident'>req</span>);
+        <span class='kw'>let</span> <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>from_utf8</span>(<span class='kw-2'>&amp;</span><span class='ident'>bytes</span>[..]).<span class='ident'>unwrap</span>();
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>s</span>.<span class='ident'>contains</span>(<span class='string'>&quot;?q=value&quot;</span>));
     }
 
-    #[test]
-    fn test_post_content_length() {
-        let url = Url::parse(&quot;http://example.dom&quot;).unwrap();
-        let mut req = Request::with_connector(
-            Post, url, &amp;mut MockConnector
-        ).unwrap();
-        let mut body = String::new();
-        form_urlencoded::Serializer::new(&amp;mut body).append_pair(&quot;q&quot;, &quot;value&quot;);
-        req.headers_mut().set(ContentLength(body.len() as u64));
-        let bytes = run_request(req);
-        let s = from_utf8(&amp;bytes[..]).unwrap();
-        assert!(s.contains(&quot;Content-Length:&quot;));
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_post_content_length</span>() {
+        <span class='kw'>let</span> <span class='ident'>url</span> <span class='op'>=</span> <span class='ident'>Url</span>::<span class='ident'>parse</span>(<span class='string'>&quot;http://example.dom&quot;</span>).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>req</span> <span class='op'>=</span> <span class='ident'>Request</span>::<span class='ident'>with_connector</span>(
+            <span class='ident'>Post</span>, <span class='ident'>url</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>MockConnector</span>
+        ).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>body</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
+        <span class='ident'>form_urlencoded</span>::<span class='ident'>Serializer</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>body</span>).<span class='ident'>append_pair</span>(<span class='string'>&quot;q&quot;</span>, <span class='string'>&quot;value&quot;</span>);
+        <span class='ident'>req</span>.<span class='ident'>headers_mut</span>().<span class='ident'>set</span>(<span class='ident'>ContentLength</span>(<span class='ident'>body</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u64</span>));
+        <span class='kw'>let</span> <span class='ident'>bytes</span> <span class='op'>=</span> <span class='ident'>run_request</span>(<span class='ident'>req</span>);
+        <span class='kw'>let</span> <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>from_utf8</span>(<span class='kw-2'>&amp;</span><span class='ident'>bytes</span>[..]).<span class='ident'>unwrap</span>();
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>s</span>.<span class='ident'>contains</span>(<span class='string'>&quot;Content-Length:&quot;</span>));
     }
 
-    #[test]
-    fn test_post_chunked() {
-        let url = Url::parse(&quot;http://example.dom&quot;).unwrap();
-        let req = Request::with_connector(
-            Post, url, &amp;mut MockConnector
-        ).unwrap();
-        let bytes = run_request(req);
-        let s = from_utf8(&amp;bytes[..]).unwrap();
-        assert!(!s.contains(&quot;Content-Length:&quot;));
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_post_chunked</span>() {
+        <span class='kw'>let</span> <span class='ident'>url</span> <span class='op'>=</span> <span class='ident'>Url</span>::<span class='ident'>parse</span>(<span class='string'>&quot;http://example.dom&quot;</span>).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='ident'>req</span> <span class='op'>=</span> <span class='ident'>Request</span>::<span class='ident'>with_connector</span>(
+            <span class='ident'>Post</span>, <span class='ident'>url</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>MockConnector</span>
+        ).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='ident'>bytes</span> <span class='op'>=</span> <span class='ident'>run_request</span>(<span class='ident'>req</span>);
+        <span class='kw'>let</span> <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>from_utf8</span>(<span class='kw-2'>&amp;</span><span class='ident'>bytes</span>[..]).<span class='ident'>unwrap</span>();
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>s</span>.<span class='ident'>contains</span>(<span class='string'>&quot;Content-Length:&quot;</span>));
     }
 
-    #[test]
-    fn test_host_header() {
-        let url = Url::parse(&quot;http://example.dom&quot;).unwrap();
-        let req = Request::with_connector(
-            Get, url, &amp;mut MockConnector
-        ).unwrap();
-        let bytes = run_request(req);
-        let s = from_utf8(&amp;bytes[..]).unwrap();
-        assert!(s.contains(&quot;Host: example.dom&quot;));
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_host_header</span>() {
+        <span class='kw'>let</span> <span class='ident'>url</span> <span class='op'>=</span> <span class='ident'>Url</span>::<span class='ident'>parse</span>(<span class='string'>&quot;http://example.dom&quot;</span>).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='ident'>req</span> <span class='op'>=</span> <span class='ident'>Request</span>::<span class='ident'>with_connector</span>(
+            <span class='ident'>Get</span>, <span class='ident'>url</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>MockConnector</span>
+        ).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='ident'>bytes</span> <span class='op'>=</span> <span class='ident'>run_request</span>(<span class='ident'>req</span>);
+        <span class='kw'>let</span> <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>from_utf8</span>(<span class='kw-2'>&amp;</span><span class='ident'>bytes</span>[..]).<span class='ident'>unwrap</span>();
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>s</span>.<span class='ident'>contains</span>(<span class='string'>&quot;Host: example.dom&quot;</span>));
     }
 
-    #[test]
-    fn test_proxy() {
-        let url = Url::parse(&quot;http://example.dom&quot;).unwrap();
-        let mut req = Request::with_connector(
-            Get, url, &amp;mut MockConnector
-        ).unwrap();
-        req.message.set_proxied(true);
-        let bytes = run_request(req);
-        let s = from_utf8(&amp;bytes[..]).unwrap();
-        let request_line = &quot;GET http://example.dom/ HTTP/1.1&quot;;
-        assert_eq!(&amp;s[..request_line.len()], request_line);
-        assert!(s.contains(&quot;Host: example.dom&quot;));
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_proxy</span>() {
+        <span class='kw'>let</span> <span class='ident'>url</span> <span class='op'>=</span> <span class='ident'>Url</span>::<span class='ident'>parse</span>(<span class='string'>&quot;http://example.dom&quot;</span>).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>req</span> <span class='op'>=</span> <span class='ident'>Request</span>::<span class='ident'>with_connector</span>(
+            <span class='ident'>Get</span>, <span class='ident'>url</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>MockConnector</span>
+        ).<span class='ident'>unwrap</span>();
+        <span class='ident'>req</span>.<span class='ident'>message</span>.<span class='ident'>set_proxied</span>(<span class='boolval'>true</span>);
+        <span class='kw'>let</span> <span class='ident'>bytes</span> <span class='op'>=</span> <span class='ident'>run_request</span>(<span class='ident'>req</span>);
+        <span class='kw'>let</span> <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>from_utf8</span>(<span class='kw-2'>&amp;</span><span class='ident'>bytes</span>[..]).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='ident'>request_line</span> <span class='op'>=</span> <span class='string'>&quot;GET http://example.dom/ HTTP/1.1&quot;</span>;
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='ident'>s</span>[..<span class='ident'>request_line</span>.<span class='ident'>len</span>()], <span class='ident'>request_line</span>);
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>s</span>.<span class='ident'>contains</span>(<span class='string'>&quot;Host: example.dom&quot;</span>));
     }
 
-    #[test]
-    fn test_post_chunked_with_encoding() {
-        let url = Url::parse(&quot;http://example.dom&quot;).unwrap();
-        let mut req = Request::with_connector(
-            Post, url, &amp;mut MockConnector
-        ).unwrap();
-        req.headers_mut().set(TransferEncoding(vec![Encoding::Chunked]));
-        let bytes = run_request(req);
-        let s = from_utf8(&amp;bytes[..]).unwrap();
-        assert!(!s.contains(&quot;Content-Length:&quot;));
-        assert!(s.contains(&quot;Transfer-Encoding:&quot;));
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_post_chunked_with_encoding</span>() {
+        <span class='kw'>let</span> <span class='ident'>url</span> <span class='op'>=</span> <span class='ident'>Url</span>::<span class='ident'>parse</span>(<span class='string'>&quot;http://example.dom&quot;</span>).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>req</span> <span class='op'>=</span> <span class='ident'>Request</span>::<span class='ident'>with_connector</span>(
+            <span class='ident'>Post</span>, <span class='ident'>url</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>MockConnector</span>
+        ).<span class='ident'>unwrap</span>();
+        <span class='ident'>req</span>.<span class='ident'>headers_mut</span>().<span class='ident'>set</span>(<span class='ident'>TransferEncoding</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>Encoding</span>::<span class='ident'>Chunked</span>]));
+        <span class='kw'>let</span> <span class='ident'>bytes</span> <span class='op'>=</span> <span class='ident'>run_request</span>(<span class='ident'>req</span>);
+        <span class='kw'>let</span> <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>from_utf8</span>(<span class='kw-2'>&amp;</span><span class='ident'>bytes</span>[..]).<span class='ident'>unwrap</span>();
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>s</span>.<span class='ident'>contains</span>(<span class='string'>&quot;Content-Length:&quot;</span>));
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>s</span>.<span class='ident'>contains</span>(<span class='string'>&quot;Transfer-Encoding:&quot;</span>));
     }
 
-    #[test]
-    fn test_write_error_closes() {
-        let url = Url::parse(&quot;http://hyper.rs&quot;).unwrap();
-        let req = Request::with_connector(
-            Get, url, &amp;mut MockConnector
-        ).unwrap();
-        let mut req = req.start().unwrap();
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_write_error_closes</span>() {
+        <span class='kw'>let</span> <span class='ident'>url</span> <span class='op'>=</span> <span class='ident'>Url</span>::<span class='ident'>parse</span>(<span class='string'>&quot;http://hyper.rs&quot;</span>).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='ident'>req</span> <span class='op'>=</span> <span class='ident'>Request</span>::<span class='ident'>with_connector</span>(
+            <span class='ident'>Get</span>, <span class='ident'>url</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>MockConnector</span>
+        ).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>req</span> <span class='op'>=</span> <span class='ident'>req</span>.<span class='ident'>start</span>().<span class='ident'>unwrap</span>();
 
-        req.message.downcast_mut::&lt;Http11Message&gt;().unwrap()
-            .get_mut().downcast_mut::&lt;MockStream&gt;().unwrap()
-            .error_on_write = true;
+        <span class='ident'>req</span>.<span class='ident'>message</span>.<span class='ident'>downcast_mut</span>::<span class='op'>&lt;</span><span class='ident'>Http11Message</span><span class='op'>&gt;</span>().<span class='ident'>unwrap</span>()
+            .<span class='ident'>get_mut</span>().<span class='ident'>downcast_mut</span>::<span class='op'>&lt;</span><span class='ident'>MockStream</span><span class='op'>&gt;</span>().<span class='ident'>unwrap</span>()
+            .<span class='ident'>error_on_write</span> <span class='op'>=</span> <span class='boolval'>true</span>;
 
-        req.write(b&quot;foo&quot;).unwrap();
-        assert!(req.flush().is_err());
+        <span class='ident'>req</span>.<span class='ident'>write</span>(<span class='string'>b&quot;foo&quot;</span>).<span class='ident'>unwrap</span>();
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>req</span>.<span class='ident'>flush</span>().<span class='ident'>is_err</span>());
 
-        assert!(req.message.downcast_ref::&lt;Http11Message&gt;().unwrap()
-            .get_ref().downcast_ref::&lt;MockStream&gt;().unwrap()
-            .is_closed);
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>req</span>.<span class='ident'>message</span>.<span class='ident'>downcast_ref</span>::<span class='op'>&lt;</span><span class='ident'>Http11Message</span><span class='op'>&gt;</span>().<span class='ident'>unwrap</span>()
+            .<span class='ident'>get_ref</span>().<span class='ident'>downcast_ref</span>::<span class='op'>&lt;</span><span class='ident'>MockStream</span><span class='op'>&gt;</span>().<span class='ident'>unwrap</span>()
+            .<span class='ident'>is_closed</span>);
     }
-    */</span>
 }
 </pre>
 </section>
