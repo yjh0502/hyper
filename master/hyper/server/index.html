@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
+    
 
     
     
@@ -43,73 +44,66 @@
 
     <section id='main' class="content mod">
 <h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>hyper</a>::<wbr><a class='mod' href=''>server</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-7429' class='srclink' href='../../src/hyper/src/server/mod.rs.html#1-369' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-7418' class='srclink' href='../../src/hyper/src/server/mod.rs.html#1-369' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>HTTP Server</p>
 
 <p>A <code>Server</code> is created to listen on a port, parse HTTP requests, and hand
 them off to a <code>Handler</code>.</p>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
-                    <tr class=' module-item'>
-                        <td><a class='struct' href='struct.Listening.html'
-                               title='hyper::server::Listening'>Listening</a></td>
-                        <td class='docblock short'>
-                             <p>A handle of the running server.</p>
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='struct' href='struct.Request.html'
-                               title='hyper::server::Request'>Request</a></td>
-                        <td class='docblock short'>
-                             <p>A request bundles several parts of an incoming <code>NetworkStream</code>, given to a <code>Handler</code>.</p>
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='struct' href='struct.Response.html'
-                               title='hyper::server::Response'>Response</a></td>
-                        <td class='docblock short'>
-                             <p>The outgoing half for a Tcp connection, created by a <code>Server</code> and given to a <code>Handler</code>.</p>
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='struct' href='struct.Server.html'
-                               title='hyper::server::Server'>Server</a></td>
-                        <td class='docblock short'>
-                             <p>A Server that can accept incoming network requests.</p>
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='struct' href='struct.ServerLoop.html'
-                               title='hyper::server::ServerLoop'>ServerLoop</a></td>
-                        <td class='docblock short'>
-                             <p>A configured <code>Server</code> ready to run.</p>
-                        </td>
-                    </tr>
-                </table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.Listening.html'
+                                  title='hyper::server::Listening'>Listening</a></td>
+                           <td class='docblock short'>
+                                <p>A handle of the running server.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.Request.html'
+                                  title='hyper::server::Request'>Request</a></td>
+                           <td class='docblock short'>
+                                <p>A request bundles several parts of an incoming <code>NetworkStream</code>, given to a <code>Handler</code>.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.Response.html'
+                                  title='hyper::server::Response'>Response</a></td>
+                           <td class='docblock short'>
+                                <p>The outgoing half for a Tcp connection, created by a <code>Server</code> and given to a <code>Handler</code>.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.Server.html'
+                                  title='hyper::server::Server'>Server</a></td>
+                           <td class='docblock short'>
+                                <p>A Server that can accept incoming network requests.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.ServerLoop.html'
+                                  title='hyper::server::ServerLoop'>ServerLoop</a></td>
+                           <td class='docblock short'>
+                                <p>A configured <code>Server</code> ready to run.</p>
+                           </td>
+                       </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
 <table>
-                    <tr class=' module-item'>
-                        <td><a class='trait' href='trait.Handler.html'
-                               title='hyper::server::Handler'>Handler</a></td>
-                        <td class='docblock short'>
-                             <p>A trait to react to server events that happen for each message.</p>
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='trait' href='trait.HandlerFactory.html'
-                               title='hyper::server::HandlerFactory'>HandlerFactory</a></td>
-                        <td class='docblock short'>
-                             <p>Used to create a <code>Handler</code> when a new message is received by the server.</p>
-                        </td>
-                    </tr>
-                </table></section>
+                       <tr class=' module-item'>
+                           <td><a class='trait' href='trait.Handler.html'
+                                  title='hyper::server::Handler'>Handler</a></td>
+                           <td class='docblock short'>
+                                <p>A trait to react to server events that happen for each message.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='trait' href='trait.HandlerFactory.html'
+                                  title='hyper::server::HandlerFactory'>HandlerFactory</a></td>
+                           <td class='docblock short'>
+                                <p>Used to create a <code>Handler</code> when a new message is received by the server.</p>
+                           </td>
+                       </tr></table></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
