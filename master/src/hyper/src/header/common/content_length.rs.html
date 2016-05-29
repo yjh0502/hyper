@@ -135,12 +135,10 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
-<span id="94">94</span>
-<span id="95">95</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 
-<span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>HeaderFormat</span>, <span class='ident'>Header</span>, <span class='ident'>parsing</span>};
+<span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Header</span>, <span class='ident'>parsing</span>};
 
 <span class='doccomment'>/// `Content-Length` header, defined in</span>
 <span class='doccomment'>/// [RFC7230](http://tools.ietf.org/html/rfc7230#section-3.3.2)</span>
@@ -195,9 +193,7 @@
             .<span class='ident'>unwrap_or</span>(<span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>))
             .<span class='ident'>map</span>(<span class='ident'>ContentLength</span>)
     }
-}
 
-<span class='kw'>impl</span> <span class='ident'>HeaderFormat</span> <span class='kw'>for</span> <span class='ident'>ContentLength</span> {
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>fmt_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
         <span class='ident'>fmt</span>::<span class='ident'>Display</span>::<span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='number'>0</span>, <span class='ident'>f</span>)
