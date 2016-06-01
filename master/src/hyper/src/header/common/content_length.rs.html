@@ -135,9 +135,6 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
-<span id="94">94</span>
-<span id="95">95</span>
-<span id="96">96</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 
@@ -173,13 +170,10 @@
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>ContentLength</span>(<span class='kw'>pub</span> <span class='ident'>u64</span>);
 
-<span class='comment'>//static NAME: &amp;&#39;static str = &quot;Content-Length&quot;;</span>
-
 <span class='kw'>impl</span> <span class='ident'>Header</span> <span class='kw'>for</span> <span class='ident'>ContentLength</span> {
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>header_name</span>() <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> {
-        <span class='kw'>static</span> <span class='ident'>NAME</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;Content-Length&quot;</span>;
-        <span class='ident'>NAME</span>
+        <span class='string'>&quot;Content-Length&quot;</span>
     }
     <span class='kw'>fn</span> <span class='ident'>parse_header</span>(<span class='ident'>raw</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>]) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>ContentLength</span><span class='op'>&gt;</span> {
         <span class='comment'>// If multiple Content-Length headers were sent, everything can still</span>
