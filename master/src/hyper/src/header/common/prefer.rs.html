@@ -243,16 +243,19 @@
 <span id="199">199</span>
 <span id="200">200</span>
 <span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::<span class='ident'>FromStr</span>;
-<span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Header</span>};
+<span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Header</span>, <span class='ident'>HeaderFormat</span>};
 <span class='kw'>use</span> <span class='ident'>header</span>::<span class='ident'>parsing</span>::{<span class='ident'>from_comma_delimited</span>, <span class='ident'>fmt_comma_delimited</span>};
 
 <span class='doccomment'>/// `Prefer` header, defined in [RFC7240](http://tools.ietf.org/html/rfc7240)</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>/// The `Prefer` header field can be used by a client to request that certain</span>
-<span class='doccomment'>/// behaviors be employed by a server while processing a request.</span>
+<span class='doccomment'>/// The `Prefer` header field is HTTP header field that can be used by a</span>
+<span class='doccomment'>/// client to request that certain behaviors be employed by a server</span>
+<span class='doccomment'>/// while processing a request.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// # ABNF</span>
 <span class='doccomment'>/// ```plain</span>
@@ -298,8 +301,7 @@
 
 <span class='kw'>impl</span> <span class='ident'>Header</span> <span class='kw'>for</span> <span class='ident'>Prefer</span> {
     <span class='kw'>fn</span> <span class='ident'>header_name</span>() <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> {
-        <span class='kw'>static</span> <span class='ident'>NAME</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;Prefer&quot;</span>;
-        <span class='ident'>NAME</span>
+        <span class='string'>&quot;Prefer&quot;</span>
     }
 
     <span class='kw'>fn</span> <span class='ident'>parse_header</span>(<span class='ident'>raw</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>]) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Prefer</span><span class='op'>&gt;</span> {
@@ -310,7 +312,9 @@
             <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
         }
     }
+}
 
+<span class='kw'>impl</span> <span class='ident'>HeaderFormat</span> <span class='kw'>for</span> <span class='ident'>Prefer</span> {
     <span class='kw'>fn</span> <span class='ident'>fmt_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
         <span class='ident'>fmt_comma_delimited</span>(<span class='ident'>f</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>[..])
     }
