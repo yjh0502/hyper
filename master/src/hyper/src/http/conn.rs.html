@@ -954,6 +954,27 @@
 <span id="910">910</span>
 <span id="911">911</span>
 <span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
+<span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
+<span id="919">919</span>
+<span id="920">920</span>
+<span id="921">921</span>
+<span id="922">922</span>
+<span id="923">923</span>
+<span id="924">924</span>
+<span id="925">925</span>
+<span id="926">926</span>
+<span id="927">927</span>
+<span id="928">928</span>
+<span id="929">929</span>
+<span id="930">930</span>
+<span id="931">931</span>
+<span id="932">932</span>
+<span id="933">933</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>borrow</span>::<span class='ident'>Cow</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
@@ -981,7 +1002,13 @@
 <span class='doccomment'>/// The connection will determine when a message begins and ends, creating</span>
 <span class='doccomment'>/// a new message `MessageHandler` for each one, as well as determine if this</span>
 <span class='doccomment'>/// connection can be kept alive after the message, or if it is complete.</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Conn</span><span class='op'>&lt;</span><span class='ident'>K</span>: <span class='ident'>Key</span>, <span class='ident'>T</span>: <span class='ident'>Transport</span>, <span class='ident'>H</span>: <span class='ident'>MessageHandler</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> {
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Conn</span><span class='op'>&lt;</span><span class='ident'>K</span>: <span class='ident'>Key</span>, <span class='ident'>T</span>: <span class='ident'>Transport</span>, <span class='ident'>H</span>: <span class='ident'>MessageHandler</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>ConnInner</span><span class='op'>&lt;</span><span class='ident'>K</span>, <span class='ident'>T</span>, <span class='ident'>H</span><span class='op'>&gt;&gt;</span>);
+
+
+<span class='doccomment'>/// `ConnInner` contains all of a connections state which Conn proxies for in a way</span>
+<span class='doccomment'>/// that allows Conn to maintain convenient move and self consuming method call</span>
+<span class='doccomment'>/// semantics but avoiding many costly memcpy calls.</span>
+<span class='kw'>struct</span> <span class='ident'>ConnInner</span><span class='op'>&lt;</span><span class='ident'>K</span>: <span class='ident'>Key</span>, <span class='ident'>T</span>: <span class='ident'>Transport</span>, <span class='ident'>H</span>: <span class='ident'>MessageHandler</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> {
     <span class='ident'>buf</span>: <span class='ident'>Buffer</span>,
     <span class='ident'>ctrl</span>: (<span class='ident'>channel</span>::<span class='ident'>Sender</span><span class='op'>&lt;</span><span class='ident'>Next</span><span class='op'>&gt;</span>, <span class='ident'>channel</span>::<span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>Next</span><span class='op'>&gt;</span>),
     <span class='ident'>keep_alive_enabled</span>: <span class='ident'>bool</span>,
@@ -990,7 +1017,7 @@
     <span class='ident'>transport</span>: <span class='ident'>T</span>,
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>K</span>: <span class='ident'>Key</span>, <span class='ident'>T</span>: <span class='ident'>Transport</span>, <span class='ident'>H</span>: <span class='ident'>MessageHandler</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='kw'>for</span> <span class='ident'>Conn</span><span class='op'>&lt;</span><span class='ident'>K</span>, <span class='ident'>T</span>, <span class='ident'>H</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>K</span>: <span class='ident'>Key</span>, <span class='ident'>T</span>: <span class='ident'>Transport</span>, <span class='ident'>H</span>: <span class='ident'>MessageHandler</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='kw'>for</span> <span class='ident'>ConnInner</span><span class='op'>&lt;</span><span class='ident'>K</span>, <span class='ident'>T</span>, <span class='ident'>H</span><span class='op'>&gt;</span> {
     <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
         <span class='ident'>f</span>.<span class='ident'>debug_struct</span>(<span class='string'>&quot;Conn&quot;</span>)
             .<span class='ident'>field</span>(<span class='string'>&quot;keep_alive_enabled&quot;</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>keep_alive_enabled</span>)
@@ -1000,23 +1027,14 @@
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>K</span>: <span class='ident'>Key</span>, <span class='ident'>T</span>: <span class='ident'>Transport</span>, <span class='ident'>H</span>: <span class='ident'>MessageHandler</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Conn</span><span class='op'>&lt;</span><span class='ident'>K</span>, <span class='ident'>T</span>, <span class='ident'>H</span><span class='op'>&gt;</span> {
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>key</span>: <span class='ident'>K</span>, <span class='ident'>transport</span>: <span class='ident'>T</span>, <span class='ident'>notify</span>: <span class='ident'>rotor</span>::<span class='ident'>Notifier</span>) <span class='op'>-&gt;</span> <span class='ident'>Conn</span><span class='op'>&lt;</span><span class='ident'>K</span>, <span class='ident'>T</span>, <span class='ident'>H</span><span class='op'>&gt;</span> {
-        <span class='ident'>Conn</span> {
-            <span class='ident'>buf</span>: <span class='ident'>Buffer</span>::<span class='ident'>new</span>(),
-            <span class='ident'>ctrl</span>: <span class='ident'>channel</span>::<span class='ident'>new</span>(<span class='ident'>notify</span>),
-            <span class='ident'>keep_alive_enabled</span>: <span class='boolval'>true</span>,
-            <span class='ident'>key</span>: <span class='ident'>key</span>,
-            <span class='ident'>state</span>: <span class='ident'>State</span>::<span class='ident'>Init</span>,
-            <span class='ident'>transport</span>: <span class='ident'>transport</span>,
-        }
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>K</span>: <span class='ident'>Key</span>, <span class='ident'>T</span>: <span class='ident'>Transport</span>, <span class='ident'>H</span>: <span class='ident'>MessageHandler</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='kw'>for</span> <span class='ident'>Conn</span><span class='op'>&lt;</span><span class='ident'>K</span>, <span class='ident'>T</span>, <span class='ident'>H</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
+        <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>fmt</span>(<span class='ident'>f</span>)
     }
+}
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>keep_alive</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>val</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='ident'>Conn</span><span class='op'>&lt;</span><span class='ident'>K</span>, <span class='ident'>T</span>, <span class='ident'>H</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>keep_alive_enabled</span> <span class='op'>=</span> <span class='ident'>val</span>;
-        <span class='self'>self</span>
-    }
 
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>K</span>: <span class='ident'>Key</span>, <span class='ident'>T</span>: <span class='ident'>Transport</span>, <span class='ident'>H</span>: <span class='ident'>MessageHandler</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>ConnInner</span><span class='op'>&lt;</span><span class='ident'>K</span>, <span class='ident'>T</span>, <span class='ident'>H</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Desired Register interest based on state of current connection.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// This includes the user interest, such as when they return `Next::read()`.</span>
@@ -1391,102 +1409,6 @@
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ready</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>events</span>: <span class='ident'>EventSet</span>, <span class='ident'>scope</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Scope</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span>(<span class='kw'>Self</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Duration</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>
-    <span class='kw'>where</span> <span class='ident'>F</span>: <span class='ident'>MessageHandlerFactory</span><span class='op'>&lt;</span><span class='ident'>K</span>, <span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>H</span><span class='op'>&gt;</span> {
-        <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;Conn::ready events=&#39;{:?}&#39;, blocked={:?}&quot;</span>, <span class='ident'>events</span>, <span class='self'>self</span>.<span class='ident'>transport</span>.<span class='ident'>blocked</span>());
-
-        <span class='kw'>if</span> <span class='ident'>events</span>.<span class='ident'>is_error</span>() {
-            <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>transport</span>.<span class='ident'>take_socket_error</span>() {
-                <span class='prelude-val'>Ok</span>(_) <span class='op'>=&gt;</span> {
-                    <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;is_error, but not socket error&quot;</span>);
-                    <span class='comment'>// spurious?</span>
-                },
-                <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>on_error</span>(<span class='ident'>e</span>.<span class='ident'>into</span>())
-            }
-        }
-
-        <span class='comment'>// if the user had an io interest, but the transport was blocked differently,</span>
-        <span class='comment'>// the event needs to be translated to what the user was actually expecting.</span>
-        <span class='comment'>//</span>
-        <span class='comment'>// Example:</span>
-        <span class='comment'>// - User asks for `Next::write().</span>
-        <span class='comment'>// - But transport is in the middle of renegotiating TLS, and is blocked on reading.</span>
-        <span class='comment'>// - hyper should not wait on the `write` event, since epoll already</span>
-        <span class='comment'>//   knows it is writable. We would just loop a whole bunch, and slow down.</span>
-        <span class='comment'>// - So instead, hyper waits on the event needed to unblock the transport, `read`.</span>
-        <span class='comment'>// - Once epoll detects the transport is readable, it will alert hyper</span>
-        <span class='comment'>//   with a `readable` event.</span>
-        <span class='comment'>// - hyper needs to translate that `readable` event back into a `write`,</span>
-        <span class='comment'>//   since that is actually what the Handler wants.</span>
-
-        <span class='kw'>let</span> <span class='ident'>events</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>blocked</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>transport</span>.<span class='ident'>blocked</span>() {
-            <span class='kw'>let</span> <span class='ident'>interest</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>interest</span>();
-            <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;translating blocked={:?}, interest={:?}&quot;</span>, <span class='ident'>blocked</span>, <span class='ident'>interest</span>);
-            <span class='kw'>match</span> (<span class='ident'>blocked</span>, <span class='ident'>interest</span>) {
-                (<span class='ident'>Blocked</span>::<span class='ident'>Read</span>, <span class='ident'>Reg</span>::<span class='ident'>Write</span>) <span class='op'>=&gt;</span> <span class='ident'>EventSet</span>::<span class='ident'>writable</span>(),
-                (<span class='ident'>Blocked</span>::<span class='ident'>Write</span>, <span class='ident'>Reg</span>::<span class='ident'>Read</span>) <span class='op'>=&gt;</span> <span class='ident'>EventSet</span>::<span class='ident'>readable</span>(),
-                <span class='comment'>// otherwise, the transport was blocked on the same thing the user wanted</span>
-                _ <span class='op'>=&gt;</span> <span class='ident'>events</span>
-            }
-        } <span class='kw'>else</span> {
-            <span class='ident'>events</span>
-        };
-
-        <span class='kw'>if</span> <span class='ident'>events</span>.<span class='ident'>is_readable</span>() {
-            <span class='self'>self</span>.<span class='ident'>on_readable</span>(<span class='ident'>scope</span>);
-        }
-
-        <span class='kw'>if</span> <span class='ident'>events</span>.<span class='ident'>is_writable</span>() {
-            <span class='self'>self</span>.<span class='ident'>on_writable</span>(<span class='ident'>scope</span>);
-        }
-
-        <span class='kw'>let</span> <span class='ident'>events</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>register</span>() {
-            <span class='ident'>Reg</span>::<span class='ident'>Read</span> <span class='op'>=&gt;</span> <span class='ident'>EventSet</span>::<span class='ident'>readable</span>(),
-            <span class='ident'>Reg</span>::<span class='ident'>Write</span> <span class='op'>=&gt;</span> <span class='ident'>EventSet</span>::<span class='ident'>writable</span>(),
-            <span class='ident'>Reg</span>::<span class='ident'>ReadWrite</span> <span class='op'>=&gt;</span> <span class='ident'>EventSet</span>::<span class='ident'>readable</span>() <span class='op'>|</span> <span class='ident'>EventSet</span>::<span class='ident'>writable</span>(),
-            <span class='ident'>Reg</span>::<span class='ident'>Wait</span> <span class='op'>=&gt;</span> <span class='ident'>EventSet</span>::<span class='ident'>none</span>(),
-            <span class='ident'>Reg</span>::<span class='ident'>Remove</span> <span class='op'>=&gt;</span> {
-                <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;removing transport&quot;</span>);
-                <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>scope</span>.<span class='ident'>deregister</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>transport</span>);
-                <span class='self'>self</span>.<span class='ident'>on_remove</span>();
-                <span class='kw'>return</span> <span class='prelude-val'>None</span>;
-            },
-        };
-
-        <span class='kw'>if</span> <span class='ident'>events</span>.<span class='ident'>is_readable</span>() <span class='op'>&amp;&amp;</span> <span class='self'>self</span>.<span class='ident'>can_read_more</span>() {
-            <span class='kw'>return</span> <span class='self'>self</span>.<span class='ident'>ready</span>(<span class='ident'>events</span>, <span class='ident'>scope</span>);
-        }
-
-        <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;scope.reregister({:?})&quot;</span>, <span class='ident'>events</span>);
-        <span class='kw'>match</span> <span class='ident'>scope</span>.<span class='ident'>reregister</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>transport</span>, <span class='ident'>events</span>, <span class='ident'>PollOpt</span>::<span class='ident'>level</span>()) {
-            <span class='prelude-val'>Ok</span>(..) <span class='op'>=&gt;</span> {
-                <span class='kw'>let</span> <span class='ident'>timeout</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>state</span>.<span class='ident'>timeout</span>();
-                <span class='prelude-val'>Some</span>((<span class='self'>self</span>, <span class='ident'>timeout</span>))
-            },
-            <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> {
-                <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;error reregistering: {:?}&quot;</span>, <span class='ident'>e</span>);
-                <span class='self'>self</span>.<span class='ident'>on_error</span>(<span class='ident'>e</span>.<span class='ident'>into</span>());
-                <span class='prelude-val'>None</span>
-            }
-        }
-    }
-
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>wakeup</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>scope</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Scope</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span>(<span class='kw'>Self</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Duration</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>
-    <span class='kw'>where</span> <span class='ident'>F</span>: <span class='ident'>MessageHandlerFactory</span><span class='op'>&lt;</span><span class='ident'>K</span>, <span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>H</span><span class='op'>&gt;</span> {
-        <span class='kw'>while</span> <span class='kw'>let</span> <span class='prelude-val'>Ok</span>(<span class='ident'>next</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>ctrl</span>.<span class='number'>1</span>.<span class='ident'>try_recv</span>() {
-            <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;woke up with {:?}&quot;</span>, <span class='ident'>next</span>);
-            <span class='self'>self</span>.<span class='ident'>state</span>.<span class='ident'>update</span>(<span class='ident'>next</span>);
-        }
-        <span class='self'>self</span>.<span class='ident'>ready</span>(<span class='ident'>EventSet</span>::<span class='ident'>readable</span>() <span class='op'>|</span> <span class='ident'>EventSet</span>::<span class='ident'>writable</span>(), <span class='ident'>scope</span>)
-    }
-
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>timeout</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>scope</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Scope</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span>(<span class='kw'>Self</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Duration</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>
-    <span class='kw'>where</span> <span class='ident'>F</span>: <span class='ident'>MessageHandlerFactory</span><span class='op'>&lt;</span><span class='ident'>K</span>, <span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>H</span><span class='op'>&gt;</span> {
-        <span class='comment'>//TODO: check if this was a spurious timeout?</span>
-        <span class='self'>self</span>.<span class='ident'>on_error</span>(::<span class='ident'>Error</span>::<span class='ident'>Timeout</span>);
-        <span class='self'>self</span>.<span class='ident'>ready</span>(<span class='ident'>EventSet</span>::<span class='ident'>none</span>(), <span class='ident'>scope</span>)
-    }
-
     <span class='kw'>fn</span> <span class='ident'>on_error</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>err</span>: ::<span class='ident'>Error</span>) {
         <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;on_error err = {:?}&quot;</span>, <span class='ident'>err</span>);
         <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;on_error state = {:?}&quot;</span>, <span class='self'>self</span>.<span class='ident'>state</span>);
@@ -1496,14 +1418,6 @@
             <span class='ident'>State</span>::<span class='ident'>Closed</span> <span class='op'>=&gt;</span> <span class='ident'>Next</span>::<span class='ident'>remove</span>(),
         };
         <span class='self'>self</span>.<span class='ident'>state</span>.<span class='ident'>update</span>(<span class='ident'>next</span>);
-    }
-
-    <span class='kw'>fn</span> <span class='ident'>on_remove</span>(<span class='self'>self</span>) {
-        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;on_remove&quot;</span>);
-        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>state</span> {
-            <span class='ident'>State</span>::<span class='ident'>Init</span> <span class='op'>|</span> <span class='ident'>State</span>::<span class='ident'>Closed</span> <span class='op'>=&gt;</span> (),
-            <span class='ident'>State</span>::<span class='ident'>Http1</span>(<span class='ident'>http1</span>) <span class='op'>=&gt;</span> <span class='ident'>http1</span>.<span class='ident'>handler</span>.<span class='ident'>on_remove</span>(<span class='self'>self</span>.<span class='ident'>transport</span>),
-        }
     }
 
     <span class='kw'>fn</span> <span class='ident'>on_readable</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>scope</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Scope</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>)
@@ -1521,6 +1435,134 @@
         <span class='self'>self</span>.<span class='ident'>state</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>write</span>(<span class='ident'>scope</span>, <span class='ident'>state</span>);
         <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;on_writable &lt;- {:?}&quot;</span>, <span class='self'>self</span>.<span class='ident'>state</span>);
     }
+
+    <span class='kw'>fn</span> <span class='ident'>on_remove</span>(<span class='self'>self</span>) {
+        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;on_remove&quot;</span>);
+        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>state</span> {
+            <span class='ident'>State</span>::<span class='ident'>Init</span> <span class='op'>|</span> <span class='ident'>State</span>::<span class='ident'>Closed</span> <span class='op'>=&gt;</span> (),
+            <span class='ident'>State</span>::<span class='ident'>Http1</span>(<span class='ident'>http1</span>) <span class='op'>=&gt;</span> <span class='ident'>http1</span>.<span class='ident'>handler</span>.<span class='ident'>on_remove</span>(<span class='self'>self</span>.<span class='ident'>transport</span>),
+        }
+    }
+
+}
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>K</span>: <span class='ident'>Key</span>, <span class='ident'>T</span>: <span class='ident'>Transport</span>, <span class='ident'>H</span>: <span class='ident'>MessageHandler</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Conn</span><span class='op'>&lt;</span><span class='ident'>K</span>, <span class='ident'>T</span>, <span class='ident'>H</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>key</span>: <span class='ident'>K</span>, <span class='ident'>transport</span>: <span class='ident'>T</span>, <span class='ident'>notify</span>: <span class='ident'>rotor</span>::<span class='ident'>Notifier</span>) <span class='op'>-&gt;</span> <span class='ident'>Conn</span><span class='op'>&lt;</span><span class='ident'>K</span>, <span class='ident'>T</span>, <span class='ident'>H</span><span class='op'>&gt;</span> {
+        <span class='ident'>Conn</span>(<span class='ident'>Box</span>::<span class='ident'>new</span>(<span class='ident'>ConnInner</span> {
+            <span class='ident'>buf</span>: <span class='ident'>Buffer</span>::<span class='ident'>new</span>(),
+            <span class='ident'>ctrl</span>: <span class='ident'>channel</span>::<span class='ident'>new</span>(<span class='ident'>notify</span>),
+            <span class='ident'>keep_alive_enabled</span>: <span class='boolval'>true</span>,
+            <span class='ident'>key</span>: <span class='ident'>key</span>,
+            <span class='ident'>state</span>: <span class='ident'>State</span>::<span class='ident'>Init</span>,
+            <span class='ident'>transport</span>: <span class='ident'>transport</span>,
+        }))
+    }
+
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>keep_alive</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>val</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='ident'>Conn</span><span class='op'>&lt;</span><span class='ident'>K</span>, <span class='ident'>T</span>, <span class='ident'>H</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>keep_alive_enabled</span> <span class='op'>=</span> <span class='ident'>val</span>;
+        <span class='self'>self</span>
+    }
+
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ready</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>events</span>: <span class='ident'>EventSet</span>, <span class='ident'>scope</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Scope</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span>(<span class='kw'>Self</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Duration</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>
+    <span class='kw'>where</span> <span class='ident'>F</span>: <span class='ident'>MessageHandlerFactory</span><span class='op'>&lt;</span><span class='ident'>K</span>, <span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>H</span><span class='op'>&gt;</span> {
+        <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;Conn::ready events=&#39;{:?}&#39;, blocked={:?}&quot;</span>, <span class='ident'>events</span>, <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>transport</span>.<span class='ident'>blocked</span>());
+
+        <span class='kw'>if</span> <span class='ident'>events</span>.<span class='ident'>is_error</span>() {
+            <span class='kw'>match</span> <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>transport</span>.<span class='ident'>take_socket_error</span>() {
+                <span class='prelude-val'>Ok</span>(_) <span class='op'>=&gt;</span> {
+                    <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;is_error, but not socket error&quot;</span>);
+                    <span class='comment'>// spurious?</span>
+                },
+                <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>on_error</span>(<span class='ident'>e</span>.<span class='ident'>into</span>())
+            }
+        }
+
+        <span class='comment'>// if the user had an io interest, but the transport was blocked differently,</span>
+        <span class='comment'>// the event needs to be translated to what the user was actually expecting.</span>
+        <span class='comment'>//</span>
+        <span class='comment'>// Example:</span>
+        <span class='comment'>// - User asks for `Next::write().</span>
+        <span class='comment'>// - But transport is in the middle of renegotiating TLS, and is blocked on reading.</span>
+        <span class='comment'>// - hyper should not wait on the `write` event, since epoll already</span>
+        <span class='comment'>//   knows it is writable. We would just loop a whole bunch, and slow down.</span>
+        <span class='comment'>// - So instead, hyper waits on the event needed to unblock the transport, `read`.</span>
+        <span class='comment'>// - Once epoll detects the transport is readable, it will alert hyper</span>
+        <span class='comment'>//   with a `readable` event.</span>
+        <span class='comment'>// - hyper needs to translate that `readable` event back into a `write`,</span>
+        <span class='comment'>//   since that is actually what the Handler wants.</span>
+
+        <span class='kw'>let</span> <span class='ident'>events</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>blocked</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>transport</span>.<span class='ident'>blocked</span>() {
+            <span class='kw'>let</span> <span class='ident'>interest</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>interest</span>();
+            <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;translating blocked={:?}, interest={:?}&quot;</span>, <span class='ident'>blocked</span>, <span class='ident'>interest</span>);
+            <span class='kw'>match</span> (<span class='ident'>blocked</span>, <span class='ident'>interest</span>) {
+                (<span class='ident'>Blocked</span>::<span class='ident'>Read</span>, <span class='ident'>Reg</span>::<span class='ident'>Write</span>) <span class='op'>=&gt;</span> <span class='ident'>EventSet</span>::<span class='ident'>writable</span>(),
+                (<span class='ident'>Blocked</span>::<span class='ident'>Write</span>, <span class='ident'>Reg</span>::<span class='ident'>Read</span>) <span class='op'>=&gt;</span> <span class='ident'>EventSet</span>::<span class='ident'>readable</span>(),
+                <span class='comment'>// otherwise, the transport was blocked on the same thing the user wanted</span>
+                _ <span class='op'>=&gt;</span> <span class='ident'>events</span>
+            }
+        } <span class='kw'>else</span> {
+            <span class='ident'>events</span>
+        };
+
+        <span class='kw'>if</span> <span class='ident'>events</span>.<span class='ident'>is_readable</span>() {
+            <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>on_readable</span>(<span class='ident'>scope</span>);
+        }
+
+        <span class='kw'>if</span> <span class='ident'>events</span>.<span class='ident'>is_writable</span>() {
+            <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>on_writable</span>(<span class='ident'>scope</span>);
+        }
+
+        <span class='kw'>let</span> <span class='ident'>events</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>register</span>() {
+            <span class='ident'>Reg</span>::<span class='ident'>Read</span> <span class='op'>=&gt;</span> <span class='ident'>EventSet</span>::<span class='ident'>readable</span>(),
+            <span class='ident'>Reg</span>::<span class='ident'>Write</span> <span class='op'>=&gt;</span> <span class='ident'>EventSet</span>::<span class='ident'>writable</span>(),
+            <span class='ident'>Reg</span>::<span class='ident'>ReadWrite</span> <span class='op'>=&gt;</span> <span class='ident'>EventSet</span>::<span class='ident'>readable</span>() <span class='op'>|</span> <span class='ident'>EventSet</span>::<span class='ident'>writable</span>(),
+            <span class='ident'>Reg</span>::<span class='ident'>Wait</span> <span class='op'>=&gt;</span> <span class='ident'>EventSet</span>::<span class='ident'>none</span>(),
+            <span class='ident'>Reg</span>::<span class='ident'>Remove</span> <span class='op'>=&gt;</span> {
+                <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;removing transport&quot;</span>);
+                <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>scope</span>.<span class='ident'>deregister</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>transport</span>);
+                <span class='self'>self</span>.<span class='ident'>on_remove</span>();
+                <span class='kw'>return</span> <span class='prelude-val'>None</span>;
+            },
+        };
+
+        <span class='kw'>if</span> <span class='ident'>events</span>.<span class='ident'>is_readable</span>() <span class='op'>&amp;&amp;</span> <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>can_read_more</span>() {
+            <span class='kw'>return</span> <span class='self'>self</span>.<span class='ident'>ready</span>(<span class='ident'>events</span>, <span class='ident'>scope</span>);
+        }
+
+        <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;scope.reregister({:?})&quot;</span>, <span class='ident'>events</span>);
+        <span class='kw'>match</span> <span class='ident'>scope</span>.<span class='ident'>reregister</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>transport</span>, <span class='ident'>events</span>, <span class='ident'>PollOpt</span>::<span class='ident'>level</span>()) {
+            <span class='prelude-val'>Ok</span>(..) <span class='op'>=&gt;</span> {
+                <span class='kw'>let</span> <span class='ident'>timeout</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>state</span>.<span class='ident'>timeout</span>();
+                <span class='prelude-val'>Some</span>((<span class='self'>self</span>, <span class='ident'>timeout</span>))
+            },
+            <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> {
+                <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;error reregistering: {:?}&quot;</span>, <span class='ident'>e</span>);
+                <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>on_error</span>(<span class='ident'>e</span>.<span class='ident'>into</span>());
+                <span class='prelude-val'>None</span>
+            }
+        }
+    }
+
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>wakeup</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>scope</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Scope</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span>(<span class='kw'>Self</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Duration</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>
+    <span class='kw'>where</span> <span class='ident'>F</span>: <span class='ident'>MessageHandlerFactory</span><span class='op'>&lt;</span><span class='ident'>K</span>, <span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>H</span><span class='op'>&gt;</span> {
+        <span class='kw'>while</span> <span class='kw'>let</span> <span class='prelude-val'>Ok</span>(<span class='ident'>next</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>ctrl</span>.<span class='number'>1</span>.<span class='ident'>try_recv</span>() {
+            <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;woke up with {:?}&quot;</span>, <span class='ident'>next</span>);
+            <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>state</span>.<span class='ident'>update</span>(<span class='ident'>next</span>);
+        }
+        <span class='self'>self</span>.<span class='ident'>ready</span>(<span class='ident'>EventSet</span>::<span class='ident'>readable</span>() <span class='op'>|</span> <span class='ident'>EventSet</span>::<span class='ident'>writable</span>(), <span class='ident'>scope</span>)
+    }
+
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>timeout</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>scope</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Scope</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span>(<span class='kw'>Self</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Duration</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>
+    <span class='kw'>where</span> <span class='ident'>F</span>: <span class='ident'>MessageHandlerFactory</span><span class='op'>&lt;</span><span class='ident'>K</span>, <span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>H</span><span class='op'>&gt;</span> {
+        <span class='comment'>//TODO: check if this was a spurious timeout?</span>
+        <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>on_error</span>(::<span class='ident'>Error</span>::<span class='ident'>Timeout</span>);
+        <span class='self'>self</span>.<span class='ident'>ready</span>(<span class='ident'>EventSet</span>::<span class='ident'>none</span>(), <span class='ident'>scope</span>)
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>on_remove</span>(<span class='self'>self</span>) {
+        <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>on_remove</span>()
+    }
+
 }
 
 <span class='kw'>enum</span> <span class='ident'>State</span><span class='op'>&lt;</span><span class='ident'>H</span>: <span class='ident'>MessageHandler</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>T</span>: <span class='ident'>Transport</span><span class='op'>&gt;</span> {
