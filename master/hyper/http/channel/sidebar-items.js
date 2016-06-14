@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["TryRecvError","This enumeration is the list of the possible reasons that `try_recv` could not return data when called."]]});
