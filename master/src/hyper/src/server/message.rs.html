@@ -99,7 +99,6 @@
 <span id="55">55</span>
 <span id="56">56</span>
 <span id="57">57</span>
-<span id="58">58</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>marker</span>::<span class='ident'>PhantomData</span>;
 
@@ -109,10 +108,10 @@
 
 <span class='kw'>use</span> <span class='ident'>super</span>::{<span class='ident'>Handler</span>, <span class='ident'>request</span>, <span class='ident'>response</span>};
 
-<span class='doccomment'>/// A MessageHandler for a Server.</span>
+<span class='doccomment'>/// A `MessageHandler` for a Server.</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>/// This should be really thin glue between http::MessageHandler and</span>
-<span class='doccomment'>/// server::Handler, but largely just providing the proper types one</span>
+<span class='doccomment'>/// This should be really thin glue between `http::MessageHandler` and</span>
+<span class='doccomment'>/// `server::Handler`, but largely just providing the proper types one</span>
 <span class='doccomment'>/// would expect in a Server Handler.</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Message</span><span class='op'>&lt;</span><span class='ident'>H</span>: <span class='ident'>Handler</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>T</span>: <span class='ident'>Transport</span><span class='op'>&gt;</span> {
     <span class='ident'>handler</span>: <span class='ident'>H</span>,
@@ -158,7 +157,6 @@
         <span class='self'>self</span>.<span class='ident'>handler</span>.<span class='ident'>on_remove</span>(<span class='ident'>transport</span>);
     }
 }
-
 </pre>
 </section>
     <section id='search' class="content hidden"></section>

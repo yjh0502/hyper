@@ -954,11 +954,6 @@
 <span id="910">910</span>
 <span id="911">911</span>
 <span id="912">912</span>
-<span id="913">913</span>
-<span id="914">914</span>
-<span id="915">915</span>
-<span id="916">916</span>
-<span id="917">917</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>borrow</span>::<span class='ident'>Cow</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
@@ -1470,7 +1465,7 @@
             },
             <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> {
                 <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;error reregistering: {:?}&quot;</span>, <span class='ident'>e</span>);
-                <span class='kw'>let</span> _ <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>on_error</span>(<span class='ident'>e</span>.<span class='ident'>into</span>());
+                <span class='self'>self</span>.<span class='ident'>on_error</span>(<span class='ident'>e</span>.<span class='ident'>into</span>());
                 <span class='prelude-val'>None</span>
             }
         }
@@ -1478,14 +1473,9 @@
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>wakeup</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>scope</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Scope</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span>(<span class='kw'>Self</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Duration</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>
     <span class='kw'>where</span> <span class='ident'>F</span>: <span class='ident'>MessageHandlerFactory</span><span class='op'>&lt;</span><span class='ident'>K</span>, <span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>H</span><span class='op'>&gt;</span> {
-        <span class='kw'>loop</span> {
-            <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>ctrl</span>.<span class='number'>1</span>.<span class='ident'>try_recv</span>() {
-                <span class='prelude-val'>Ok</span>(<span class='ident'>next</span>) <span class='op'>=&gt;</span> {
-                    <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;woke up with {:?}&quot;</span>, <span class='ident'>next</span>);
-                    <span class='self'>self</span>.<span class='ident'>state</span>.<span class='ident'>update</span>(<span class='ident'>next</span>);
-                },
-                <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> <span class='kw'>break</span>
-            }
+        <span class='kw'>while</span> <span class='kw'>let</span> <span class='prelude-val'>Ok</span>(<span class='ident'>next</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>ctrl</span>.<span class='number'>1</span>.<span class='ident'>try_recv</span>() {
+            <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;woke up with {:?}&quot;</span>, <span class='ident'>next</span>);
+            <span class='self'>self</span>.<span class='ident'>state</span>.<span class='ident'>update</span>(<span class='ident'>next</span>);
         }
         <span class='self'>self</span>.<span class='ident'>ready</span>(<span class='ident'>EventSet</span>::<span class='ident'>readable</span>() <span class='op'>|</span> <span class='ident'>EventSet</span>::<span class='ident'>writable</span>(), <span class='ident'>scope</span>)
     }
@@ -1834,7 +1824,7 @@
     }
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>key</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>K</span> {
-        <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='number'>0</span>
+        <span class='self'>self</span>.<span class='number'>0</span>
     }
 }
 
