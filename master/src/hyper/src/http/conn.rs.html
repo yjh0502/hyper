@@ -975,6 +975,11 @@
 <span id="931">931</span>
 <span id="932">932</span>
 <span id="933">933</span>
+<span id="934">934</span>
+<span id="935">935</span>
+<span id="936">936</span>
+<span id="937">937</span>
+<span id="938">938</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>borrow</span>::<span class='ident'>Cow</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
@@ -1624,13 +1629,6 @@
                     _ <span class='op'>=&gt;</span> <span class='ident'>Reading</span>::<span class='ident'>Closed</span>,
                 };
                 <span class='kw'>let</span> <span class='ident'>writing</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>http1</span>.<span class='ident'>writing</span> {
-                    <span class='ident'>Writing</span>::<span class='ident'>Ready</span>(<span class='kw-2'>ref</span> <span class='ident'>encoder</span>) <span class='kw'>if</span> <span class='ident'>encoder</span>.<span class='ident'>is_eof</span>() <span class='op'>=&gt;</span> {
-                        <span class='kw'>if</span> <span class='ident'>http1</span>.<span class='ident'>keep_alive</span> {
-                            <span class='ident'>Writing</span>::<span class='ident'>KeepAlive</span>
-                        } <span class='kw'>else</span> {
-                            <span class='ident'>Writing</span>::<span class='ident'>Closed</span>
-                        }
-                    },
                     <span class='ident'>Writing</span>::<span class='ident'>Ready</span>(<span class='ident'>encoder</span>) <span class='op'>=&gt;</span> {
                         <span class='kw'>if</span> <span class='ident'>encoder</span>.<span class='ident'>is_eof</span>() {
                             <span class='kw'>if</span> <span class='ident'>http1</span>.<span class='ident'>keep_alive</span> {
@@ -1638,7 +1636,7 @@
                             } <span class='kw'>else</span> {
                                 <span class='ident'>Writing</span>::<span class='ident'>Closed</span>
                             }
-                        } <span class='kw'>else</span> <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>buf</span>) <span class='op'>=</span> <span class='ident'>encoder</span>.<span class='ident'>end</span>() {
+                        } <span class='kw'>else</span> <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>buf</span>) <span class='op'>=</span> <span class='ident'>encoder</span>.<span class='ident'>finish</span>() {
                             <span class='ident'>Writing</span>::<span class='ident'>Chunk</span>(<span class='ident'>Chunk</span> {
                                 <span class='ident'>buf</span>: <span class='ident'>buf</span>.<span class='ident'>bytes</span>,
                                 <span class='ident'>pos</span>: <span class='ident'>buf</span>.<span class='ident'>pos</span>,
@@ -1658,7 +1656,7 @@
                                 } <span class='kw'>else</span> {
                                     <span class='ident'>Writing</span>::<span class='ident'>Closed</span>
                                 }
-                            } <span class='kw'>else</span> <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>buf</span>) <span class='op'>=</span> <span class='ident'>encoder</span>.<span class='ident'>end</span>() {
+                            } <span class='kw'>else</span> <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>buf</span>) <span class='op'>=</span> <span class='ident'>encoder</span>.<span class='ident'>finish</span>() {
                                 <span class='ident'>Writing</span>::<span class='ident'>Chunk</span>(<span class='ident'>Chunk</span> {
                                     <span class='ident'>buf</span>: <span class='ident'>buf</span>.<span class='ident'>bytes</span>,
                                     <span class='ident'>pos</span>: <span class='ident'>buf</span>.<span class='ident'>pos</span>,
@@ -1697,14 +1695,26 @@
                 };
 
                 <span class='ident'>http1</span>.<span class='ident'>writing</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>http1</span>.<span class='ident'>writing</span> {
-                    <span class='ident'>Writing</span>::<span class='ident'>Ready</span>(<span class='ident'>encoder</span>) <span class='op'>=&gt;</span> <span class='kw'>if</span> <span class='ident'>encoder</span>.<span class='ident'>is_eof</span>() {
-                        <span class='kw'>if</span> <span class='ident'>http1</span>.<span class='ident'>keep_alive</span> {
-                            <span class='ident'>Writing</span>::<span class='ident'>KeepAlive</span>
+                    <span class='ident'>Writing</span>::<span class='ident'>Ready</span>(<span class='ident'>encoder</span>) <span class='op'>=&gt;</span> {
+                        <span class='kw'>if</span> <span class='ident'>encoder</span>.<span class='ident'>is_eof</span>() {
+                            <span class='kw'>if</span> <span class='ident'>http1</span>.<span class='ident'>keep_alive</span> {
+                                <span class='ident'>Writing</span>::<span class='ident'>KeepAlive</span>
+                            } <span class='kw'>else</span> {
+                                <span class='ident'>Writing</span>::<span class='ident'>Closed</span>
+                            }
+                        } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>encoder</span>.<span class='ident'>is_closed</span>() {
+                            <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>buf</span>) <span class='op'>=</span> <span class='ident'>encoder</span>.<span class='ident'>finish</span>() {
+                                <span class='ident'>Writing</span>::<span class='ident'>Chunk</span>(<span class='ident'>Chunk</span> {
+                                    <span class='ident'>buf</span>: <span class='ident'>buf</span>.<span class='ident'>bytes</span>,
+                                    <span class='ident'>pos</span>: <span class='ident'>buf</span>.<span class='ident'>pos</span>,
+                                    <span class='ident'>next</span>: (<span class='ident'>h1</span>::<span class='ident'>Encoder</span>::<span class='ident'>length</span>(<span class='number'>0</span>), <span class='ident'>Next</span>::<span class='ident'>wait</span>())
+                                })
+                            } <span class='kw'>else</span> {
+                                <span class='ident'>Writing</span>::<span class='ident'>Closed</span>
+                            }
                         } <span class='kw'>else</span> {
-                            <span class='ident'>Writing</span>::<span class='ident'>Closed</span>
+                            <span class='ident'>Writing</span>::<span class='ident'>Wait</span>(<span class='ident'>encoder</span>)
                         }
-                    } <span class='kw'>else</span> {
-                        <span class='ident'>Writing</span>::<span class='ident'>Wait</span>(<span class='ident'>encoder</span>)
                     },
                     <span class='ident'>Writing</span>::<span class='ident'>Chunk</span>(<span class='ident'>chunk</span>) <span class='op'>=&gt;</span> <span class='kw'>if</span> <span class='ident'>chunk</span>.<span class='ident'>is_written</span>() {
                         <span class='ident'>Writing</span>::<span class='ident'>Wait</span>(<span class='ident'>chunk</span>.<span class='ident'>next</span>.<span class='number'>0</span>)
