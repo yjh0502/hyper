@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-898' class='srclink' href='../../src/hyper/src/header/mod.rs.html#1-839' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-1111' class='srclink' href='../../src/hyper/src/header/mod.rs.html#1-808' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Headers container, and common header fields.</p>
 
 <p>hyper has the opinion that Headers should be strongly-typed, because that&#39;s
@@ -80,16 +80,17 @@ many wrapper-style headers.</p>
     <span class='ident'>headers</span>.<span class='ident'>set</span>(<span class='ident'>XRequestGuid</span>(<span class='string'>&quot;a proper guid&quot;</span>.<span class='ident'>to_owned</span>()))
 }</pre>
 
-<p>This works well for simple &quot;string&quot; headers.  If you need more control,
-you can implement the trait directly.</p>
+<p>This works well for simple &quot;string&quot; headers. But the header system
+actually involves 2 parts: parsing, and formatting. If you need to
+customize either part, you can do so.</p>
 
-<h2 id='implementing-the-header-trait' class='section-header'><a href='#implementing-the-header-trait'>Implementing the <code>Header</code> trait</a></h2>
+<h2 id='header-and-headerformat' class='section-header'><a href='#header-and-headerformat'><code>Header</code> and <code>HeaderFormat</code></a></h2>
 <p>Consider a Do Not Track header. It can be true or false, but it represents
 that via the numerals <code>1</code> and <code>0</code>.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
-<span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>header</span>::<span class='ident'>Header</span>;
+<span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>header</span>::{<span class='ident'>Header</span>, <span class='ident'>HeaderFormat</span>};
 
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>, <span class='ident'>Clone</span>, <span class='ident'>Copy</span>)]</span>
 <span class='kw'>struct</span> <span class='ident'>Dnt</span>(<span class='ident'>bool</span>);
@@ -113,7 +114,9 @@ that via the numerals <code>1</code> and <code>0</code>.</p>
         }
         <span class='prelude-val'>Err</span>(<span class='ident'>hyper</span>::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
     }
+}
 
+<span class='kw'>impl</span> <span class='ident'>HeaderFormat</span> <span class='kw'>for</span> <span class='ident'>Dnt</span> {
     <span class='kw'>fn</span> <span class='ident'>fmt_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
         <span class='kw'>if</span> <span class='self'>self</span>.<span class='number'>0</span> {
             <span class='ident'>f</span>.<span class='ident'>write_str</span>(<span class='string'>&quot;1&quot;</span>)
@@ -377,7 +380,7 @@ that via the numerals <code>1</code> and <code>0</code>.</p>
                            <td><a class='struct' href='struct.HeaderFormatter.html'
                                   title='hyper::header::HeaderFormatter'>HeaderFormatter</a></td>
                            <td class='docblock short'>
-                                <p>A wrapper around any Header with a Display impl that calls <code>fmt_header</code>.</p>
+                                <p>A wrapper around any Header with a Display impl that calls fmt_header.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
@@ -679,6 +682,13 @@ except for the <code>WebSocket</code> value.</p>
                        <tr class=' module-item'>
                            <td><a class='trait' href='trait.Header.html'
                                   title='hyper::header::Header'>Header</a></td>
+                           <td class='docblock short'>
+                                <p>A trait for any object that will represent a header field and value.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='trait' href='trait.HeaderFormat.html'
+                                  title='hyper::header::HeaderFormat'>HeaderFormat</a></td>
                            <td class='docblock short'>
                                 <p>A trait for any object that will represent a header field and value.</p>
                            </td>
