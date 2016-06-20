@@ -242,6 +242,12 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! The HTTP request method</span>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
@@ -318,7 +324,7 @@
     }
 
     <span class='doccomment'>/// Whether a method is considered &quot;idempotent&quot;, meaning the request has</span>
-    <span class='doccomment'>/// the same result is executed multiple times.</span>
+    <span class='doccomment'>/// the same result if executed multiple times.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// See [the spec](https://tools.ietf.org/html/rfc7231#section-4.2.2) for</span>
     <span class='doccomment'>/// more words.</span>
@@ -370,6 +376,12 @@
             <span class='ident'>Patch</span> <span class='op'>=&gt;</span> <span class='string'>&quot;PATCH&quot;</span>,
             <span class='ident'>Extension</span>(<span class='kw-2'>ref</span> <span class='ident'>s</span>) <span class='op'>=&gt;</span> <span class='ident'>s</span>.<span class='ident'>as_ref</span>()
         })
+    }
+}
+
+<span class='kw'>impl</span> <span class='ident'>Default</span> <span class='kw'>for</span> <span class='ident'>Method</span> {
+    <span class='kw'>fn</span> <span class='ident'>default</span>() <span class='op'>-&gt;</span> <span class='ident'>Method</span> {
+        <span class='ident'>Method</span>::<span class='ident'>Get</span>
     }
 }
 
