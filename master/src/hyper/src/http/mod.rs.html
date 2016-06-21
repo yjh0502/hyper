@@ -453,6 +453,22 @@
 <span id="409">409</span>
 <span id="410">410</span>
 <span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Pieces pertaining to the HTTP message protocol.</span>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>borrow</span>::<span class='ident'>Cow</span>;
@@ -528,6 +544,7 @@
         <span class='ident'>Decoder</span>(<span class='ident'>DecoderImpl</span>::<span class='ident'>H1</span>(<span class='ident'>decoder</span>, <span class='ident'>transport</span>))
     }
 
+
     <span class='doccomment'>/// Get a reference to the transport.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_ref</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>T</span> {
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='number'>0</span> {
@@ -541,6 +558,17 @@
         <span class='ident'>Encoder</span>(<span class='ident'>EncoderImpl</span>::<span class='ident'>H1</span>(<span class='ident'>encoder</span>, <span class='ident'>transport</span>))
     }
 
+    <span class='doccomment'>/// Closes an encoder, signaling that no more writing will occur.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// This is needed for encodings that don&#39;t know length of the content</span>
+    <span class='doccomment'>/// beforehand. Most common instance would be usage of</span>
+    <span class='doccomment'>/// `Transfer-Enciding: chunked`. You would call `close()` to signal</span>
+    <span class='doccomment'>/// the `Encoder` should write the end chunk, or `0\r\n\r\n`.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>close</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
+        <span class='kw'>match</span> <span class='self'>self</span>.<span class='number'>0</span> {
+            <span class='ident'>EncoderImpl</span>::<span class='ident'>H1</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>encoder</span>, _) <span class='op'>=&gt;</span> <span class='ident'>encoder</span>.<span class='ident'>close</span>()
+        }
+    }
 
     <span class='doccomment'>/// Get a reference to the transport.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_ref</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>T</span> {
@@ -569,7 +597,11 @@
         }
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='number'>0</span> {
             <span class='ident'>EncoderImpl</span>::<span class='ident'>H1</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>encoder</span>, <span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>transport</span>) <span class='op'>=&gt;</span> {
-                <span class='ident'>encoder</span>.<span class='ident'>encode</span>(<span class='op'>*</span><span class='ident'>transport</span>, <span class='ident'>data</span>)
+                <span class='kw'>if</span> <span class='ident'>encoder</span>.<span class='ident'>is_closed</span>() {
+                    <span class='prelude-val'>Ok</span>(<span class='number'>0</span>)
+                } <span class='kw'>else</span> {
+                    <span class='ident'>encoder</span>.<span class='ident'>encode</span>(<span class='op'>*</span><span class='ident'>transport</span>, <span class='ident'>data</span>)
+                }
             }
         }
     }

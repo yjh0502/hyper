@@ -413,6 +413,18 @@
 <span id="369">369</span>
 <span id="370">370</span>
 <span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>borrow</span>::<span class='ident'>Cow</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cmp</span>;
@@ -424,7 +436,8 @@
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>, <span class='ident'>Clone</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Encoder</span> {
     <span class='ident'>kind</span>: <span class='ident'>Kind</span>,
-    <span class='ident'>prefix</span>: <span class='ident'>Prefix</span>, <span class='comment'>//Option&lt;WriteBuf&lt;Vec&lt;u8&gt;&gt;&gt;</span>
+    <span class='ident'>prefix</span>: <span class='ident'>Prefix</span>,
+    <span class='ident'>is_closed</span>: <span class='ident'>bool</span>,
 }
 
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Clone</span>)]</span>
@@ -441,14 +454,16 @@
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>chunked</span>() <span class='op'>-&gt;</span> <span class='ident'>Encoder</span> {
         <span class='ident'>Encoder</span> {
             <span class='ident'>kind</span>: <span class='ident'>Kind</span>::<span class='ident'>Chunked</span>(<span class='ident'>Chunked</span>::<span class='ident'>Init</span>),
-            <span class='ident'>prefix</span>: <span class='ident'>Prefix</span>(<span class='prelude-val'>None</span>)
+            <span class='ident'>prefix</span>: <span class='ident'>Prefix</span>(<span class='prelude-val'>None</span>),
+            <span class='ident'>is_closed</span>: <span class='boolval'>false</span>,
         }
     }
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>length</span>(<span class='ident'>len</span>: <span class='ident'>u64</span>) <span class='op'>-&gt;</span> <span class='ident'>Encoder</span> {
         <span class='ident'>Encoder</span> {
             <span class='ident'>kind</span>: <span class='ident'>Kind</span>::<span class='ident'>Length</span>(<span class='ident'>len</span>),
-            <span class='ident'>prefix</span>: <span class='ident'>Prefix</span>(<span class='prelude-val'>None</span>)
+            <span class='ident'>prefix</span>: <span class='ident'>Prefix</span>(<span class='prelude-val'>None</span>),
+            <span class='ident'>is_closed</span>: <span class='boolval'>false</span>,
         }
     }
 
@@ -467,7 +482,16 @@
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>end</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>WriteBuf</span><span class='op'>&lt;</span><span class='ident'>Cow</span><span class='op'>&lt;</span><span class='lifetime'>&#39;static</span>, [<span class='ident'>u8</span>]<span class='op'>&gt;&gt;</span><span class='op'>&gt;</span> {
+    <span class='doccomment'>/// User has called `encoder.close()` in a `Handler`.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_closed</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
+        <span class='self'>self</span>.<span class='ident'>is_closed</span>
+    }
+
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>close</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
+        <span class='self'>self</span>.<span class='ident'>is_closed</span> <span class='op'>=</span> <span class='boolval'>true</span>;
+    }
+
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>finish</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>WriteBuf</span><span class='op'>&lt;</span><span class='ident'>Cow</span><span class='op'>&lt;</span><span class='lifetime'>&#39;static</span>, [<span class='ident'>u8</span>]<span class='op'>&gt;&gt;</span><span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>trailer</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>trailer</span>();
         <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>prefix</span>.<span class='number'>0</span>;
 
@@ -751,7 +775,7 @@
     <span class='kw'>use</span> <span class='ident'>mock</span>::{<span class='ident'>Async</span>, <span class='ident'>Buf</span>};
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_write_chunked_sync</span>() {
+    <span class='kw'>fn</span> <span class='ident'>test_chunked_encode_sync</span>() {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>dst</span> <span class='op'>=</span> <span class='ident'>Buf</span>::<span class='ident'>new</span>();
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>encoder</span> <span class='op'>=</span> <span class='ident'>Encoder</span>::<span class='ident'>chunked</span>();
 
@@ -762,7 +786,7 @@
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_write_chunked_async</span>() {
+    <span class='kw'>fn</span> <span class='ident'>test_chunked_encode_async</span>() {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>dst</span> <span class='op'>=</span> <span class='ident'>Async</span>::<span class='ident'>new</span>(<span class='ident'>Buf</span>::<span class='ident'>new</span>(), <span class='number'>7</span>);
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>encoder</span> <span class='op'>=</span> <span class='ident'>Encoder</span>::<span class='ident'>chunked</span>();
 
@@ -776,7 +800,7 @@
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_write_sized</span>() {
+    <span class='kw'>fn</span> <span class='ident'>test_sized_encode</span>() {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>dst</span> <span class='op'>=</span> <span class='ident'>Buf</span>::<span class='ident'>new</span>();
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>encoder</span> <span class='op'>=</span> <span class='ident'>Encoder</span>::<span class='ident'>length</span>(<span class='number'>8</span>);
         <span class='ident'>encoder</span>.<span class='ident'>encode</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>dst</span>, <span class='string'>b&quot;foo bar&quot;</span>).<span class='ident'>unwrap</span>();
