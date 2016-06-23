@@ -47,14 +47,16 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-7590' class='srclink' href='../../src/hyper/src/server/request.rs.html#27-34' title='goto source code'>[src]</a></span></h1>
-<pre class='rust struct'>pub struct Request {
+               </span><a id='src-7595' class='srclink' href='../../src/hyper/src/server/request.rs.html#29-35' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Request&lt;'a, T: 'a&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>A request bundles several parts of an incoming <code>NetworkStream</code>, given to a <code>Handler</code>.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../hyper/server/struct.Request.html' title='hyper::server::Request'>Request</a></code></h3><div class='impl-items'><h4 id='method.method' class='method'><code>fn <a href='#method.method' class='fnname'>method</a>(&amp;self) -&gt; &amp;<a class='enum' href='../../hyper/method/enum.Method.html' title='hyper::method::Method'>Method</a></code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;'a, T&gt; <a class='struct' href='../../hyper/server/struct.Request.html' title='hyper::server::Request'>Request</a>&lt;'a, T&gt;</code></h3><div class='impl-items'><h4 id='method.method' class='method'><code>fn <a href='#method.method' class='fnname'>method</a>(&amp;self) -&gt; &amp;<a class='enum' href='../../hyper/method/enum.Method.html' title='hyper::method::Method'>Method</a></code></h4>
 <div class='docblock'><p>The <code>Method</code>, such as <code>Get</code>, <code>Post</code>, etc.</p>
 </div><h4 id='method.headers' class='method'><code>fn <a href='#method.headers' class='fnname'>headers</a>(&amp;self) -&gt; &amp;<a class='struct' href='../../hyper/header/struct.Headers.html' title='hyper::header::Headers'>Headers</a></code></h4>
 <div class='docblock'><p>The headers of the incoming request.</p>
+</div><h4 id='method.transport' class='method'><code>fn <a href='#method.transport' class='fnname'>transport</a>(&amp;self) -&gt; &amp;'a T</code></h4>
+<div class='docblock'><p>The underlying <code>Transport</code> of this request.</p>
 </div><h4 id='method.uri' class='method'><code>fn <a href='#method.uri' class='fnname'>uri</a>(&amp;self) -&gt; &amp;<a class='enum' href='../../hyper/uri/enum.RequestUri.html' title='hyper::uri::RequestUri'>RequestUri</a></code></h4>
 <div class='docblock'><p>The target request-uri for this request.</p>
 </div><h4 id='method.version' class='method'><code>fn <a href='#method.version' class='fnname'>version</a>(&amp;self) -&gt; &amp;<a class='enum' href='../../hyper/version/enum.HttpVersion.html' title='hyper::version::HttpVersion'>HttpVersion</a></code></h4>
@@ -63,7 +65,7 @@
 <div class='docblock'><p>Deconstruct this Request into its pieces.</p>
 
 <p>Modifying these pieces will have no effect on how hyper behaves.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../hyper/server/struct.Request.html' title='hyper::server::Request'>Request</a></code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;'a, T&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../hyper/server/struct.Request.html' title='hyper::server::Request'>Request</a>&lt;'a, T&gt;</code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 

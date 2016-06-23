@@ -116,11 +116,28 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Server Requests</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! These are requests that a `hyper::Server` receives, and include its method,</span>
 <span class='doccomment'>//! target URI, headers, and message body.</span>
+
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 
 <span class='kw'>use</span> <span class='ident'>version</span>::<span class='ident'>HttpVersion</span>;
 <span class='kw'>use</span> <span class='ident'>method</span>::<span class='ident'>Method</span>;
@@ -128,7 +145,7 @@
 <span class='kw'>use</span> <span class='ident'>http</span>::{<span class='ident'>RequestHead</span>, <span class='ident'>MessageHead</span>, <span class='ident'>RequestLine</span>};
 <span class='kw'>use</span> <span class='ident'>uri</span>::<span class='ident'>RequestUri</span>;
 
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>incoming</span>: <span class='ident'>RequestHead</span>) <span class='op'>-&gt;</span> <span class='ident'>Request</span> {
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span>(<span class='ident'>incoming</span>: <span class='ident'>RequestHead</span>, <span class='ident'>transport</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Request</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>let</span> <span class='ident'>MessageHead</span> { <span class='ident'>version</span>, <span class='ident'>subject</span>: <span class='ident'>RequestLine</span>(<span class='ident'>method</span>, <span class='ident'>uri</span>), <span class='ident'>headers</span> } <span class='op'>=</span> <span class='ident'>incoming</span>;
     <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Request Line: {:?} {:?} {:?}&quot;</span>, <span class='ident'>method</span>, <span class='ident'>uri</span>, <span class='ident'>version</span>);
     <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;{:#?}&quot;</span>, <span class='ident'>headers</span>);
@@ -138,22 +155,31 @@
         <span class='ident'>uri</span>: <span class='ident'>uri</span>,
         <span class='ident'>headers</span>: <span class='ident'>headers</span>,
         <span class='ident'>version</span>: <span class='ident'>version</span>,
+        <span class='ident'>transport</span>: <span class='ident'>transport</span>,
     }
 }
 
 <span class='doccomment'>/// A request bundles several parts of an incoming `NetworkStream`, given to a `Handler`.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Request</span> {
-    <span class='comment'>// The IP address of the remote connection.</span>
-    <span class='comment'>//remote_addr: SocketAddr,</span>
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Request</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
     <span class='ident'>method</span>: <span class='ident'>Method</span>,
-    <span class='ident'>headers</span>: <span class='ident'>Headers</span>,
     <span class='ident'>uri</span>: <span class='ident'>RequestUri</span>,
     <span class='ident'>version</span>: <span class='ident'>HttpVersion</span>,
+    <span class='ident'>headers</span>: <span class='ident'>Headers</span>,
+    <span class='ident'>transport</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span>,
 }
 
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='kw'>for</span> <span class='ident'>Request</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
+        <span class='ident'>f</span>.<span class='ident'>debug_struct</span>(<span class='string'>&quot;Request&quot;</span>)
+            .<span class='ident'>field</span>(<span class='string'>&quot;method&quot;</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>method</span>)
+            .<span class='ident'>field</span>(<span class='string'>&quot;uri&quot;</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>uri</span>)
+            .<span class='ident'>field</span>(<span class='string'>&quot;version&quot;</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>version</span>)
+            .<span class='ident'>field</span>(<span class='string'>&quot;headers&quot;</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>headers</span>)
+            .<span class='ident'>finish</span>()
+    }
+}
 
-<span class='kw'>impl</span> <span class='ident'>Request</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>Request</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// The `Method`, such as `Get`, `Post`, etc.</span>
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>method</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>Method</span> { <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>method</span> }
@@ -161,6 +187,10 @@
     <span class='doccomment'>/// The headers of the incoming request.</span>
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>headers</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>Headers</span> { <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>headers</span> }
+
+    <span class='doccomment'>/// The underlying `Transport` of this request.</span>
+    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>transport</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span> { <span class='self'>self</span>.<span class='ident'>transport</span> }
 
     <span class='doccomment'>/// The target request-uri for this request.</span>
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>

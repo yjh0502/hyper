@@ -988,7 +988,7 @@ impl Drop for Client {
         <span class='self'>self</span>.<span class='ident'>handler</span>.<span class='ident'>on_request_writable</span>(<span class='ident'>transport</span>)
     }
 
-    <span class='kw'>fn</span> <span class='ident'>on_incoming</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>head</span>: <span class='ident'>http</span>::<span class='ident'>ResponseHead</span>) <span class='op'>-&gt;</span> <span class='ident'>Next</span> {
+    <span class='kw'>fn</span> <span class='ident'>on_incoming</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>head</span>: <span class='ident'>http</span>::<span class='ident'>ResponseHead</span>, _: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Next</span> {
         <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;on_incoming {:?}&quot;</span>, <span class='ident'>head</span>);
         <span class='kw'>let</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='ident'>response</span>::<span class='ident'>new</span>(<span class='ident'>head</span>);
         <span class='self'>self</span>.<span class='ident'>handler</span>.<span class='ident'>on_response</span>(<span class='ident'>resp</span>)
