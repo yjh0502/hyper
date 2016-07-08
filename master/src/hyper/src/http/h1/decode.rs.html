@@ -365,7 +365,7 @@
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>eof</span>() <span class='op'>-&gt;</span> <span class='ident'>Decoder</span> {
         <span class='ident'>Decoder</span> {
-            <span class='ident'>kind</span>: <span class='ident'>Kind</span>::<span class='ident'>Eof</span>(<span class='boolval'>false</span>)
+            <span class='ident'>kind</span>: <span class='ident'>Kind</span>::<span class='ident'>Eof</span>(<span class='boolvalue'>false</span>)
         }
     }
 }
@@ -399,8 +399,8 @@
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>kind</span> {
             <span class='ident'>Length</span>(<span class='number'>0</span>) <span class='op'>|</span>
             <span class='ident'>Chunked</span>(<span class='prelude-val'>Some</span>(<span class='number'>0</span>)) <span class='op'>|</span>
-            <span class='ident'>Eof</span>(<span class='boolval'>true</span>) <span class='op'>=&gt;</span> <span class='boolval'>true</span>,
-            _ <span class='op'>=&gt;</span> <span class='boolval'>false</span>
+            <span class='ident'>Eof</span>(<span class='boolvalue'>true</span>) <span class='op'>=&gt;</span> <span class='boolvalue'>true</span>,
+            _ <span class='op'>=&gt;</span> <span class='boolvalue'>false</span>
         }
     }
 }
@@ -464,7 +464,7 @@
             <span class='ident'>Eof</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>is_eof</span>) <span class='op'>=&gt;</span> {
                 <span class='kw'>match</span> <span class='ident'>body</span>.<span class='ident'>read</span>(<span class='ident'>buf</span>) {
                     <span class='prelude-val'>Ok</span>(<span class='number'>0</span>) <span class='op'>=&gt;</span> {
-                        <span class='op'>*</span><span class='ident'>is_eof</span> <span class='op'>=</span> <span class='boolval'>true</span>;
+                        <span class='op'>*</span><span class='ident'>is_eof</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
                         <span class='prelude-val'>Ok</span>(<span class='number'>0</span>)
                     }
                     <span class='ident'>other</span> <span class='op'>=&gt;</span> <span class='ident'>other</span>
@@ -501,19 +501,19 @@
     );
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>size</span> <span class='op'>=</span> <span class='number'>0u64</span>;
     <span class='kw'>let</span> <span class='ident'>radix</span> <span class='op'>=</span> <span class='number'>16</span>;
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>in_ext</span> <span class='op'>=</span> <span class='boolval'>false</span>;
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>in_chunk_size</span> <span class='op'>=</span> <span class='boolval'>true</span>;
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>in_ext</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>in_chunk_size</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
     <span class='kw'>loop</span> {
         <span class='kw'>match</span> <span class='macro'>byte</span><span class='macro'>!</span>(<span class='ident'>rdr</span>) {
-            <span class='ident'>b</span><span class='kw-2'>@</span><span class='string'>b&#39;0&#39;</span>...<span class='string'>b&#39;9&#39;</span> <span class='kw'>if</span> <span class='ident'>in_chunk_size</span> <span class='op'>=&gt;</span> {
+            <span class='ident'>b</span>@<span class='string'>b&#39;0&#39;</span>...<span class='string'>b&#39;9&#39;</span> <span class='kw'>if</span> <span class='ident'>in_chunk_size</span> <span class='op'>=&gt;</span> {
                 <span class='ident'>size</span> <span class='op'>*=</span> <span class='ident'>radix</span>;
                 <span class='ident'>size</span> <span class='op'>+=</span> (<span class='ident'>b</span> <span class='op'>-</span> <span class='string'>b&#39;0&#39;</span>) <span class='kw'>as</span> <span class='ident'>u64</span>;
             },
-            <span class='ident'>b</span><span class='kw-2'>@</span><span class='string'>b&#39;a&#39;</span>...<span class='string'>b&#39;f&#39;</span> <span class='kw'>if</span> <span class='ident'>in_chunk_size</span> <span class='op'>=&gt;</span> {
+            <span class='ident'>b</span>@<span class='string'>b&#39;a&#39;</span>...<span class='string'>b&#39;f&#39;</span> <span class='kw'>if</span> <span class='ident'>in_chunk_size</span> <span class='op'>=&gt;</span> {
                 <span class='ident'>size</span> <span class='op'>*=</span> <span class='ident'>radix</span>;
                 <span class='ident'>size</span> <span class='op'>+=</span> (<span class='ident'>b</span> <span class='op'>+</span> <span class='number'>10</span> <span class='op'>-</span> <span class='string'>b&#39;a&#39;</span>) <span class='kw'>as</span> <span class='ident'>u64</span>;
             },
-            <span class='ident'>b</span><span class='kw-2'>@</span><span class='string'>b&#39;A&#39;</span>...<span class='string'>b&#39;F&#39;</span> <span class='kw'>if</span> <span class='ident'>in_chunk_size</span> <span class='op'>=&gt;</span> {
+            <span class='ident'>b</span>@<span class='string'>b&#39;A&#39;</span>...<span class='string'>b&#39;F&#39;</span> <span class='kw'>if</span> <span class='ident'>in_chunk_size</span> <span class='op'>=&gt;</span> {
                 <span class='ident'>size</span> <span class='op'>*=</span> <span class='ident'>radix</span>;
                 <span class='ident'>size</span> <span class='op'>+=</span> (<span class='ident'>b</span> <span class='op'>+</span> <span class='number'>10</span> <span class='op'>-</span> <span class='string'>b&#39;A&#39;</span>) <span class='kw'>as</span> <span class='ident'>u64</span>;
             },
@@ -527,14 +527,14 @@
             },
             <span class='comment'>// If we weren&#39;t in the extension yet, the &quot;;&quot; signals its start</span>
             <span class='string'>b&#39;;&#39;</span> <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>in_ext</span> <span class='op'>=&gt;</span> {
-                <span class='ident'>in_ext</span> <span class='op'>=</span> <span class='boolval'>true</span>;
-                <span class='ident'>in_chunk_size</span> <span class='op'>=</span> <span class='boolval'>false</span>;
+                <span class='ident'>in_ext</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
+                <span class='ident'>in_chunk_size</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
             },
             <span class='comment'>// &quot;Linear white space&quot; is ignored between the chunk size and the</span>
             <span class='comment'>// extension separator token (&quot;;&quot;) due to the &quot;implied *LWS rule&quot;.</span>
             <span class='string'>b&#39;\t&#39;</span> <span class='op'>|</span> <span class='string'>b&#39; &#39;</span> <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>in_ext</span> <span class='kw-2'>&amp;</span> <span class='op'>!</span><span class='ident'>in_chunk_size</span> <span class='op'>=&gt;</span> {},
             <span class='comment'>// LWS can follow the chunk size, but no more digits can come</span>
-            <span class='string'>b&#39;\t&#39;</span> <span class='op'>|</span> <span class='string'>b&#39; &#39;</span> <span class='kw'>if</span> <span class='ident'>in_chunk_size</span> <span class='op'>=&gt;</span> <span class='ident'>in_chunk_size</span> <span class='op'>=</span> <span class='boolval'>false</span>,
+            <span class='string'>b&#39;\t&#39;</span> <span class='op'>|</span> <span class='string'>b&#39; &#39;</span> <span class='kw'>if</span> <span class='ident'>in_chunk_size</span> <span class='op'>=&gt;</span> <span class='ident'>in_chunk_size</span> <span class='op'>=</span> <span class='boolvalue'>false</span>,
             <span class='comment'>// We allow any arbitrary octet once we are in the extension, since</span>
             <span class='comment'>// they all get ignored anyway. According to the HTTP spec, valid</span>
             <span class='comment'>// extensions would have a more strict syntax:</span>
@@ -560,7 +560,7 @@
 <span class='kw'>mod</span> <span class='ident'>tests</span> {
     <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>error</span>::<span class='ident'>Error</span>;
     <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
-    <span class='kw'>use</span> <span class='ident'>super</span>::{<span class='ident'>Decoder</span>, <span class='ident'>read_chunk_size</span>};
+    <span class='kw'>use</span> <span class='kw'>super</span>::{<span class='ident'>Decoder</span>, <span class='ident'>read_chunk_size</span>};
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_read_chunk_size</span>() {
@@ -653,6 +653,8 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

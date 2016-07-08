@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-7969' class='srclink' href='../../src/hyper/src/server/mod.rs.html#351-356' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-7966' class='srclink' href='../../src/hyper/src/server/mod.rs.html#351-356' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait HandlerFactory&lt;T: <a class='trait' href='../../hyper/net/trait.Transport.html' title='hyper::net::Transport'>Transport</a>&gt; {
     type <a href='#associatedtype.Output' class='type'>Output</a>: <a class='trait' href='../../hyper/server/trait.Handler.html' title='hyper::server::Handler'>Handler</a>&lt;T&gt;;
     fn <a href='#tymethod.create' class='fnname'>create</a>(&amp;mut self, ctrl: <a class='struct' href='../../hyper/struct.Control.html' title='hyper::Control'>Control</a>) -&gt; Self::<a class='trait' href='../../hyper/server/trait.HandlerFactory.html' title='hyper::server::HandlerFactory'>Output</a>;
@@ -63,7 +63,8 @@
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    </ul><script type="text/javascript" async
+    <li><code>impl&lt;F, H, T&gt; HandlerFactory&lt;T&gt; for F <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(<a class='struct' href='../../hyper/struct.Control.html' title='hyper::Control'>Control</a>) -&gt; H, H: <a class='trait' href='../../hyper/server/trait.Handler.html' title='hyper::server::Handler'>Handler</a>&lt;T&gt;, T: <a class='trait' href='../../hyper/net/trait.Transport.html' title='hyper::net::Transport'>Transport</a></span></code></li>
+</ul><script type="text/javascript" async
                          src="../../implementors/hyper/server/trait.HandlerFactory.js">
                  </script></section>
     <section id='search' class="content hidden"></section>
@@ -88,6 +89,8 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 
