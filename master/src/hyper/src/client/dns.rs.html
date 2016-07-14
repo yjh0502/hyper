@@ -126,10 +126,23 @@
 <span id="82">82</span>
 <span id="83">83</span>
 <span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>net</span>::{<span class='ident'>IpAddr</span>, <span class='ident'>ToSocketAddrs</span>};
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>net</span>::{<span class='ident'>IpAddr</span>, <span class='ident'>SocketAddr</span>, <span class='ident'>ToSocketAddrs</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>thread</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>vec</span>;
 
 <span class='kw'>use</span> ::<span class='ident'>spmc</span>;
 
@@ -140,7 +153,19 @@
     <span class='ident'>rx</span>: <span class='ident'>channel</span>::<span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>Answer</span><span class='op'>&gt;</span>,
 }
 
-<span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>Answer</span> <span class='op'>=</span> (<span class='ident'>String</span>, <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>IpAddr</span><span class='op'>&gt;</span>);
+<span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>Answer</span> <span class='op'>=</span> (<span class='ident'>String</span>, <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>IpAddrs</span><span class='op'>&gt;</span>);
+
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>IpAddrs</span> {
+    <span class='ident'>iter</span>: <span class='ident'>vec</span>::<span class='ident'>IntoIter</span><span class='op'>&lt;</span><span class='ident'>SocketAddr</span><span class='op'>&gt;</span>,
+}
+
+<span class='kw'>impl</span> <span class='ident'>Iterator</span> <span class='kw'>for</span> <span class='ident'>IpAddrs</span> {
+    <span class='kw'>type</span> <span class='ident'>Item</span> <span class='op'>=</span> <span class='ident'>IpAddr</span>;
+    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>next</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>IpAddr</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>iter</span>.<span class='ident'>next</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>addr</span><span class='op'>|</span> <span class='ident'>addr</span>.<span class='ident'>ip</span>())
+    }
+}
 
 <span class='kw'>impl</span> <span class='ident'>Dns</span> {
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>notify</span>: (<span class='ident'>channel</span>::<span class='ident'>Sender</span><span class='op'>&lt;</span><span class='ident'>Answer</span><span class='op'>&gt;</span>, <span class='ident'>channel</span>::<span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>Answer</span><span class='op'>&gt;</span>), <span class='ident'>threads</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Dns</span> {
@@ -155,7 +180,7 @@
     }
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>resolve</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>hostname</span>: <span class='ident'>T</span>) {
-        <span class='self'>self</span>.<span class='ident'>tx</span>.<span class='ident'>send</span>(<span class='ident'>hostname</span>.<span class='ident'>into</span>()).<span class='ident'>expect</span>(<span class='string'>&quot;Workers all died horribly&quot;</span>);
+        <span class='self'>self</span>.<span class='ident'>tx</span>.<span class='ident'>send</span>(<span class='ident'>hostname</span>.<span class='ident'>into</span>()).<span class='ident'>expect</span>(<span class='string'>&quot;DNS workers all died unexpectedly&quot;</span>);
     }
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>resolved</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Answer</span>, <span class='ident'>channel</span>::<span class='ident'>TryRecvError</span><span class='op'>&gt;</span> {
@@ -170,9 +195,8 @@
         <span class='kw'>let</span> <span class='ident'>notify</span> <span class='op'>=</span> <span class='ident'>worker</span>.<span class='ident'>notify</span>.<span class='ident'>as_ref</span>().<span class='ident'>expect</span>(<span class='string'>&quot;Worker lost notify&quot;</span>);
         <span class='kw'>while</span> <span class='kw'>let</span> <span class='prelude-val'>Ok</span>(<span class='ident'>host</span>) <span class='op'>=</span> <span class='ident'>rx</span>.<span class='ident'>recv</span>() {
             <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;resolve {:?}&quot;</span>, <span class='ident'>host</span>);
-            <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='kw'>match</span> (<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>host</span>, <span class='number'>80</span>).<span class='ident'>to_socket_addrs</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='kw-2'>mut</span> <span class='ident'>i</span><span class='op'>|</span> <span class='ident'>i</span>.<span class='ident'>next</span>()) {
-                <span class='prelude-val'>Ok</span>(<span class='prelude-val'>Some</span>(<span class='ident'>addr</span>)) <span class='op'>=&gt;</span> (<span class='ident'>host</span>, <span class='prelude-val'>Ok</span>(<span class='ident'>addr</span>.<span class='ident'>ip</span>())),
-                <span class='prelude-val'>Ok</span>(<span class='prelude-val'>None</span>) <span class='op'>=&gt;</span> (<span class='ident'>host</span>, <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>Other</span>, <span class='string'>&quot;no addresses found&quot;</span>))),
+            <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='kw'>match</span> (<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>host</span>, <span class='number'>80</span>).<span class='ident'>to_socket_addrs</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>i</span><span class='op'>|</span> <span class='ident'>IpAddrs</span>{ <span class='ident'>iter</span>: <span class='ident'>i</span> }) {
+                <span class='prelude-val'>Ok</span>(<span class='ident'>addrs</span>) <span class='op'>=&gt;</span> (<span class='ident'>host</span>, <span class='prelude-val'>Ok</span>(<span class='ident'>addrs</span>)),
                 <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> (<span class='ident'>host</span>, <span class='prelude-val'>Err</span>(<span class='ident'>e</span>))
             };
 
