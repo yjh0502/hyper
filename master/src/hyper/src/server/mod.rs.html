@@ -415,6 +415,8 @@
 <span id="371">371</span>
 <span id="372">372</span>
 <span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! HTTP Server</span>
 <span class='doccomment'>//!</span>
@@ -433,7 +435,9 @@
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>response</span>::<span class='ident'>Response</span>;
 
 <span class='kw'>use</span> <span class='ident'>http</span>::{<span class='self'>self</span>, <span class='ident'>Next</span>};
-<span class='kw'>use</span> <span class='ident'>net</span>::{<span class='ident'>Accept</span>, <span class='ident'>HttpListener</span>, <span class='ident'>HttpsListener</span>, <span class='ident'>SslServer</span>, <span class='ident'>Transport</span>};
+
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>net</span>::{<span class='ident'>Accept</span>, <span class='ident'>HttpListener</span>, <span class='ident'>HttpsListener</span>};
+<span class='kw'>use</span> <span class='ident'>net</span>::{<span class='ident'>SslServer</span>, <span class='ident'>Transport</span>};
 
 
 <span class='kw'>mod</span> <span class='ident'>request</span>;
