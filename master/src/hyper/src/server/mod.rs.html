@@ -417,6 +417,13 @@
 <span id="373">373</span>
 <span id="374">374</span>
 <span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! HTTP Server</span>
 <span class='doccomment'>//!</span>
@@ -460,7 +467,7 @@
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Server</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Accept</span><span class='op'>&gt;</span> {
     <span class='ident'>listener</span>: <span class='ident'>T</span>,
     <span class='ident'>keep_alive</span>: <span class='ident'>bool</span>,
-    <span class='ident'>idle_timeout</span>: <span class='ident'>Duration</span>,
+    <span class='ident'>idle_timeout</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Duration</span><span class='op'>&gt;</span>,
     <span class='ident'>max_sockets</span>: <span class='ident'>usize</span>,
 }
 
@@ -471,7 +478,7 @@
         <span class='ident'>Server</span> {
             <span class='ident'>listener</span>: <span class='ident'>listener</span>,
             <span class='ident'>keep_alive</span>: <span class='boolvalue'>true</span>,
-            <span class='ident'>idle_timeout</span>: <span class='ident'>Duration</span>::<span class='ident'>from_secs</span>(<span class='number'>10</span>),
+            <span class='ident'>idle_timeout</span>: <span class='prelude-val'>Some</span>(<span class='ident'>Duration</span>::<span class='ident'>from_secs</span>(<span class='number'>10</span>)),
             <span class='ident'>max_sockets</span>: <span class='number'>4096</span>,
         }
     }
@@ -487,7 +494,7 @@
     <span class='doccomment'>/// Sets how long an idle connection will be kept before closing.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Default is 10 seconds.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>idle_timeout</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>val</span>: <span class='ident'>Duration</span>) <span class='op'>-&gt;</span> <span class='ident'>Server</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>idle_timeout</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>val</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Duration</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Server</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='self'>self</span>.<span class='ident'>idle_timeout</span> <span class='op'>=</span> <span class='ident'>val</span>;
         <span class='self'>self</span>
     }
@@ -537,6 +544,7 @@
         <span class='ident'>config</span>.<span class='ident'>slab_capacity</span>(<span class='self'>self</span>.<span class='ident'>max_sockets</span>);
         <span class='ident'>config</span>.<span class='ident'>mio</span>().<span class='ident'>notify_capacity</span>(<span class='self'>self</span>.<span class='ident'>max_sockets</span>);
         <span class='kw'>let</span> <span class='ident'>keep_alive</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>keep_alive</span>;
+        <span class='kw'>let</span> <span class='ident'>idle_timeout</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>idle_timeout</span>;
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>loop_</span> <span class='op'>=</span> <span class='ident'>rotor</span>::<span class='ident'>Loop</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>config</span>).<span class='ident'>unwrap</span>();
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>notifier</span> <span class='op'>=</span> <span class='prelude-val'>None</span>;
         {
@@ -555,8 +563,9 @@
         };
         <span class='kw'>let</span> <span class='ident'>server</span> <span class='op'>=</span> <span class='ident'>ServerLoop</span> {
             <span class='ident'>inner</span>: <span class='prelude-val'>Some</span>((<span class='ident'>loop_</span>, <span class='ident'>Context</span> {
+                <span class='ident'>factory</span>: <span class='ident'>factory</span>,
+                <span class='ident'>idle_timeout</span>: <span class='ident'>idle_timeout</span>,
                 <span class='ident'>keep_alive</span>: <span class='ident'>keep_alive</span>,
-                <span class='ident'>factory</span>: <span class='ident'>factory</span>
             }))
         };
         <span class='prelude-val'>Ok</span>((<span class='ident'>listening</span>, <span class='ident'>server</span>))
@@ -582,8 +591,9 @@
 }
 
 <span class='kw'>struct</span> <span class='ident'>Context</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span> {
-    <span class='ident'>keep_alive</span>: <span class='ident'>bool</span>,
     <span class='ident'>factory</span>: <span class='ident'>F</span>,
+    <span class='ident'>idle_timeout</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Duration</span><span class='op'>&gt;</span>,
+    <span class='ident'>keep_alive</span>: <span class='ident'>bool</span>,
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>F</span>: <span class='ident'>HandlerFactory</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>T</span>: <span class='ident'>Transport</span><span class='op'>&gt;</span> <span class='ident'>http</span>::<span class='ident'>MessageHandlerFactory</span><span class='op'>&lt;</span>(), <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Context</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span> {
@@ -594,7 +604,11 @@
     }
 
     <span class='kw'>fn</span> <span class='ident'>keep_alive_interest</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Next</span> {
-        <span class='ident'>Next</span>::<span class='ident'>read</span>()
+        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>dur</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>idle_timeout</span> {
+            <span class='ident'>Next</span>::<span class='ident'>read</span>().<span class='ident'>timeout</span>(<span class='ident'>dur</span>)
+        } <span class='kw'>else</span> {
+            <span class='ident'>Next</span>::<span class='ident'>read</span>()
+        }
     }
 }
 

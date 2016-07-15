@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-463' class='srclink' href='../../src/hyper/src/client/mod.rs.html#238-266' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-469' class='srclink' href='../../src/hyper/src/client/mod.rs.html#253-281' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait Handler&lt;T: <a class='trait' href='../../hyper/net/trait.Transport.html' title='hyper::net::Transport'>Transport</a>&gt;: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + 'static {
     fn <a href='#tymethod.on_request' class='fnname'>on_request</a>(&amp;mut self, request: &amp;mut <a class='struct' href='../../hyper/client/struct.Request.html' title='hyper::client::Request'>Request</a>) -&gt; <a class='struct' href='../../hyper/struct.Next.html' title='hyper::Next'>Next</a>;
     fn <a href='#tymethod.on_request_writable' class='fnname'>on_request_writable</a>(&amp;mut self, request: &amp;mut <a class='struct' href='../../hyper/struct.Encoder.html' title='hyper::Encoder'>Encoder</a>&lt;T&gt;) -&gt; <a class='struct' href='../../hyper/struct.Next.html' title='hyper::Next'>Next</a>;
