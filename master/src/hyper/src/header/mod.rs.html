@@ -882,6 +882,38 @@
 <span id="838">838</span>
 <span id="839">839</span>
 <span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Headers container, and common header fields.</span>
 <span class='doccomment'>//!</span>
@@ -960,15 +992,12 @@
 <span class='doccomment'>//!     }</span>
 <span class='doccomment'>//! }</span>
 <span class='doccomment'>//! ```</span>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>any</span>::<span class='ident'>Any</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>any</span>::{<span class='ident'>Any</span>, <span class='ident'>TypeId</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>borrow</span>::{<span class='ident'>Cow</span>, <span class='ident'>ToOwned</span>};
-<span class='comment'>//use std::collections::HashMap;</span>
-<span class='comment'>//use std::collections::hash_map::{Iter, Entry};</span>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>iter</span>::{<span class='ident'>FromIterator</span>, <span class='ident'>IntoIterator</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::{<span class='ident'>mem</span>, <span class='ident'>fmt</span>};
 
-<span class='kw'>use</span> {<span class='ident'>httparse</span>, <span class='ident'>traitobject</span>};
-<span class='kw'>use</span> <span class='ident'>typeable</span>::<span class='ident'>Typeable</span>;
+<span class='kw'>use</span> <span class='ident'>httparse</span>;
 <span class='kw'>use</span> <span class='ident'>unicase</span>::<span class='ident'>UniCase</span>;
 
 <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>internals</span>::{<span class='ident'>Item</span>, <span class='ident'>VecMap</span>, <span class='ident'>Entry</span>};
@@ -993,7 +1022,7 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// This trait represents the construction and identification of headers,</span>
 <span class='doccomment'>/// and contains trait-object unsafe methods.</span>
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Header</span>: <span class='ident'>HeaderClone</span> <span class='op'>+</span> <span class='ident'>Any</span> <span class='op'>+</span> <span class='ident'>Typeable</span> <span class='op'>+</span> <span class='ident'>Send</span> <span class='op'>+</span> <span class='ident'>Sync</span> {
+<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Header</span>: <span class='ident'>HeaderClone</span> <span class='op'>+</span> <span class='ident'>Any</span> <span class='op'>+</span> <span class='ident'>GetType</span> <span class='op'>+</span> <span class='ident'>Send</span> <span class='op'>+</span> <span class='ident'>Sync</span> {
     <span class='doccomment'>/// Returns the name of the header field this belongs to.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// This will become an associated constant once available.</span>
@@ -1014,6 +1043,33 @@
 }
 
 <span class='attribute'>#[<span class='ident'>doc</span>(<span class='ident'>hidden</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>GetType</span>: <span class='ident'>Any</span> {
+    <span class='attribute'>#[<span class='ident'>inline</span>(<span class='ident'>always</span>)]</span>
+    <span class='kw'>fn</span> <span class='ident'>get_type</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>TypeId</span> {
+        <span class='ident'>TypeId</span>::<span class='ident'>of</span>::<span class='op'>&lt;</span><span class='self'>Self</span><span class='op'>&gt;</span>()
+    }
+}
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Any</span><span class='op'>&gt;</span> <span class='ident'>GetType</span> <span class='kw'>for</span> <span class='ident'>T</span> {}
+
+<span class='attribute'>#[<span class='ident'>test</span>]</span>
+<span class='kw'>fn</span> <span class='ident'>test_get_type</span>() {
+    <span class='kw'>use</span> ::<span class='ident'>header</span>::{<span class='ident'>ContentLength</span>, <span class='ident'>UserAgent</span>};
+
+    <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='ident'>ContentLength</span>(<span class='number'>5</span>);
+    <span class='kw'>let</span> <span class='ident'>agent</span> <span class='op'>=</span> <span class='ident'>UserAgent</span>(<span class='string'>&quot;hyper&quot;</span>.<span class='ident'>to_owned</span>());
+
+    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>TypeId</span>::<span class='ident'>of</span>::<span class='op'>&lt;</span><span class='ident'>ContentLength</span><span class='op'>&gt;</span>(), <span class='ident'>len</span>.<span class='ident'>get_type</span>());
+    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>TypeId</span>::<span class='ident'>of</span>::<span class='op'>&lt;</span><span class='ident'>UserAgent</span><span class='op'>&gt;</span>(), <span class='ident'>agent</span>.<span class='ident'>get_type</span>());
+
+    <span class='kw'>let</span> <span class='ident'>len</span>: <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Header</span> <span class='op'>+</span> <span class='ident'>Send</span> <span class='op'>+</span> <span class='ident'>Sync</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Box</span>::<span class='ident'>new</span>(<span class='ident'>len</span>);
+    <span class='kw'>let</span> <span class='ident'>agent</span>: <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Header</span> <span class='op'>+</span> <span class='ident'>Send</span> <span class='op'>+</span> <span class='ident'>Sync</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Box</span>::<span class='ident'>new</span>(<span class='ident'>agent</span>);
+
+    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>TypeId</span>::<span class='ident'>of</span>::<span class='op'>&lt;</span><span class='ident'>ContentLength</span><span class='op'>&gt;</span>(), (<span class='op'>*</span><span class='ident'>len</span>).<span class='ident'>get_type</span>());
+    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>TypeId</span>::<span class='ident'>of</span>::<span class='op'>&lt;</span><span class='ident'>UserAgent</span><span class='op'>&gt;</span>(), (<span class='op'>*</span><span class='ident'>agent</span>).<span class='ident'>get_type</span>());
+}
+
+<span class='attribute'>#[<span class='ident'>doc</span>(<span class='ident'>hidden</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>HeaderClone</span> {
     <span class='kw'>fn</span> <span class='ident'>clone_box</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Header</span> <span class='op'>+</span> <span class='ident'>Send</span> <span class='op'>+</span> <span class='ident'>Sync</span><span class='op'>&gt;</span>;
 }
@@ -1026,14 +1082,22 @@
 }
 
 <span class='kw'>impl</span> <span class='ident'>Header</span> <span class='op'>+</span> <span class='ident'>Send</span> <span class='op'>+</span> <span class='ident'>Sync</span> {
+    <span class='comment'>// A trait object looks like this:</span>
+    <span class='comment'>//</span>
+    <span class='comment'>// TraitObject { data: *mut (), vtable: *mut () }</span>
+    <span class='comment'>//</span>
+    <span class='comment'>// So, we transmute &amp;Trait into a (*mut (), *mut ()). This depends on the</span>
+    <span class='comment'>// order the compiler has chosen to represent a TraitObject.</span>
+    <span class='comment'>//</span>
+    <span class='comment'>// It has been assured that this order will be stable.</span>
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>downcast_ref_unchecked</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='lifetime'>&#39;static</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>T</span> {
-        <span class='kw-2'>&amp;</span><span class='op'>*</span>(<span class='ident'>traitobject</span>::<span class='ident'>data</span>(<span class='self'>self</span>) <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>T</span>)
+        <span class='kw-2'>&amp;</span><span class='op'>*</span>(<span class='ident'>mem</span>::<span class='ident'>transmute</span>::<span class='op'>&lt;</span><span class='op'>*</span><span class='kw'>const</span> _, (<span class='op'>*</span><span class='kw'>const</span> (), <span class='op'>*</span><span class='kw'>const</span> ())<span class='op'>&gt;</span>(<span class='self'>self</span>).<span class='number'>0</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>T</span>)
     }
 
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>downcast_mut_unchecked</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='lifetime'>&#39;static</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>T</span> {
-        <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='op'>*</span>(<span class='ident'>traitobject</span>::<span class='ident'>data_mut</span>(<span class='self'>self</span>) <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>T</span>)
+        <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='op'>*</span>(<span class='ident'>mem</span>::<span class='ident'>transmute</span>::<span class='op'>&lt;</span><span class='op'>*</span><span class='kw-2'>mut</span> _, (<span class='op'>*</span><span class='kw-2'>mut</span> (), <span class='op'>*</span><span class='kw-2'>mut</span> ())<span class='op'>&gt;</span>(<span class='self'>self</span>).<span class='number'>0</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>T</span>)
     }
 }
 
