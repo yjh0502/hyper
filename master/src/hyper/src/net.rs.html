@@ -801,10 +801,30 @@
 <span id="757">757</span>
 <span id="758">758</span>
 <span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! A collection of traits abstracting over Listeners and Streams.</span>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='self'>self</span>, <span class='ident'>Read</span>, <span class='ident'>Write</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>net</span>::{<span class='ident'>SocketAddr</span>};
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>option</span>;
 
 <span class='kw'>use</span> <span class='ident'>rotor</span>::<span class='ident'>mio</span>::<span class='ident'>tcp</span>::{<span class='ident'>TcpStream</span>, <span class='ident'>TcpListener</span>};
 <span class='kw'>use</span> <span class='ident'>rotor</span>::<span class='ident'>mio</span>::{<span class='ident'>Selector</span>, <span class='ident'>Token</span>, <span class='ident'>Evented</span>, <span class='ident'>EventSet</span>, <span class='ident'>PollOpt</span>, <span class='ident'>TryAccept</span>};
@@ -969,6 +989,15 @@
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>deregister</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>selector</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Selector</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
         <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>deregister</span>(<span class='ident'>selector</span>)
+    }
+}
+
+<span class='kw'>impl</span> <span class='ident'>IntoIterator</span> <span class='kw'>for</span> <span class='ident'>HttpListener</span> {
+    <span class='kw'>type</span> <span class='ident'>Item</span> <span class='op'>=</span> <span class='self'>Self</span>;
+    <span class='kw'>type</span> <span class='ident'>IntoIter</span> <span class='op'>=</span> <span class='ident'>option</span>::<span class='ident'>IntoIter</span><span class='op'>&lt;</span><span class='self'>Self</span><span class='op'>&gt;</span>;
+
+    <span class='kw'>fn</span> <span class='ident'>into_iter</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span>::<span class='ident'>IntoIter</span> {
+        <span class='prelude-val'>Some</span>(<span class='self'>self</span>).<span class='ident'>into_iter</span>()
     }
 }
 
@@ -1191,6 +1220,15 @@
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>deregister</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>selector</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Selector</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
         <span class='self'>self</span>.<span class='ident'>listener</span>.<span class='ident'>deregister</span>(<span class='ident'>selector</span>)
+    }
+}
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>SslServer</span><span class='op'>&gt;</span> <span class='ident'>IntoIterator</span> <span class='kw'>for</span> <span class='ident'>HttpsListener</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> {
+    <span class='kw'>type</span> <span class='ident'>Item</span> <span class='op'>=</span> <span class='self'>Self</span>;
+    <span class='kw'>type</span> <span class='ident'>IntoIter</span> <span class='op'>=</span> <span class='ident'>option</span>::<span class='ident'>IntoIter</span><span class='op'>&lt;</span><span class='self'>Self</span><span class='op'>&gt;</span>;
+
+    <span class='kw'>fn</span> <span class='ident'>into_iter</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span>::<span class='ident'>IntoIter</span> {
+        <span class='prelude-val'>Some</span>(<span class='self'>self</span>).<span class='ident'>into_iter</span>()
     }
 }
 
