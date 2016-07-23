@@ -246,7 +246,7 @@
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::<span class='ident'>FromStr</span>;
-<span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Header</span>};
+<span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Header</span>, <span class='ident'>Raw</span>};
 <span class='kw'>use</span> <span class='ident'>header</span>::<span class='ident'>parsing</span>::{<span class='ident'>from_comma_delimited</span>, <span class='ident'>fmt_comma_delimited</span>};
 
 <span class='doccomment'>/// `Prefer` header, defined in [RFC7240](http://tools.ietf.org/html/rfc7240)</span>
@@ -302,7 +302,7 @@
         <span class='ident'>NAME</span>
     }
 
-    <span class='kw'>fn</span> <span class='ident'>parse_header</span>(<span class='ident'>raw</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>]) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Prefer</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>parse_header</span>(<span class='ident'>raw</span>: <span class='kw-2'>&amp;</span><span class='ident'>Raw</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Prefer</span><span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>preferences</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>from_comma_delimited</span>(<span class='ident'>raw</span>));
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>preferences</span>.<span class='ident'>is_empty</span>() {
             <span class='prelude-val'>Ok</span>(<span class='ident'>Prefer</span>(<span class='ident'>preferences</span>))
@@ -405,14 +405,14 @@
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_parse_multiple_headers</span>() {
-        <span class='kw'>let</span> <span class='ident'>prefer</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span>[<span class='string'>b&quot;respond-async, return=representation&quot;</span>.<span class='ident'>to_vec</span>()]);
+        <span class='kw'>let</span> <span class='ident'>prefer</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span><span class='string'>&quot;respond-async, return=representation&quot;</span>.<span class='ident'>into</span>());
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>prefer</span>.<span class='ident'>ok</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Prefer</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>Preference</span>::<span class='ident'>RespondAsync</span>,
                                            <span class='ident'>Preference</span>::<span class='ident'>ReturnRepresentation</span>])))
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_parse_argument</span>() {
-        <span class='kw'>let</span> <span class='ident'>prefer</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span>[<span class='string'>b&quot;wait=100, handling=leniant, respond-async&quot;</span>.<span class='ident'>to_vec</span>()]);
+        <span class='kw'>let</span> <span class='ident'>prefer</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span><span class='string'>&quot;wait=100, handling=leniant, respond-async&quot;</span>.<span class='ident'>into</span>());
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>prefer</span>.<span class='ident'>ok</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Prefer</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>Preference</span>::<span class='ident'>Wait</span>(<span class='number'>100</span>),
                                            <span class='ident'>Preference</span>::<span class='ident'>HandlingLeniant</span>,
                                            <span class='ident'>Preference</span>::<span class='ident'>RespondAsync</span>])))
@@ -420,14 +420,14 @@
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_parse_quote_form</span>() {
-        <span class='kw'>let</span> <span class='ident'>prefer</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span>[<span class='string'>b&quot;wait=\&quot;200\&quot;, handling=\&quot;strict\&quot;&quot;</span>.<span class='ident'>to_vec</span>()]);
+        <span class='kw'>let</span> <span class='ident'>prefer</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span><span class='string'>&quot;wait=\&quot;200\&quot;, handling=\&quot;strict\&quot;&quot;</span>.<span class='ident'>into</span>());
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>prefer</span>.<span class='ident'>ok</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Prefer</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>Preference</span>::<span class='ident'>Wait</span>(<span class='number'>200</span>),
                                            <span class='ident'>Preference</span>::<span class='ident'>HandlingStrict</span>])))
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_parse_extension</span>() {
-        <span class='kw'>let</span> <span class='ident'>prefer</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span>[<span class='string'>b&quot;foo, bar=baz, baz; foo; bar=baz, bux=\&quot;\&quot;; foo=\&quot;\&quot;, buz=\&quot;some parameter\&quot;&quot;</span>.<span class='ident'>to_vec</span>()]);
+        <span class='kw'>let</span> <span class='ident'>prefer</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span><span class='string'>&quot;foo, bar=baz, baz; foo; bar=baz, bux=\&quot;\&quot;; foo=\&quot;\&quot;, buz=\&quot;some parameter\&quot;&quot;</span>.<span class='ident'>into</span>());
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>prefer</span>.<span class='ident'>ok</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Prefer</span>(<span class='macro'>vec</span><span class='macro'>!</span>[
             <span class='ident'>Preference</span>::<span class='ident'>Extension</span>(<span class='string'>&quot;foo&quot;</span>.<span class='ident'>to_owned</span>(), <span class='string'>&quot;&quot;</span>.<span class='ident'>to_owned</span>(), <span class='macro'>vec</span><span class='macro'>!</span>[]),
             <span class='ident'>Preference</span>::<span class='ident'>Extension</span>(<span class='string'>&quot;bar&quot;</span>.<span class='ident'>to_owned</span>(), <span class='string'>&quot;baz&quot;</span>.<span class='ident'>to_owned</span>(), <span class='macro'>vec</span><span class='macro'>!</span>[]),
@@ -438,7 +438,7 @@
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_fail_with_args</span>() {
-        <span class='kw'>let</span> <span class='ident'>prefer</span>: ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Prefer</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span>[<span class='string'>b&quot;respond-async; foo=bar&quot;</span>.<span class='ident'>to_vec</span>()]);
+        <span class='kw'>let</span> <span class='ident'>prefer</span>: ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Prefer</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span><span class='string'>&quot;respond-async; foo=bar&quot;</span>.<span class='ident'>into</span>());
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>prefer</span>.<span class='ident'>ok</span>(), <span class='prelude-val'>None</span>);
     }
 }

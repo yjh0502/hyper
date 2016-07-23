@@ -165,10 +165,10 @@
         <span class='kw'>fn</span> <span class='ident'>test2</span>() {
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>vary</span>: ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Vary</span><span class='op'>&gt;</span>;
 
-            <span class='ident'>vary</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>([<span class='string'>b&quot;*&quot;</span>.<span class='ident'>to_vec</span>()].<span class='ident'>as_ref</span>());
+            <span class='ident'>vary</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span><span class='string'>&quot;*&quot;</span>.<span class='ident'>into</span>());
             <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>vary</span>.<span class='ident'>ok</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Vary</span>::<span class='ident'>Any</span>));
 
-            <span class='ident'>vary</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>([<span class='string'>b&quot;etag,cookie,allow&quot;</span>.<span class='ident'>to_vec</span>()].<span class='ident'>as_ref</span>());
+            <span class='ident'>vary</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span><span class='string'>&quot;etag,cookie,allow&quot;</span>.<span class='ident'>into</span>());
             <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>vary</span>.<span class='ident'>ok</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Vary</span>::<span class='ident'>Items</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>&quot;eTag&quot;</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>(),
                                                         <span class='string'>&quot;cookIE&quot;</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>(),
                                                         <span class='string'>&quot;AlLOw&quot;</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>(),])));

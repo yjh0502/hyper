@@ -340,7 +340,7 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::{<span class='ident'>FromStr</span>, <span class='ident'>from_utf8</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ops</span>::{<span class='ident'>Deref</span>, <span class='ident'>DerefMut</span>};
 <span class='kw'>use</span> <span class='ident'>serialize</span>::<span class='ident'>base64</span>::{<span class='ident'>ToBase64</span>, <span class='ident'>FromBase64</span>, <span class='ident'>Standard</span>, <span class='ident'>Config</span>, <span class='ident'>Newline</span>};
-<span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Header</span>};
+<span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Header</span>, <span class='ident'>Raw</span>};
 
 <span class='doccomment'>/// `Authorization` header, defined in [RFC7235](https://tools.ietf.org/html/rfc7235#section-4.2)</span>
 <span class='doccomment'>///</span>
@@ -414,25 +414,26 @@
         <span class='ident'>NAME</span>
     }
 
-    <span class='kw'>fn</span> <span class='ident'>parse_header</span>(<span class='ident'>raw</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>]) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw'>if</span> <span class='ident'>raw</span>.<span class='ident'>len</span>() <span class='op'>!=</span> <span class='number'>1</span> {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>);
-        }
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>from_utf8</span>(<span class='kw'>unsafe</span> { <span class='kw-2'>&amp;</span><span class='ident'>raw</span>.<span class='ident'>get_unchecked</span>(<span class='number'>0</span>)[..] }));
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>scheme</span>) <span class='op'>=</span> <span class='op'>&lt;</span><span class='ident'>S</span> <span class='kw'>as</span> <span class='ident'>Scheme</span><span class='op'>&gt;</span>::<span class='ident'>scheme</span>() {
-            <span class='kw'>if</span> <span class='ident'>header</span>.<span class='ident'>starts_with</span>(<span class='ident'>scheme</span>) <span class='op'>&amp;&amp;</span> <span class='ident'>header</span>.<span class='ident'>len</span>() <span class='op'>&gt;</span> <span class='ident'>scheme</span>.<span class='ident'>len</span>() <span class='op'>+</span> <span class='number'>1</span> {
-                <span class='kw'>match</span> <span class='ident'>header</span>[<span class='ident'>scheme</span>.<span class='ident'>len</span>() <span class='op'>+</span> <span class='number'>1</span>..].<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span>().<span class='ident'>map</span>(<span class='ident'>Authorization</span>) {
+    <span class='kw'>fn</span> <span class='ident'>parse_header</span>(<span class='ident'>raw</span>: <span class='kw-2'>&amp;</span><span class='ident'>Raw</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;&gt;</span> {
+        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>line</span>) <span class='op'>=</span> <span class='ident'>raw</span>.<span class='ident'>one</span>() {
+            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>from_utf8</span>(<span class='ident'>line</span>));
+            <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>scheme</span>) <span class='op'>=</span> <span class='op'>&lt;</span><span class='ident'>S</span> <span class='kw'>as</span> <span class='ident'>Scheme</span><span class='op'>&gt;</span>::<span class='ident'>scheme</span>() {
+                <span class='kw'>if</span> <span class='ident'>header</span>.<span class='ident'>starts_with</span>(<span class='ident'>scheme</span>) <span class='op'>&amp;&amp;</span> <span class='ident'>header</span>.<span class='ident'>len</span>() <span class='op'>&gt;</span> <span class='ident'>scheme</span>.<span class='ident'>len</span>() <span class='op'>+</span> <span class='number'>1</span> {
+                    <span class='kw'>match</span> <span class='ident'>header</span>[<span class='ident'>scheme</span>.<span class='ident'>len</span>() <span class='op'>+</span> <span class='number'>1</span>..].<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span>().<span class='ident'>map</span>(<span class='ident'>Authorization</span>) {
+                        <span class='prelude-val'>Ok</span>(<span class='ident'>h</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>h</span>),
+                        <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
+                    }
+                } <span class='kw'>else</span> {
+                    <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
+                }
+            } <span class='kw'>else</span> {
+                <span class='kw'>match</span> <span class='ident'>header</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span>().<span class='ident'>map</span>(<span class='ident'>Authorization</span>) {
                     <span class='prelude-val'>Ok</span>(<span class='ident'>h</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>h</span>),
                     <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
                 }
-            } <span class='kw'>else</span> {
-                <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
             }
         } <span class='kw'>else</span> {
-            <span class='kw'>match</span> <span class='ident'>header</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span>().<span class='ident'>map</span>(<span class='ident'>Authorization</span>) {
-                <span class='prelude-val'>Ok</span>(<span class='ident'>h</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>h</span>),
-                <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
-            }
+            <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
         }
     }
 
@@ -568,8 +569,7 @@
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_raw_auth_parse</span>() {
-        <span class='kw'>let</span> <span class='ident'>header</span>: <span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(
-            <span class='kw-2'>&amp;</span>[<span class='string'>b&quot;foo bar baz&quot;</span>.<span class='ident'>to_vec</span>()]).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='ident'>header</span>: <span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span><span class='string'>b&quot;foo bar baz&quot;</span>.<span class='ident'>as_ref</span>().<span class='ident'>into</span>()).<span class='ident'>unwrap</span>();
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>header</span>.<span class='number'>0</span>, <span class='string'>&quot;foo bar baz&quot;</span>);
     }
 
@@ -593,7 +593,7 @@
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_basic_auth_parse</span>() {
         <span class='kw'>let</span> <span class='ident'>auth</span>: <span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>Basic</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(
-            <span class='kw-2'>&amp;</span>[<span class='string'>b&quot;Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==&quot;</span>.<span class='ident'>to_vec</span>()]).<span class='ident'>unwrap</span>();
+            <span class='kw-2'>&amp;</span><span class='string'>b&quot;Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==&quot;</span>.<span class='ident'>as_ref</span>().<span class='ident'>into</span>()).<span class='ident'>unwrap</span>();
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>auth</span>.<span class='number'>0</span>.<span class='ident'>username</span>, <span class='string'>&quot;Aladdin&quot;</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>auth</span>.<span class='number'>0</span>.<span class='ident'>password</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;open sesame&quot;</span>.<span class='ident'>to_owned</span>()));
     }
@@ -601,7 +601,7 @@
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_basic_auth_parse_no_password</span>() {
         <span class='kw'>let</span> <span class='ident'>auth</span>: <span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>Basic</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(
-            <span class='kw-2'>&amp;</span>[<span class='string'>b&quot;Basic QWxhZGRpbjo=&quot;</span>.<span class='ident'>to_vec</span>()]).<span class='ident'>unwrap</span>();
+            <span class='kw-2'>&amp;</span><span class='string'>b&quot;Basic QWxhZGRpbjo=&quot;</span>.<span class='ident'>as_ref</span>().<span class='ident'>into</span>()).<span class='ident'>unwrap</span>();
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>auth</span>.<span class='number'>0</span>.<span class='ident'>username</span>, <span class='string'>&quot;Aladdin&quot;</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>auth</span>.<span class='number'>0</span>.<span class='ident'>password</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;&quot;</span>.<span class='ident'>to_owned</span>()));
     }
@@ -619,7 +619,7 @@
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_bearer_auth_parse</span>() {
         <span class='kw'>let</span> <span class='ident'>auth</span>: <span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>Bearer</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(
-            <span class='kw-2'>&amp;</span>[<span class='string'>b&quot;Bearer fpKL54jvWmEGVoRdCNjG&quot;</span>.<span class='ident'>to_vec</span>()]).<span class='ident'>unwrap</span>();
+            <span class='kw-2'>&amp;</span><span class='string'>b&quot;Bearer fpKL54jvWmEGVoRdCNjG&quot;</span>.<span class='ident'>as_ref</span>().<span class='ident'>into</span>()).<span class='ident'>unwrap</span>();
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>auth</span>.<span class='number'>0</span>.<span class='ident'>token</span>, <span class='string'>&quot;fpKL54jvWmEGVoRdCNjG&quot;</span>);
     }
 }
