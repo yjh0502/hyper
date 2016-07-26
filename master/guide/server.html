@@ -31,32 +31,327 @@
 
     <h1 class="title">Server Guide</h1>
     <nav id="TOC"><ul>
-<li><a href="#the-handler">1 The <code>Handler</code></a><ul></ul></li></ul></nav>
-<h1 id='the-handler' class='section-header'><a href='#the-handler'>1 The <code>Handler</code></a></h1>
+<li><a href="#hello-world">1 Hello, World</a><ul>
+<li><a href="#handler">1.1 Handler</a><ul></ul></li>
+<li><a href="#next">1.2 Next</a><ul></ul></li>
+<li><a href="#server">1.3 Server</a><ul></ul></li></ul></li>
+<li><a href="#non-blocking-io">2 Non-blocking IO</a><ul>
+<li><a href="#dont-panic">2.1 Don&#39;t Panic</a><ul></ul></li>
+<li><a href="#wouldblock">2.2 WouldBlock</a><ul></ul></li></ul></li>
+<li><a href="#routing">3 Routing</a><ul></ul></li>
+<li><a href="#waiting">4 Waiting</a><ul>
+<li><a href="#control">4.1 Control</a><ul></ul></li>
+<li><a href="#wait">4.2 Wait</a><ul></ul></li></ul></li></ul></nav>
+<h1 id='hello-world' class='section-header'><a href='#hello-world'>1 Hello, World</a></h1>
+<p>Let&#39;s start off by creating a simple server to just serve a text response
+of &quot;Hello, World!&quot; to every request.</p>
+
 <pre class='rust rust-example-rendered'>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>hyper</span>;
-<span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>server</span>::{<span class='ident'>Handler</span>, <span class='ident'>Request</span>, <span class='ident'>Response</span>, <span class='ident'>Decoder</span>, <span class='ident'>Encoder</span>, <span class='ident'>Next</span>, <span class='ident'>HttpStream</span> <span class='kw'>as</span> <span class='ident'>Http</span>};
+<span class='kw'>use</span> <span class='ident'>hyper</span>::{<span class='ident'>Decoder</span>, <span class='ident'>Encoder</span>, <span class='ident'>HttpStream</span> <span class='kw'>as</span> <span class='ident'>Http</span>, <span class='ident'>Next</span>};
+<span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>server</span>::{<span class='ident'>Server</span>, <span class='ident'>Handler</span>, <span class='ident'>Request</span>, <span class='ident'>Response</span>};
 
-<span class='kw'>struct</span> <span class='ident'>Hello</span>;
+<span class='kw'>struct</span> <span class='ident'>Text</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> [<span class='ident'>u8</span>]);
 
-<span class='kw'>impl</span> <span class='ident'>Handler</span><span class='op'>&lt;</span><span class='ident'>Http</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Hello</span> {
-    <span class='kw'>fn</span> <span class='ident'>on_request</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>req</span>: <span class='ident'>Request</span><span class='op'>&lt;</span><span class='ident'>Http</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Next</span> {
-
+<span class='kw'>impl</span> <span class='ident'>Handler</span><span class='op'>&lt;</span><span class='ident'>Http</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Text</span> {
+    <span class='kw'>fn</span> <span class='ident'>on_request</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>_req</span>: <span class='ident'>Request</span><span class='op'>&lt;</span><span class='ident'>Http</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Next</span> {
+        <span class='ident'>Next</span>::<span class='ident'>write</span>()
     }
 
-    <span class='kw'>fn</span> <span class='ident'>on_request_readable</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>decoder</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Decoder</span><span class='op'>&lt;</span><span class='ident'>Http</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Next</span> {
-
+    <span class='kw'>fn</span> <span class='ident'>on_request_readable</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>_decoder</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Decoder</span><span class='op'>&lt;</span><span class='ident'>Http</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Next</span> {
+        <span class='ident'>Next</span>::<span class='ident'>write</span>()
     }
 
     <span class='kw'>fn</span> <span class='ident'>on_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>res</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Response</span>) <span class='op'>-&gt;</span> <span class='ident'>Next</span> {
-
+        <span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>header</span>::<span class='ident'>ContentLength</span>;
+        <span class='ident'>res</span>.<span class='ident'>headers_mut</span>().<span class='ident'>set</span>(<span class='ident'>ContentLength</span>(<span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u64</span>));
+        <span class='ident'>Next</span>::<span class='ident'>write</span>()
     }
 
     <span class='kw'>fn</span> <span class='ident'>on_response_writable</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>encoder</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Encoder</span><span class='op'>&lt;</span><span class='ident'>Http</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Next</span> {
-
+        <span class='ident'>encoder</span>.<span class='ident'>write</span>(<span class='self'>self</span>.<span class='number'>0</span>).<span class='ident'>unwrap</span>(); <span class='comment'>// for now</span>
+        <span class='ident'>Next</span>::<span class='ident'>end</span>()
     }
 }
+
+<span class='kw'>fn</span> <span class='ident'>main</span>() {
+    <span class='kw'>let</span> <span class='ident'>addr</span> <span class='op'>=</span> <span class='string'>&quot;127.0.0.1:0&quot;</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>();
+    <span class='kw'>let</span> (<span class='ident'>listening</span>, <span class='ident'>server</span>) <span class='op'>=</span> <span class='ident'>Server</span>::<span class='ident'>http</span>(<span class='kw-2'>&amp;</span><span class='ident'>addr</span>).<span class='ident'>unwrap</span>()
+        .<span class='ident'>handle</span>(<span class='op'>|</span>_<span class='op'>|</span> <span class='ident'>Text</span>(<span class='string'>b&quot;Hello, World&quot;</span>)).<span class='ident'>unwrap</span>();
+
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;Listening on http://{}&quot;</span>, <span class='ident'>listening</span>);
+    <span class='ident'>server</span>.<span class='ident'>run</span>()
+}</pre>
+
+<p>There is quite a few concepts here, so let&#39;s tackle them one by one.</p>
+
+<h2 id='handler' class='section-header'><a href='#handler'>1.1 Handler</a></h2>
+<p>The <a href="../hyper/server/trait.Handler.html"><code>Handler</code></a> is how you define what should happen during the lifetime
+of an HTTP message.</p>
+
+<h2 id='next' class='section-header'><a href='#next'>1.2 Next</a></h2>
+<p>Every event in the <a href="../hyper/server/trait.Handler.html"><code>Handler</code></a> returns a <a href="../hyper/struct.Next.html"><code>Next</code></a>. This signals
+to hyper what the <code>Handler</code> would wishes to do next, and hyper will call the
+appropriate method of the <code>Handler</code> when the action is ready again.</p>
+
+<p>So, in our &quot;Hello World&quot; server, you&#39;ll notice that when a request comes in, we
+have no interest in the <code>Request</code> or its body. We immediately just wish to write
+&quot;Hello, World!&quot;, and be done. So, in <code>on_request</code>, we return <code>Next::write()</code>,
+which tells hyper we wish to write the response.</p>
+
+<p>After <code>on_response</code> is called, we ask for <code>Next::write()</code> again, because we
+still need to write the response body. hyper knows that the next time the
+transport is ready to be written, since it already called <code>on_response</code>, it
+will call <code>on_response_writable</code>, which is where we can write the text body.</p>
+
+<p>Once we&#39;re all done with the response, we can tell hyper to finish by returning
+<code>Next::end()</code>. hyper will try to finish flushing all the output, and if the
+conditions are met, it may try to use the underlying transport for another
+request. This is also known as &quot;keep-alive&quot;.</p>
+
+<h2 id='server' class='section-header'><a href='#server'>1.3 Server</a></h2>
+<p>In the <code>main</code> function, a <a href="../hyper/server/struct.Server.html"><code>Server</code></a> is created that will utilize our
+<code>Hello</code> handler. We use the default options, though you may wish to peruse
+them, especially the <code>max_sockets</code> option, as it is conservative by default.</p>
+
+<p>We pass a constructor closure to <code>Server.handle</code>, which constructs a <code>Handler</code>
+to be used for each incoming request.</p>
+
+<h1 id='non-blocking-io' class='section-header'><a href='#non-blocking-io'>2 Non-blocking IO</a></h1>
+<h2 id='dont-panic' class='section-header'><a href='#dont-panic'>2.1 Don&#39;t Panic</a></h2>
+<p>There is actually a very bad practice in the &quot;Hello, World&quot;  example. The usage
+of <code>decoder.write(x).unwrap()</code> will panic if the write operation fails. A panic
+will take down the whole thread, which means the event loop and all other
+in-progress requests. So don&#39;t do it. It&#39;s bad.</p>
+
+<p>What makes it worse, is that the write operation is much more likely to fail
+when using non-blocking IO. If the write would block the thread, instead of
+doing so, it will return an <code>io::Error</code> with the <code>kind</code> of <code>WouldBlock</code>. These
+are expected errors.</p>
+
+<h2 id='wouldblock' class='section-header'><a href='#wouldblock'>2.2 WouldBlock</a></h2>
+<p>Instead, we should inspect when there is a read or write error to see if the
+<code>kind</code> was a <code>WouldBlock</code> error. Since <code>WouldBlock</code> is so common when using
+non-blocking IO, the <code>Encoder</code> and <code>Decoder</code> provide <code>try_</code> methods that will
+special case <code>WouldBlock</code>, allowing you to treat all <code>Err</code> cases as actual
+errors.</p>
+
+<p>Additionally, it&#39;s possible there was a partial write of the response body, so
+we should probably change the example to keep track of it&#39;s progress. Can you
+see how we should change the example to better handle these conditions?</p>
+
+<p>This will just show the updated <code>on_response_writable</code> method, the rest stays
+the same:</p>
+
+<pre class='rust rust-example-rendered'>
+
+
+    <span class='kw'>fn</span> <span class='ident'>on_response_writable</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>encoder</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Encoder</span><span class='op'>&lt;</span><span class='ident'>Http</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Next</span> {
+        <span class='kw'>match</span> <span class='ident'>encoder</span>.<span class='ident'>try_write</span>(<span class='self'>self</span>.<span class='number'>0</span>) {
+            <span class='prelude-val'>Ok</span>(<span class='prelude-val'>Some</span>(<span class='ident'>n</span>)) <span class='op'>=&gt;</span> {
+                <span class='kw'>if</span> <span class='ident'>n</span> <span class='op'>==</span> <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>len</span>() {
+                    <span class='comment'>// all done!</span>
+                    <span class='ident'>Next</span>::<span class='ident'>end</span>()
+                } <span class='kw'>else</span> {
+                    <span class='comment'>// a partial write!</span>
+                    <span class='comment'>// with a static array, we can just move our pointer</span>
+                    <span class='comment'>// another option could be to store a separate index field</span>
+                    <span class='self'>self</span>.<span class='number'>0</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='number'>0</span>[<span class='ident'>n</span>..];
+                    <span class='comment'>// there&#39;s still more to write, so ask to write again</span>
+                    <span class='ident'>Next</span>::<span class='ident'>write</span>()
+                }
+            },
+            <span class='prelude-val'>Ok</span>(<span class='prelude-val'>None</span>) <span class='op'>=&gt;</span> {
+                <span class='comment'>// would block, ask to write again</span>
+                <span class='ident'>Next</span>::<span class='ident'>write</span>()
+            },
+            <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> {
+                <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;oh noes, we cannot say hello! {}&quot;</span>, <span class='ident'>e</span>);
+                <span class='comment'>// remove (kill) this transport</span>
+                <span class='ident'>Next</span>::<span class='ident'>remove</span>()
+            }
+        }
+    }
 </pre>
+
+<h1 id='routing' class='section-header'><a href='#routing'>3 Routing</a></h1>
+<p>What if we wanted to serve different messages depending on the URL of the
+request? Say, we wanted to respond with &quot;Hello, World!&quot; to <code>/hello</code>, but
+&quot;Good-bye&quot; with <code>/bye</code>. Let&#39;s adjust our example to do that.</p>
+
+<pre class='rust rust-example-rendered'>
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>hyper</span>;
+<span class='kw'>use</span> <span class='ident'>hyper</span>::{<span class='ident'>Decoder</span>, <span class='ident'>Encoder</span>, <span class='ident'>HttpStream</span> <span class='kw'>as</span> <span class='ident'>Http</span>, <span class='ident'>Next</span>, <span class='ident'>StatusCode</span>};
+<span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>server</span>::{<span class='ident'>Server</span>, <span class='ident'>Handler</span>, <span class='ident'>Request</span>, <span class='ident'>Response</span>};
+
+<span class='kw'>struct</span> <span class='ident'>Text</span>(<span class='ident'>StatusCode</span>, <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> [<span class='ident'>u8</span>]);
+
+<span class='kw'>impl</span> <span class='ident'>Handler</span><span class='op'>&lt;</span><span class='ident'>Http</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Text</span> {
+    <span class='kw'>fn</span> <span class='ident'>on_request</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>req</span>: <span class='ident'>Request</span><span class='op'>&lt;</span><span class='ident'>Http</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Next</span> {
+        <span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>RequestUri</span>;
+        <span class='kw'>let</span> <span class='ident'>path</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='op'>*</span><span class='ident'>req</span>.<span class='ident'>uri</span>() {
+            <span class='ident'>RequestUri</span>::<span class='ident'>AbsolutePath</span>(<span class='kw-2'>ref</span> <span class='ident'>p</span>) <span class='op'>=&gt;</span> <span class='ident'>p</span>,
+            <span class='ident'>RequestUri</span>::<span class='ident'>AbsoluteUri</span>(<span class='kw-2'>ref</span> <span class='ident'>url</span>) <span class='op'>=&gt;</span> <span class='ident'>url</span>.<span class='ident'>path</span>(),
+            <span class='comment'>// other 2 forms are for CONNECT and OPTIONS methods</span>
+            _ <span class='op'>=&gt;</span> <span class='string'>&quot;&quot;</span>
+        };
+
+        <span class='kw'>match</span> <span class='ident'>path</span> {
+            <span class='string'>&quot;/hello&quot;</span> <span class='op'>=&gt;</span> {
+                <span class='self'>self</span>.<span class='number'>1</span> <span class='op'>=</span> <span class='string'>b&quot;Hello, World!&quot;</span>;
+            },
+            <span class='string'>&quot;/bye&quot;</span> <span class='op'>=&gt;</span> {
+                <span class='self'>self</span>.<span class='number'>1</span> <span class='op'>=</span> <span class='string'>b&quot;Good-bye&quot;</span>;
+            },
+            _ <span class='op'>=&gt;</span> {
+                <span class='self'>self</span>.<span class='number'>0</span> <span class='op'>=</span> <span class='ident'>StatusCode</span>::<span class='ident'>NotFound</span>;
+                <span class='self'>self</span>.<span class='number'>1</span> <span class='op'>=</span> <span class='string'>b&quot;Not Found&quot;</span>;
+            }
+        }
+        <span class='ident'>Next</span>::<span class='ident'>write</span>()
+    }
+
+
+    <span class='kw'>fn</span> <span class='ident'>on_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>res</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Response</span>) <span class='op'>-&gt;</span> <span class='ident'>Next</span> {
+        <span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>header</span>::<span class='ident'>ContentLength</span>;
+        <span class='comment'>// we send an HTTP Status Code, 200 OK, or 404 Not Found</span>
+        <span class='ident'>res</span>.<span class='ident'>set_status</span>(<span class='self'>self</span>.<span class='number'>0</span>);
+        <span class='ident'>res</span>.<span class='ident'>headers_mut</span>().<span class='ident'>set</span>(<span class='ident'>ContentLength</span>(<span class='self'>self</span>.<span class='number'>1</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u64</span>));
+        <span class='ident'>Next</span>::<span class='ident'>write</span>()
+    }
+
+}
+
+<span class='kw'>fn</span> <span class='ident'>main</span>() {
+    <span class='kw'>let</span> <span class='ident'>addr</span> <span class='op'>=</span> <span class='string'>&quot;127.0.0.1:0&quot;</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>();
+    <span class='kw'>let</span> (<span class='ident'>listening</span>, <span class='ident'>server</span>) <span class='op'>=</span> <span class='ident'>Server</span>::<span class='ident'>http</span>(<span class='kw-2'>&amp;</span><span class='ident'>addr</span>).<span class='ident'>unwrap</span>()
+        .<span class='ident'>handle</span>(<span class='op'>|</span>_<span class='op'>|</span> <span class='ident'>Text</span>(<span class='ident'>StatusCode</span>::<span class='prelude-val'>Ok</span>, <span class='string'>b&quot;&quot;</span>)).<span class='ident'>unwrap</span>();
+
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;Listening on http://{}&quot;</span>, <span class='ident'>listening</span>);
+    <span class='ident'>server</span>.<span class='ident'>run</span>()
+}</pre>
+
+<h1 id='waiting' class='section-header'><a href='#waiting'>4 Waiting</a></h1>
+<p>More often than not, a server needs to something &quot;expensive&quot; before it can
+provide a response to a request. This may be talking to a database, reading
+a file, processing an image, sending its own HTTP request to another server,
+or anything else that would impede the event loop thread. These sorts of actions
+should be done off the event loop thread, when complete, should notify hyper
+that it can now proceed. This is done by combining <code>Next::wait()</code> and the
+<a href="../hyper/struct.Control.html"><code>Control</code></a>.</p>
+
+<h2 id='control' class='section-header'><a href='#control'>4.1 Control</a></h2>
+<p>The <code>Control</code> is provided to the <code>Handler</code> constructor; it is the argument we
+have so far been ignoring. It&#39;s not needed if we don&#39;t ever need to wait a
+transport. The <code>Control</code> is usually sent to a queue, or another thread, or
+wherever makes sense to be able to use it when the &quot;blocking&quot; operations are
+complete.</p>
+
+<p>To focus on hyper instead of obscure blocking operations, we&#39;ll use this useless
+sleeping thread to show it works.</p>
+
+<pre class='rust rust-example-rendered'>
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>hyper</span>;
+
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>mpsc</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>thread</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>time</span>::<span class='ident'>Duration</span>;
+
+<span class='kw'>use</span> <span class='ident'>hyper</span>::{<span class='ident'>Control</span>, <span class='ident'>Next</span>};
+
+<span class='kw'>fn</span> <span class='ident'>calculate_ultimate_question</span>(<span class='ident'>rx</span>: <span class='ident'>mpsc</span>::<span class='ident'>Receiver</span><span class='op'>&lt;</span>(<span class='ident'>Control</span>, <span class='ident'>mpsc</span>::<span class='ident'>Sender</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> [<span class='ident'>u8</span>]<span class='op'>&gt;</span>)<span class='op'>&gt;</span>) {
+    <span class='ident'>thread</span>::<span class='ident'>spawn</span>(<span class='kw'>move</span> <span class='op'>||</span> {
+        <span class='kw'>while</span> <span class='kw'>let</span> <span class='prelude-val'>Ok</span>((<span class='ident'>ctrl</span>, <span class='ident'>tx</span>)) <span class='op'>=</span> <span class='ident'>rx</span>.<span class='ident'>recv</span>() {
+            <span class='ident'>thread</span>::<span class='ident'>sleep</span>(<span class='ident'>Duration</span>::<span class='ident'>from_millis</span>(<span class='number'>500</span>));
+            <span class='ident'>tx</span>.<span class='ident'>send</span>(<span class='string'>b&quot;42&quot;</span>).<span class='ident'>unwrap</span>();
+            <span class='ident'>ctrl</span>.<span class='ident'>ready</span>(<span class='ident'>Next</span>::<span class='ident'>write</span>()).<span class='ident'>unwrap</span>();
+        }
+    });
+}
+</pre>
+
+<p>Our worker will spawn a thread that waits on messages. When receiving a message,
+after a short nap, it will send back the &quot;result&quot; of the work, and wake up the
+waiting transport with a <code>Next::write()</code> desire.</p>
+
+<h2 id='wait' class='section-header'><a href='#wait'>4.2 Wait</a></h2>
+<p>Finally, let&#39;s tie in our worker thread into our <code>Text</code> handler:</p>
+
+<pre class='rust rust-example-rendered'>
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>hyper</span>;
+<span class='kw'>use</span> <span class='ident'>hyper</span>::{<span class='ident'>Control</span>, <span class='ident'>Decoder</span>, <span class='ident'>Encoder</span>, <span class='ident'>HttpStream</span> <span class='kw'>as</span> <span class='ident'>Http</span>, <span class='ident'>Next</span>, <span class='ident'>StatusCode</span>};
+<span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>server</span>::{<span class='ident'>Server</span>, <span class='ident'>Handler</span>, <span class='ident'>Request</span>, <span class='ident'>Response</span>};
+
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>mpsc</span>;
+
+<span class='kw'>struct</span> <span class='ident'>Text</span> {
+    <span class='ident'>status</span>: <span class='ident'>StatusCode</span>,
+    <span class='ident'>text</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> [<span class='ident'>u8</span>],
+    <span class='ident'>control</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Control</span><span class='op'>&gt;</span>,
+    <span class='ident'>worker_tx</span>: <span class='ident'>mpsc</span>::<span class='ident'>Sender</span><span class='op'>&lt;</span>(<span class='ident'>Control</span>, <span class='ident'>mpsc</span>::<span class='ident'>Sender</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> [<span class='ident'>u8</span>]<span class='op'>&gt;</span>)<span class='op'>&gt;</span>,
+    <span class='ident'>worker_rx</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>mpsc</span>::<span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> [<span class='ident'>u8</span>]<span class='op'>&gt;&gt;</span>,
+}
+
+<span class='kw'>impl</span> <span class='ident'>Handler</span><span class='op'>&lt;</span><span class='ident'>Http</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Text</span> {
+    <span class='kw'>fn</span> <span class='ident'>on_request</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>req</span>: <span class='ident'>Request</span><span class='op'>&lt;</span><span class='ident'>Http</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Next</span> {
+        <span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>RequestUri</span>;
+        <span class='kw'>let</span> <span class='ident'>path</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='op'>*</span><span class='ident'>req</span>.<span class='ident'>uri</span>() {
+            <span class='ident'>RequestUri</span>::<span class='ident'>AbsolutePath</span>(<span class='kw-2'>ref</span> <span class='ident'>p</span>) <span class='op'>=&gt;</span> <span class='ident'>p</span>,
+            <span class='ident'>RequestUri</span>::<span class='ident'>AbsoluteUri</span>(<span class='kw-2'>ref</span> <span class='ident'>url</span>) <span class='op'>=&gt;</span> <span class='ident'>url</span>.<span class='ident'>path</span>(),
+            _ <span class='op'>=&gt;</span> <span class='string'>&quot;&quot;</span>
+        };
+
+        <span class='kw'>match</span> <span class='ident'>path</span> {
+            <span class='string'>&quot;/hello&quot;</span> <span class='op'>=&gt;</span> {
+                <span class='self'>self</span>.<span class='ident'>text</span> <span class='op'>=</span> <span class='string'>b&quot;Hello, World!&quot;</span>;
+            },
+            <span class='string'>&quot;/bye&quot;</span> <span class='op'>=&gt;</span> {
+                <span class='self'>self</span>.<span class='ident'>text</span> <span class='op'>=</span> <span class='string'>b&quot;Good-bye&quot;</span>;
+            },
+            <span class='string'>&quot;/question&quot;</span> <span class='op'>=&gt;</span> {
+                <span class='kw'>let</span> (<span class='ident'>tx</span>, <span class='ident'>rx</span>) <span class='op'>=</span> <span class='ident'>mpsc</span>::<span class='ident'>channel</span>();
+                <span class='comment'>// queue work on our worker</span>
+                <span class='self'>self</span>.<span class='ident'>worker_tx</span>.<span class='ident'>send</span>((<span class='self'>self</span>.<span class='ident'>control</span>.<span class='ident'>take</span>().<span class='ident'>unwrap</span>(), <span class='ident'>tx</span>));
+                <span class='comment'>// tell hyper we need to wait until we can continue</span>
+                <span class='kw'>return</span> <span class='ident'>Next</span>::<span class='ident'>wait</span>();
+            }
+            _ <span class='op'>=&gt;</span> {
+                <span class='self'>self</span>.<span class='ident'>status</span> <span class='op'>=</span> <span class='ident'>StatusCode</span>::<span class='ident'>NotFound</span>;
+                <span class='self'>self</span>.<span class='ident'>text</span> <span class='op'>=</span> <span class='string'>b&quot;Not Found&quot;</span>;
+            }
+        }
+        <span class='ident'>Next</span>::<span class='ident'>write</span>()
+    }
+
+
+    <span class='kw'>fn</span> <span class='ident'>on_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>res</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Response</span>) <span class='op'>-&gt;</span> <span class='ident'>Next</span> {
+        <span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>header</span>::<span class='ident'>ContentLength</span>;
+        <span class='ident'>res</span>.<span class='ident'>set_status</span>(<span class='self'>self</span>.<span class='ident'>status</span>);
+        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>rx</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>worker_rx</span>.<span class='ident'>take</span>() {
+            <span class='self'>self</span>.<span class='ident'>text</span> <span class='op'>=</span> <span class='ident'>rx</span>.<span class='ident'>recv</span>().<span class='ident'>unwrap</span>();
+        }
+        <span class='ident'>res</span>.<span class='ident'>headers_mut</span>().<span class='ident'>set</span>(<span class='ident'>ContentLength</span>(<span class='self'>self</span>.<span class='ident'>text</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u64</span>));
+        <span class='ident'>Next</span>::<span class='ident'>write</span>()
+    }
+}
+
+
+<span class='kw'>fn</span> <span class='ident'>main</span>() {
+    <span class='kw'>let</span> (<span class='ident'>tx</span>, <span class='ident'>rx</span>) <span class='op'>=</span> <span class='ident'>mpsc</span>::<span class='ident'>channel</span>();
+    <span class='ident'>calculate_ultimate_question</span>(<span class='ident'>rx</span>);
+    <span class='kw'>let</span> <span class='ident'>addr</span> <span class='op'>=</span> <span class='string'>&quot;127.0.0.1:0&quot;</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>();
+    <span class='kw'>let</span> (<span class='ident'>listening</span>, <span class='ident'>server</span>) <span class='op'>=</span> <span class='ident'>Server</span>::<span class='ident'>http</span>(<span class='kw-2'>&amp;</span><span class='ident'>addr</span>).<span class='ident'>unwrap</span>()
+        .<span class='ident'>handle</span>(<span class='kw'>move</span> <span class='op'>|</span><span class='ident'>ctrl</span><span class='op'>|</span> <span class='ident'>Text</span> {
+            <span class='ident'>status</span>: <span class='ident'>StatusCode</span>::<span class='prelude-val'>Ok</span>,
+            <span class='ident'>text</span>: <span class='string'>b&quot;&quot;</span>,
+            <span class='ident'>control</span>: <span class='prelude-val'>Some</span>(<span class='ident'>ctrl</span>),
+            <span class='ident'>worker_tx</span>: <span class='ident'>tx</span>.<span class='ident'>clone</span>(),
+            <span class='ident'>worker_rx</span>: <span class='prelude-val'>None</span>,
+        }).<span class='ident'>unwrap</span>();
+
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;Listening on http://{}&quot;</span>, <span class='ident'>listening</span>);
+    <span class='ident'>server</span>.<span class='ident'>run</span>()
+}</pre>
 
     <script type="text/javascript">
         window.playgroundUrl = "";
