@@ -87,7 +87,8 @@ of &quot;Hello, World!&quot; to every request.</p>
 
 <h2 id='handler' class='section-header'><a href='#handler'>1.1 Handler</a></h2>
 <p>The <a href="../hyper/server/trait.Handler.html"><code>Handler</code></a> is how you define what should happen during the lifetime
-of an HTTP message.</p>
+of an HTTP message. We&#39;ve implemented it for the <code>Text</code>, defining what should
+happen at each event during an HTTP message.</p>
 
 <h2 id='next' class='section-header'><a href='#next'>1.2 Next</a></h2>
 <p>Every event in the <a href="../hyper/server/trait.Handler.html"><code>Handler</code></a> returns a <a href="../hyper/struct.Next.html"><code>Next</code></a>. This signals
