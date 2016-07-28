@@ -462,6 +462,8 @@
 <span id="418">418</span>
 <span id="419">419</span>
 <span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! A Collection of Header implementations for common HTTP Headers.</span>
 <span class='doccomment'>//!</span>
@@ -492,6 +494,7 @@
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>content_length</span>::<span class='ident'>ContentLength</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>content_encoding</span>::<span class='ident'>ContentEncoding</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>content_language</span>::<span class='ident'>ContentLanguage</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>content_location</span>::<span class='ident'>ContentLocation</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>content_range</span>::{<span class='ident'>ContentRange</span>, <span class='ident'>ContentRangeSpec</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>content_type</span>::<span class='ident'>ContentType</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>cookie</span>::<span class='ident'>Cookie</span>;
@@ -854,6 +857,7 @@
 <span class='kw'>mod</span> <span class='ident'>content_encoding</span>;
 <span class='kw'>mod</span> <span class='ident'>content_language</span>;
 <span class='kw'>mod</span> <span class='ident'>content_length</span>;
+<span class='kw'>mod</span> <span class='ident'>content_location</span>;
 <span class='kw'>mod</span> <span class='ident'>content_range</span>;
 <span class='kw'>mod</span> <span class='ident'>content_type</span>;
 <span class='kw'>mod</span> <span class='ident'>date</span>;
