@@ -312,7 +312,9 @@ waiting transport with a <code>Next::write()</code> desire.</p>
             <span class='string'>&quot;/question&quot;</span> <span class='op'>=&gt;</span> {
                 <span class='kw'>let</span> (<span class='ident'>tx</span>, <span class='ident'>rx</span>) <span class='op'>=</span> <span class='ident'>mpsc</span>::<span class='ident'>channel</span>();
                 <span class='comment'>// queue work on our worker</span>
-                <span class='self'>self</span>.<span class='ident'>worker_tx</span>.<span class='ident'>send</span>((<span class='self'>self</span>.<span class='ident'>control</span>.<span class='ident'>take</span>().<span class='ident'>unwrap</span>(), <span class='ident'>tx</span>));
+                <span class='self'>self</span>.<span class='ident'>worker_tx</span>.<span class='ident'>send</span>((<span class='self'>self</span>.<span class='ident'>control</span>.<span class='ident'>take</span>().<span class='ident'>unwrap</span>(), <span class='ident'>tx</span>)).<span class='ident'>unwrap</span>();
+                <span class='comment'>// save receive channel for response handling</span>
+                <span class='self'>self</span>.<span class='ident'>worker_rx</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>rx</span>);
                 <span class='comment'>// tell hyper we need to wait until we can continue</span>
                 <span class='kw'>return</span> <span class='ident'>Next</span>::<span class='ident'>wait</span>();
             }
