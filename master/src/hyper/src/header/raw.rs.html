@@ -337,14 +337,14 @@
 
 <span class='kw'>fn</span> <span class='ident'>eq</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span>[<span class='ident'>u8</span>]<span class='op'>&gt;</span>, <span class='ident'>B</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span>[<span class='ident'>u8</span>]<span class='op'>&gt;&gt;</span>(<span class='ident'>a</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>A</span>], <span class='ident'>b</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>B</span>]) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
     <span class='kw'>if</span> <span class='ident'>a</span>.<span class='ident'>len</span>() <span class='op'>!=</span> <span class='ident'>b</span>.<span class='ident'>len</span>() {
-        <span class='boolvalue'>false</span>
+        <span class='bool-val'>false</span>
     } <span class='kw'>else</span> {
         <span class='kw'>for</span> (<span class='ident'>a</span>, <span class='ident'>b</span>) <span class='kw'>in</span> <span class='ident'>a</span>.<span class='ident'>iter</span>().<span class='ident'>zip</span>(<span class='ident'>b</span>.<span class='ident'>iter</span>()) {
             <span class='kw'>if</span> <span class='ident'>a</span>.<span class='ident'>as_ref</span>() <span class='op'>!=</span> <span class='ident'>b</span>.<span class='ident'>as_ref</span>() {
-                <span class='kw'>return</span> <span class='boolvalue'>false</span>
+                <span class='kw'>return</span> <span class='bool-val'>false</span>
             }
         }
-        <span class='boolvalue'>true</span>
+        <span class='bool-val'>true</span>
     }
 }
 
@@ -361,7 +361,7 @@
     <span class='kw'>fn</span> <span class='ident'>eq</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>bytes</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='number'>0</span> {
             <span class='ident'>Lines</span>::<span class='ident'>One</span>(<span class='kw-2'>ref</span> <span class='ident'>line</span>) <span class='op'>=&gt;</span> <span class='ident'>line</span>.<span class='ident'>as_ref</span>() <span class='op'>==</span> <span class='ident'>bytes</span>,
-            <span class='ident'>Lines</span>::<span class='ident'>Many</span>(..) <span class='op'>=&gt;</span> <span class='boolvalue'>false</span>
+            <span class='ident'>Lines</span>::<span class='ident'>Many</span>(..) <span class='op'>=&gt;</span> <span class='bool-val'>false</span>
         }
     }
 }
@@ -370,7 +370,7 @@
     <span class='kw'>fn</span> <span class='ident'>eq</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>s</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='number'>0</span> {
             <span class='ident'>Lines</span>::<span class='ident'>One</span>(<span class='kw-2'>ref</span> <span class='ident'>line</span>) <span class='op'>=&gt;</span> <span class='ident'>line</span>.<span class='ident'>as_ref</span>() <span class='op'>==</span> <span class='ident'>s</span>.<span class='ident'>as_bytes</span>(),
-            <span class='ident'>Lines</span>::<span class='ident'>Many</span>(..) <span class='op'>=&gt;</span> <span class='boolvalue'>false</span>
+            <span class='ident'>Lines</span>::<span class='ident'>Many</span>(..) <span class='op'>=&gt;</span> <span class='bool-val'>false</span>
         }
     }
 }

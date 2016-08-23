@@ -147,7 +147,7 @@
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>mpsc</span>::<span class='ident'>TryRecvError</span>;
 
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>(<span class='ident'>notify</span>: <span class='ident'>rotor</span>::<span class='ident'>Notifier</span>) <span class='op'>-&gt;</span> (<span class='ident'>Sender</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) {
-    <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>Arc</span>::<span class='ident'>new</span>(<span class='ident'>AtomicBool</span>::<span class='ident'>new</span>(<span class='boolvalue'>false</span>));
+    <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>Arc</span>::<span class='ident'>new</span>(<span class='ident'>AtomicBool</span>::<span class='ident'>new</span>(<span class='bool-val'>false</span>));
     <span class='kw'>let</span> (<span class='ident'>tx</span>, <span class='ident'>rx</span>) <span class='op'>=</span> <span class='ident'>mpsc</span>::<span class='ident'>channel</span>();
     (<span class='ident'>Sender</span> {
         <span class='ident'>awake</span>: <span class='ident'>b</span>.<span class='ident'>clone</span>(),
@@ -184,7 +184,7 @@
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Send</span><span class='op'>&gt;</span> <span class='ident'>Sender</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>send</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>val</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>SendError</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> {
         <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>tx</span>.<span class='ident'>send</span>(<span class='ident'>val</span>));
-        <span class='kw'>if</span> <span class='op'>!</span><span class='self'>self</span>.<span class='ident'>awake</span>.<span class='ident'>swap</span>(<span class='boolvalue'>true</span>, <span class='ident'>Ordering</span>::<span class='ident'>SeqCst</span>) {
+        <span class='kw'>if</span> <span class='op'>!</span><span class='self'>self</span>.<span class='ident'>awake</span>.<span class='ident'>swap</span>(<span class='bool-val'>true</span>, <span class='ident'>Ordering</span>::<span class='ident'>SeqCst</span>) {
             <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>notify</span>.<span class='ident'>wakeup</span>());
         }
         <span class='prelude-val'>Ok</span>(())
@@ -231,7 +231,7 @@
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Send</span><span class='op'>&gt;</span> <span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>try_recv</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>mpsc</span>::<span class='ident'>TryRecvError</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>awake</span>.<span class='ident'>store</span>(<span class='boolvalue'>false</span>, <span class='ident'>Ordering</span>::<span class='ident'>Relaxed</span>);
+        <span class='self'>self</span>.<span class='ident'>awake</span>.<span class='ident'>store</span>(<span class='bool-val'>false</span>, <span class='ident'>Ordering</span>::<span class='ident'>Relaxed</span>);
         <span class='self'>self</span>.<span class='ident'>rx</span>.<span class='ident'>try_recv</span>()
     }
 }
