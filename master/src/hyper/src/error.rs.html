@@ -267,6 +267,9 @@
 <span id="223">223</span>
 <span id="224">224</span>
 <span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Error and Result module.</span>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>error</span>::<span class='ident'>Error</span> <span class='kw'>as</span> <span class='ident'>StdError</span>;
@@ -318,6 +321,8 @@
     <span class='ident'>Status</span>,
     <span class='doccomment'>/// A timeout occurred waiting for an IO event.</span>
     <span class='ident'>Timeout</span>,
+    <span class='doccomment'>/// Event loop is full and cannot process request</span>
+    <span class='ident'>Full</span>,
     <span class='doccomment'>/// An `io::Error` that occurred while trying to read or write to a network stream.</span>
     <span class='ident'>Io</span>(<span class='ident'>IoError</span>),
     <span class='doccomment'>/// An error from a SSL library.</span>
@@ -360,6 +365,7 @@
             <span class='ident'>Status</span> <span class='op'>=&gt;</span> <span class='string'>&quot;Invalid Status provided&quot;</span>,
             <span class='ident'>Incomplete</span> <span class='op'>=&gt;</span> <span class='string'>&quot;Message is incomplete&quot;</span>,
             <span class='ident'>Timeout</span> <span class='op'>=&gt;</span> <span class='string'>&quot;Timeout&quot;</span>,
+            <span class='ident'>Error</span>::<span class='ident'>Full</span> <span class='op'>=&gt;</span> <span class='string'>&quot;Event loop is full&quot;</span>,
             <span class='ident'>Uri</span>(<span class='kw-2'>ref</span> <span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='ident'>e</span>.<span class='ident'>description</span>(),
             <span class='ident'>Io</span>(<span class='kw-2'>ref</span> <span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='ident'>e</span>.<span class='ident'>description</span>(),
             <span class='ident'>Ssl</span>(<span class='kw-2'>ref</span> <span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='ident'>e</span>.<span class='ident'>description</span>(),
