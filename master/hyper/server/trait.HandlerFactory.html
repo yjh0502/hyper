@@ -50,7 +50,7 @@
                </span><a id='src-8454' class='srclink' href='../../src/hyper/src/server/mod.rs.html#392-397' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait HandlerFactory&lt;T:&nbsp;<a class='trait' href='../../hyper/net/trait.Transport.html' title='hyper::net::Transport'>Transport</a>&gt; {
     type <a href='#associatedtype.Output' class='type'>Output</a>: <a class='trait' href='../../hyper/server/trait.Handler.html' title='hyper::server::Handler'>Handler</a>&lt;T&gt;;
-    fn <a href='#tymethod.create' class='fnname'>create</a>(&amp;mut self, ctrl: <a class='struct' href='../../hyper/struct.Control.html' title='hyper::Control'>Control</a>) -&gt; Self::<a class='trait' href='../../hyper/server/trait.HandlerFactory.html' title='hyper::server::HandlerFactory'>Output</a>;
+    fn <a href='#tymethod.create' class='fnname'>create</a>(&amp;mut self, ctrl: <a class='struct' href='../../hyper/struct.Control.html' title='hyper::Control'>Control</a>) -&gt; Self::Output;
 }</pre><div class='docblock'><p>Used to create a <code>Handler</code> when a new message is received by the server.</p>
 </div>
             <h2 id='associated-types'>Associated Types</h2>
@@ -59,7 +59,7 @@
 </div></div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.create' class='method stab '><code>fn <a href='#tymethod.create' class='fnname'>create</a>(&amp;mut self, ctrl: <a class='struct' href='../../hyper/struct.Control.html' title='hyper::Control'>Control</a>) -&gt; Self::<a class='trait' href='../../hyper/server/trait.HandlerFactory.html' title='hyper::server::HandlerFactory'>Output</a></code></h3><div class='docblock'><p>Creates the associated <code>Handler</code>.</p>
+        <h3 id='tymethod.create' class='method stab '><code>fn <a href='#tymethod.create' class='fnname'>create</a>(&amp;mut self, ctrl: <a class='struct' href='../../hyper/struct.Control.html' title='hyper::Control'>Control</a>) -&gt; Self::Output</code></h3><div class='docblock'><p>Creates the associated <code>Handler</code>.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>

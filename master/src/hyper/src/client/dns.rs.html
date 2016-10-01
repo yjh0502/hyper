@@ -189,7 +189,7 @@
 }
 
 <span class='kw'>fn</span> <span class='ident'>work</span>(<span class='ident'>rx</span>: <span class='ident'>spmc</span>::<span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, <span class='ident'>notify</span>: <span class='ident'>channel</span>::<span class='ident'>Sender</span><span class='op'>&lt;</span><span class='ident'>Answer</span><span class='op'>&gt;</span>) {
-    <span class='ident'>thread</span>::<span class='ident'>spawn</span>(<span class='kw'>move</span> <span class='op'>||</span> {
+    <span class='ident'>thread</span>::<span class='ident'>Builder</span>::<span class='ident'>new</span>().<span class='ident'>name</span>(<span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>&quot;hyper-dns&quot;</span>)).<span class='ident'>spawn</span>(<span class='kw'>move</span> <span class='op'>||</span> {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>worker</span> <span class='op'>=</span> <span class='ident'>Worker</span>::<span class='ident'>new</span>(<span class='ident'>rx</span>, <span class='ident'>notify</span>);
         <span class='kw'>let</span> <span class='ident'>rx</span> <span class='op'>=</span> <span class='ident'>worker</span>.<span class='ident'>rx</span>.<span class='ident'>as_ref</span>().<span class='ident'>expect</span>(<span class='string'>&quot;Worker lost rx&quot;</span>);
         <span class='kw'>let</span> <span class='ident'>notify</span> <span class='op'>=</span> <span class='ident'>worker</span>.<span class='ident'>notify</span>.<span class='ident'>as_ref</span>().<span class='ident'>expect</span>(<span class='string'>&quot;Worker lost notify&quot;</span>);
@@ -205,7 +205,7 @@
             }
         }
         <span class='ident'>worker</span>.<span class='ident'>shutdown</span> <span class='op'>=</span> <span class='bool-val'>true</span>;
-    });
+    }).<span class='ident'>expect</span>(<span class='string'>&quot;spawn dns thread&quot;</span>);
 }
 
 <span class='kw'>struct</span> <span class='ident'>Worker</span> {
