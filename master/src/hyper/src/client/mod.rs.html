@@ -858,6 +858,11 @@
 <span id="814">814</span>
 <span id="815">815</span>
 <span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! HTTP Client</span>
 <span class='doccomment'>//!</span>
@@ -1354,8 +1359,13 @@
                         <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;connected and writable {:?}&quot;</span>, <span class='ident'>seed</span>.<span class='number'>0</span>);
                         <span class='ident'>rotor</span>::<span class='ident'>Response</span>::<span class='ident'>ok</span>(
                             <span class='ident'>ClientFsm</span>::<span class='ident'>Socket</span>(
-                                <span class='ident'>http</span>::<span class='ident'>Conn</span>::<span class='ident'>new</span>(<span class='ident'>seed</span>.<span class='number'>0</span>, <span class='ident'>seed</span>.<span class='number'>1</span>, <span class='ident'>Next</span>::<span class='ident'>write</span>().<span class='ident'>timeout</span>(<span class='ident'>scope</span>.<span class='ident'>connect_timeout</span>), <span class='ident'>scope</span>.<span class='ident'>notifier</span>())
-                                    .<span class='ident'>keep_alive</span>(<span class='ident'>scope</span>.<span class='ident'>keep_alive</span>)
+                                <span class='ident'>http</span>::<span class='ident'>Conn</span>::<span class='ident'>new</span>(
+                                    <span class='ident'>seed</span>.<span class='number'>0</span>,
+                                    <span class='ident'>seed</span>.<span class='number'>1</span>,
+                                    <span class='ident'>Next</span>::<span class='ident'>write</span>().<span class='ident'>timeout</span>(<span class='ident'>scope</span>.<span class='ident'>connect_timeout</span>),
+                                    <span class='ident'>scope</span>.<span class='ident'>notifier</span>(),
+                                    <span class='ident'>scope</span>.<span class='ident'>now</span>()
+                                ).<span class='ident'>keep_alive</span>(<span class='ident'>scope</span>.<span class='ident'>keep_alive</span>)
                             )
                         )
                     } <span class='kw'>else</span> {
