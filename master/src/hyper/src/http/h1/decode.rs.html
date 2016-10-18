@@ -507,6 +507,24 @@
 <span id="463">463</span>
 <span id="464">464</span>
 <span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::{<span class='ident'>cmp</span>, <span class='ident'>usize</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='self'>self</span>, <span class='ident'>Read</span>};
@@ -568,6 +586,8 @@
     <span class='ident'>Body</span>,
     <span class='ident'>BodyCr</span>,
     <span class='ident'>BodyLf</span>,
+    <span class='ident'>EndCr</span>,
+    <span class='ident'>EndLf</span>,
     <span class='ident'>End</span>,
 }
 
@@ -658,6 +678,8 @@
             <span class='ident'>Body</span> <span class='op'>=&gt;</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>ChunkedState</span>::<span class='ident'>read_body</span>(<span class='ident'>body</span>, <span class='ident'>size</span>, <span class='ident'>buf</span>, <span class='ident'>read</span>)),
             <span class='ident'>BodyCr</span> <span class='op'>=&gt;</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>ChunkedState</span>::<span class='ident'>read_body_cr</span>(<span class='ident'>body</span>)),
             <span class='ident'>BodyLf</span> <span class='op'>=&gt;</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>ChunkedState</span>::<span class='ident'>read_body_lf</span>(<span class='ident'>body</span>)),
+            <span class='ident'>EndCr</span> <span class='op'>=&gt;</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>ChunkedState</span>::<span class='ident'>read_end_cr</span>(<span class='ident'>body</span>)),
+            <span class='ident'>EndLf</span> <span class='op'>=&gt;</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>ChunkedState</span>::<span class='ident'>read_end_lf</span>(<span class='ident'>body</span>)),
             <span class='ident'>End</span> <span class='op'>=&gt;</span> <span class='ident'>ChunkedState</span>::<span class='ident'>End</span>,
         })
     }
@@ -711,10 +733,11 @@
         <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;Chunk size is {:?}&quot;</span>, <span class='ident'>size</span>);
         <span class='kw'>match</span> <span class='macro'>byte</span><span class='macro'>!</span>(<span class='ident'>rdr</span>) {
             <span class='string'>b&#39;\n&#39;</span> <span class='kw'>if</span> <span class='op'>*</span><span class='ident'>size</span> <span class='op'>&gt;</span> <span class='number'>0</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>ChunkedState</span>::<span class='ident'>Body</span>),
-            <span class='string'>b&#39;\n&#39;</span> <span class='kw'>if</span> <span class='op'>*</span><span class='ident'>size</span> <span class='op'>==</span> <span class='number'>0</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>ChunkedState</span>::<span class='ident'>End</span>),
+            <span class='string'>b&#39;\n&#39;</span> <span class='kw'>if</span> <span class='op'>*</span><span class='ident'>size</span> <span class='op'>==</span> <span class='number'>0</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>ChunkedState</span>::<span class='ident'>EndCr</span>),
             _ <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidInput</span>, <span class='string'>&quot;Invalid chunk size LF&quot;</span>)),
         }
     }
+
     <span class='kw'>fn</span> <span class='ident'>read_body</span><span class='op'>&lt;</span><span class='ident'>R</span>: <span class='ident'>Read</span><span class='op'>&gt;</span>(<span class='ident'>rdr</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>R</span>,
                           <span class='ident'>rem</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>u64</span>,
                           <span class='ident'>buf</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>u8</span>],
@@ -760,6 +783,19 @@
             _ <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidInput</span>, <span class='string'>&quot;Invalid chunk body LF&quot;</span>)),
         }
     }
+
+    <span class='kw'>fn</span> <span class='ident'>read_end_cr</span><span class='op'>&lt;</span><span class='ident'>R</span>: <span class='ident'>Read</span><span class='op'>&gt;</span>(<span class='ident'>rdr</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>R</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>ChunkedState</span><span class='op'>&gt;</span> {
+        <span class='kw'>match</span> <span class='macro'>byte</span><span class='macro'>!</span>(<span class='ident'>rdr</span>) {
+            <span class='string'>b&#39;\r&#39;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>ChunkedState</span>::<span class='ident'>EndLf</span>),
+            _ <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidInput</span>, <span class='string'>&quot;Invalid chunk end CR&quot;</span>)),
+        }
+    }
+    <span class='kw'>fn</span> <span class='ident'>read_end_lf</span><span class='op'>&lt;</span><span class='ident'>R</span>: <span class='ident'>Read</span><span class='op'>&gt;</span>(<span class='ident'>rdr</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>R</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>ChunkedState</span><span class='op'>&gt;</span> {
+        <span class='kw'>match</span> <span class='macro'>byte</span><span class='macro'>!</span>(<span class='ident'>rdr</span>) {
+            <span class='string'>b&#39;\n&#39;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>ChunkedState</span>::<span class='ident'>End</span>),
+            _ <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidInput</span>, <span class='string'>&quot;Invalid chunk end LF&quot;</span>)),
+        }
+    }
 }
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
@@ -786,7 +822,7 @@
                 <span class='kw'>let</span> <span class='ident'>desc</span> <span class='op'>=</span> <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;read_size failed for {:?}&quot;</span>, <span class='ident'>s</span>);
                 <span class='ident'>state</span> <span class='op'>=</span> <span class='ident'>result</span>.<span class='ident'>expect</span>(<span class='ident'>desc</span>.<span class='ident'>as_str</span>());
                 <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;State {:?}&quot;</span>, <span class='ident'>state</span>);
-                <span class='kw'>if</span> <span class='ident'>state</span> <span class='op'>==</span> <span class='ident'>ChunkedState</span>::<span class='ident'>Body</span> <span class='op'>||</span> <span class='ident'>state</span> <span class='op'>==</span> <span class='ident'>ChunkedState</span>::<span class='ident'>End</span> {
+                <span class='kw'>if</span> <span class='ident'>state</span> <span class='op'>==</span> <span class='ident'>ChunkedState</span>::<span class='ident'>Body</span> <span class='op'>||</span> <span class='ident'>state</span> <span class='op'>==</span> <span class='ident'>ChunkedState</span>::<span class='ident'>EndCr</span> {
                     <span class='kw'>break</span>;
                 }
             }
@@ -885,7 +921,7 @@
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_read_chunked_after_eof</span>() {
-        <span class='kw'>let</span> <span class='ident'>content</span> <span class='op'>=</span> <span class='string'>b&quot;10\r\n1234567890abcdef\r\n0\r\n&quot;</span>;
+        <span class='kw'>let</span> <span class='ident'>content</span> <span class='op'>=</span> <span class='string'>b&quot;10\r\n1234567890abcdef\r\n0\r\n\r\n&quot;</span>;
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>mock_buf</span> <span class='op'>=</span> <span class='ident'>io</span>::<span class='ident'>Cursor</span>::<span class='ident'>new</span>(<span class='ident'>content</span>);
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0u8</span>; <span class='number'>50</span>];
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>decoder</span> <span class='op'>=</span> <span class='ident'>Decoder</span>::<span class='ident'>chunked</span>();
