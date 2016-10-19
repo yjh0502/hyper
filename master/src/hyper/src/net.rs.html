@@ -820,6 +820,10 @@
 <span id="776">776</span>
 <span id="777">777</span>
 <span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! A collection of traits abstracting over Listeners and Streams.</span>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='self'>self</span>, <span class='ident'>Read</span>, <span class='ident'>Write</span>};
@@ -1458,6 +1462,10 @@ pub type DefaultTransport = &lt;DefaultConnector as Connect&gt;::Output;
     <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='kw'>super</span>::<span class='ident'>Transport</span><span class='op'>&gt;</span> <span class='kw'>super</span>::<span class='ident'>Transport</span> <span class='kw'>for</span> <span class='ident'>OpensslStream</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='kw'>fn</span> <span class='ident'>take_socket_error</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
             <span class='self'>self</span>.<span class='ident'>stream</span>.<span class='ident'>get_mut</span>().<span class='ident'>take_socket_error</span>()
+        }
+
+        <span class='kw'>fn</span> <span class='ident'>blocked</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw'>super</span>::<span class='ident'>Blocked</span><span class='op'>&gt;</span> {
+            <span class='self'>self</span>.<span class='ident'>blocked</span>
         }
     }
 }
