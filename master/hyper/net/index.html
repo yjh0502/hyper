@@ -47,42 +47,42 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-7814' class='srclink' href='../../src/hyper/src/net.rs.html#1-782' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-7797' class='srclink' href='../../src/hyper/src/net.rs.html#1-782' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>A collection of traits abstracting over Listeners and Streams.</p>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.HttpListener.html'
                                   title='hyper::net::HttpListener'>HttpListener</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>An alias to <code>mio::tcp::TcpListener</code>.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.HttpStream.html'
                                   title='hyper::net::HttpStream'>HttpStream</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>An alias to <code>mio::tcp::TcpStream</code>.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.HttpsListener.html'
                                   title='hyper::net::HttpsListener'>HttpsListener</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>An <code>HttpListener</code> over SSL.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.Openssl.html'
                                   title='hyper::net::Openssl'>Openssl</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>An implementation of <code>Ssl</code> for OpenSSL.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.OpensslStream.html'
                                   title='hyper::net::OpensslStream'>OpensslStream</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>A transport protected by OpenSSL.</p>
                            </td>
                        </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
@@ -90,7 +90,7 @@
                        <tr class=' module-item'>
                            <td><a class='enum' href='enum.Blocked.html'
                                   title='hyper::net::Blocked'>Blocked</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Declares when a transport is blocked from any further action, until the
 corresponding event has occured.</p>
                            </td>
@@ -98,7 +98,7 @@ corresponding event has occured.</p>
                        <tr class=' module-item'>
                            <td><a class='enum' href='enum.HttpsStream.html'
                                   title='hyper::net::HttpsStream'>HttpsStream</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>A stream over the HTTP protocol, possibly protected by TLS.</p>
                            </td>
                        </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
@@ -106,35 +106,35 @@ corresponding event has occured.</p>
                        <tr class=' module-item'>
                            <td><a class='trait' href='trait.Accept.html'
                                   title='hyper::net::Accept'>Accept</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Accepts sockets asynchronously.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='trait' href='trait.Ssl.html'
                                   title='hyper::net::Ssl'>Ssl</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Deprecated</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='trait' href='trait.SslClient.html'
                                   title='hyper::net::SslClient'>SslClient</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>An abstraction to allow any SSL implementation to be used with client-side <code>HttpsStream</code>s.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='trait' href='trait.SslServer.html'
                                   title='hyper::net::SslServer'>SslServer</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>An abstraction to allow any SSL implementation to be used with server-side <code>HttpsStream</code>s.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='trait' href='trait.Transport.html'
                                   title='hyper::net::Transport'>Transport</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>A trait representing a socket transport that can be used in a Client or Server.</p>
                            </td>
                        </tr></table></section>

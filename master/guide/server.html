@@ -81,7 +81,7 @@ of &quot;Hello, World!&quot; to every request.</p>
 
     <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;Listening on http://{}&quot;</span>, <span class='ident'>listening</span>);
     <span class='ident'>server</span>.<span class='ident'>run</span>()
-}</pre>
+}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 
 <p>There is quite a few concepts here, so let&#39;s tackle them one by one.</p>
 
@@ -173,7 +173,7 @@ the same:</p>
             }
         }
     }
-</pre>
+<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 
 <h1 id='routing' class='section-header'><a href='#routing'>3 Routing</a></h1>
 <p>What if we wanted to serve different messages depending on the URL of the
@@ -230,7 +230,7 @@ request? Say, we wanted to respond with &quot;Hello, World!&quot; to <code>/hell
 
     <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;Listening on http://{}&quot;</span>, <span class='ident'>listening</span>);
     <span class='ident'>server</span>.<span class='ident'>run</span>()
-}</pre>
+}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 
 <h1 id='waiting' class='section-header'><a href='#waiting'>4 Waiting</a></h1>
 <p>More often than not, a server needs to something &quot;expensive&quot; before it can
@@ -269,7 +269,7 @@ sleeping thread to show it works.</p>
         }
     });
 }
-</pre>
+<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 
 <p>Our worker will spawn a thread that waits on messages. When receiving a message,
 after a short nap, it will send back the &quot;result&quot; of the work, and wake up the
@@ -354,7 +354,7 @@ waiting transport with a <code>Next::write()</code> desire.</p>
 
     <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;Listening on http://{}&quot;</span>, <span class='ident'>listening</span>);
     <span class='ident'>server</span>.<span class='ident'>run</span>()
-}</pre>
+}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 
     <script type="text/javascript">
         window.playgroundUrl = "";
