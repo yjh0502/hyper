@@ -1784,13 +1784,6 @@
             }
         }
 
-        <span class='kw'>if</span> <span class='ident'>events</span>.<span class='ident'>is_hup</span>() {
-            <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;Conn::ready got hangup&quot;</span>);
-            <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>scope</span>.<span class='ident'>deregister</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>transport</span>);
-            <span class='self'>self</span>.<span class='ident'>on_remove</span>();
-            <span class='kw'>return</span> <span class='ident'>ReadyResult</span>::<span class='ident'>Done</span>(<span class='prelude-val'>None</span>);
-        }
-
         <span class='comment'>// if the user had an io interest, but the transport was blocked differently,</span>
         <span class='comment'>// the event needs to be translated to what the user was actually expecting.</span>
         <span class='comment'>//</span>
@@ -1829,6 +1822,13 @@
 
         <span class='kw'>if</span> <span class='ident'>events</span>.<span class='ident'>is_writable</span>() {
             <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>on_writable</span>(<span class='ident'>scope</span>);
+        }
+
+        <span class='kw'>if</span> <span class='ident'>events</span>.<span class='ident'>is_hup</span>() {
+            <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;Conn::ready got hangup&quot;</span>);
+            <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>scope</span>.<span class='ident'>deregister</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>transport</span>);
+            <span class='self'>self</span>.<span class='ident'>on_remove</span>();
+            <span class='kw'>return</span> <span class='ident'>ReadyResult</span>::<span class='ident'>Done</span>(<span class='prelude-val'>None</span>);
         }
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>events</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>register</span>() {
