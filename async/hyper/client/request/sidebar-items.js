@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Request","A client request to a remote server."]]});
