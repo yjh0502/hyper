@@ -9,6 +9,7 @@
 
     <title>hyper::server - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
     
@@ -47,19 +48,19 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-8268' class='srclink' href='../../src/hyper/src/server/mod.rs.html#1-413' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/hyper/server/mod.rs.html#1-438' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>HTTP Server</p>
 
 <p>A <code>Server</code> is created to listen on a port, parse HTTP requests, and hand
-them off to a <code>Handler</code>.</p>
-</div><h2 id='reexports' class='section-header'><a href="#reexports">Reexports</a></h2>
-<table><tr><td><code>pub use net::{<a class='trait' href='../../hyper/net/trait.Accept.html' title='hyper::net::Accept'>Accept</a>, <a class='struct' href='../../hyper/net/struct.HttpListener.html' title='hyper::net::HttpListener'>HttpListener</a>, <a class='struct' href='../../hyper/net/struct.HttpsListener.html' title='hyper::net::HttpsListener'>HttpsListener</a>};</code></td></tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+them off to a <code>Service</code>.</p>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.Listening.html'
-                                  title='hyper::server::Listening'>Listening</a></td>
+                           <td><a class='struct' href='struct.Http.html'
+                                  title='hyper::server::Http'>Http</a></td>
                            <td class='docblock-short'>
-                                <p>A handle of the running server.</p>
+                                <p>An instance of the HTTP protocol, and implementation of tokio-proto&#39;s
+<code>ServerProto</code> trait.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
@@ -73,36 +74,29 @@ them off to a <code>Handler</code>.</p>
                            <td><a class='struct' href='struct.Response.html'
                                   title='hyper::server::Response'>Response</a></td>
                            <td class='docblock-short'>
-                                <p>The outgoing half for a Tcp connection, created by a <code>Server</code> and given to a <code>Handler</code>.</p>
+                                <p>The Response sent to a client after receiving a Request in a Service.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.Server.html'
                                   title='hyper::server::Server'>Server</a></td>
                            <td class='docblock-short'>
-                                <p>A Server that can accept incoming network requests.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='struct' href='struct.ServerLoop.html'
-                                  title='hyper::server::ServerLoop'>ServerLoop</a></td>
-                           <td class='docblock-short'>
-                                <p>A configured <code>Server</code> ready to run.</p>
+                                <p>An instance of a server created through <code>Http::bind</code>.</p>
                            </td>
                        </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class='trait' href='trait.Handler.html'
-                                  title='hyper::server::Handler'>Handler</a></td>
+                           <td><a class='trait' href='trait.NewService.html'
+                                  title='hyper::server::NewService'>NewService</a></td>
                            <td class='docblock-short'>
-                                <p>A trait to react to server events that happen for each message.</p>
+                                <p>Creates new <code>Service</code> values.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='trait' href='trait.HandlerFactory.html'
-                                  title='hyper::server::HandlerFactory'>HandlerFactory</a></td>
+                           <td><a class='trait' href='trait.Service.html'
+                                  title='hyper::server::Service'>Service</a></td>
                            <td class='docblock-short'>
-                                <p>Used to create a <code>Handler</code> when a new message is received by the server.</p>
+                                <p>An asynchronous function from <code>Request</code> to a <code>Response</code>.</p>
                            </td>
                        </tr></table></section>
     <section id='search' class="content hidden"></section>
@@ -160,11 +154,9 @@ them off to a <code>Handler</code>.</p>
     <script>
         window.rootPath = "../../";
         window.currentCrate = "hyper";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

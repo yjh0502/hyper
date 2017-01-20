@@ -9,6 +9,7 @@
 
     <title>hyper::header - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
     
@@ -47,7 +48,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1005' class='srclink' href='../../src/hyper/src/header/mod.rs.html#1-898' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/hyper/header/mod.rs.html#1-855' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Headers container, and common header fields.</p>
 
 <p>hyper has the opinion that Headers should be strongly-typed, because that&#39;s
@@ -78,7 +79,7 @@ many wrapper-style headers.</p>
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='ident'>Headers</span>::<span class='ident'>new</span>();
 
     <span class='ident'>headers</span>.<span class='ident'>set</span>(<span class='ident'>XRequestGuid</span>(<span class='string'>&quot;a proper guid&quot;</span>.<span class='ident'>to_owned</span>()))
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>This works well for simple &quot;string&quot; headers.  If you need more control,
 you can implement the trait directly.</p>
@@ -121,7 +122,7 @@ that via the numerals <code>1</code> and <code>0</code>.</p>
             <span class='ident'>f</span>.<span class='ident'>write_str</span>(<span class='string'>&quot;0&quot;</span>)
         }
     }
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
                        <tr class=' module-item'>
@@ -330,20 +331,6 @@ that via the numerals <code>1</code> and <code>0</code>.</p>
                                   title='hyper::header::Cookie'>Cookie</a></td>
                            <td class='docblock-short'>
                                 <p><code>Cookie</code> header, defined in <a href="http://tools.ietf.org/html/rfc6265#section-5.4">RFC6265</a></p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='struct' href='struct.CookieJar.html'
-                                  title='hyper::header::CookieJar'>CookieJar</a></td>
-                           <td class='docblock-short'>
-                                <p>A jar of cookies for managing a session</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='struct' href='struct.CookiePair.html'
-                                  title='hyper::header::CookiePair'>CookiePair</a></td>
-                           <td class='docblock-short'>
-                                
                            </td>
                        </tr>
                        <tr class=' module-item'>
@@ -713,6 +700,13 @@ except for the <code>WebSocket</code> value.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
+                           <td><a class='enum' href='enum.RetryAfter.html'
+                                  title='hyper::header::RetryAfter'>RetryAfter</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>Retry-After</code> header.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
                            <td><a class='enum' href='enum.Vary.html'
                                   title='hyper::header::Vary'>Vary</a></td>
                            <td class='docblock-short'>
@@ -805,11 +799,9 @@ Sets <code>q</code> to the default 1.0</p>
     <script>
         window.rootPath = "../../";
         window.currentCrate = "hyper";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>
