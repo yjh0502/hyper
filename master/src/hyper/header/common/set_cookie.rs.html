@@ -9,7 +9,6 @@
 
     <title>set_cookie.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
     
@@ -146,9 +145,21 @@
 <span id="101">101</span>
 <span id="102">102</span>
 <span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Header</span>, <span class='ident'>Raw</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='self'>self</span>, <span class='ident'>Display</span>};
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::<span class='ident'>from_utf8</span>;
 
 
@@ -239,16 +250,28 @@
             <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
         }
     }
+    <span class='kw'>fn</span> <span class='ident'>fmt_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>_f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
+        <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;SetCookie cannot be used with fmt_header, must use fmt_multi_header&quot;</span>);
+    }
 
-    <span class='kw'>fn</span> <span class='ident'>fmt_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>cookie</span>) <span class='kw'>in</span> <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>() {
-            <span class='kw'>if</span> <span class='ident'>i</span> <span class='op'>!=</span> <span class='number'>0</span> {
-                <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>f</span>.<span class='ident'>write_str</span>(<span class='string'>&quot;\r\nSet-Cookie: &quot;</span>));
-            }
-            <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>Display</span>::<span class='ident'>fmt</span>(<span class='ident'>cookie</span>, <span class='ident'>f</span>));
+
+    <span class='kw'>fn</span> <span class='ident'>fmt_multi_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> ::<span class='ident'>header</span>::<span class='ident'>MultilineFormatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
+        <span class='kw'>for</span> <span class='ident'>cookie</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='number'>0</span> {
+            <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>f</span>.<span class='ident'>fmt_line</span>(<span class='ident'>cookie</span>));
         }
         <span class='prelude-val'>Ok</span>(())
     }
+}
+
+<span class='attribute'>#[<span class='ident'>test</span>]</span>
+<span class='kw'>fn</span> <span class='ident'>test_set_cookie_fmt</span>() {
+    <span class='kw'>use</span> ::<span class='ident'>header</span>::<span class='ident'>Headers</span>;
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='ident'>Headers</span>::<span class='ident'>new</span>();
+    <span class='ident'>headers</span>.<span class='ident'>set</span>(<span class='ident'>SetCookie</span>(<span class='macro'>vec</span><span class='macro'>!</span>[
+        <span class='string'>&quot;foo=bar&quot;</span>.<span class='ident'>into</span>(),
+        <span class='string'>&quot;baz=quux&quot;</span>.<span class='ident'>into</span>(),
+    ]));
+    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>headers</span>.<span class='ident'>to_string</span>(), <span class='string'>&quot;Set-Cookie: foo=bar\r\nSet-Cookie: baz=quux\r\n&quot;</span>);
 }
 </pre>
 </section>
