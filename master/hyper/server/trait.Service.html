@@ -9,7 +9,6 @@
 
     <title>hyper::server::Service - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
     
@@ -49,7 +48,7 @@
                        [<span class='inner'>&#x2212;</span>]
                    </a>
                </span></span></h1>
-<pre class='rust trait'>pub trait Service <span class='where'>where Self::<a class='trait' href='../../hyper/server/trait.Service.html' title='hyper::server::Service'>Future</a>::<a class='trait' href='https://docs.rs/futures/0.1/futures/future/trait.Future.html' title='futures::future::Future'>Item</a> == Self::<a class='trait' href='../../hyper/server/trait.Service.html' title='hyper::server::Service'>Response</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Self::<a class='trait' href='../../hyper/server/trait.Service.html' title='hyper::server::Service'>Future</a>::<a class='trait' href='https://docs.rs/futures/0.1/futures/future/trait.Future.html' title='futures::future::Future'>Error</a> == Self::<a class='trait' href='../../hyper/server/trait.Service.html' title='hyper::server::Service'>Error</a></span> {
+<pre class='rust trait'>pub trait Service <span class='where'>where Self::<a class='trait' href='../../hyper/server/trait.Service.html' title='hyper::server::Service'>Future</a>::<a class='trait' href='https://docs.rs/futures/0.1/futures/future/trait.Future.html' title='futures::future::Future'>Item</a> == Self::<a class='trait' href='../../hyper/server/trait.Service.html' title='hyper::server::Service'>Response</a>, Self::<a class='trait' href='../../hyper/server/trait.Service.html' title='hyper::server::Service'>Future</a>::<a class='trait' href='https://docs.rs/futures/0.1/futures/future/trait.Future.html' title='futures::future::Future'>Error</a> == Self::<a class='trait' href='../../hyper/server/trait.Service.html' title='hyper::server::Service'>Error</a></span> {
     type <a href='#associatedtype.Request' class='type'>Request</a>;
     type <a href='#associatedtype.Response' class='type'>Response</a>;
     type <a href='#associatedtype.Error' class='type'>Error</a>;
@@ -174,14 +173,14 @@ same timeout middleware could be used in either a client or a server.</p>
 </div>
             <h2 id='associated-types'>Associated Types</h2>
             <div class='methods'>
-        <h3 id='associatedtype.Request' class='method'><span id='Request.t' class='invisible'><code>type <a href='#associatedtype.Request' class='type'>Request</a></code></span></h3><div class='docblock'><p>Requests handled by the service.</p>
-</div><h3 id='associatedtype.Response' class='method'><span id='Response.t' class='invisible'><code>type <a href='#associatedtype.Response' class='type'>Response</a></code></span></h3><div class='docblock'><p>Responses given by the service.</p>
-</div><h3 id='associatedtype.Error' class='method'><span id='Error.t' class='invisible'><code>type <a href='#associatedtype.Error' class='type'>Error</a></code></span></h3><div class='docblock'><p>Errors produced by the service.</p>
-</div><h3 id='associatedtype.Future' class='method'><span id='Future.t' class='invisible'><code>type <a href='#associatedtype.Future' class='type'>Future</a>: <a class='trait' href='https://docs.rs/futures/0.1/futures/future/trait.Future.html' title='futures::future::Future'>Future</a></code></span></h3><div class='docblock'><p>The future response value.</p>
+        <h3 id='associatedtype.Request' class='method stab '><span id='Request.t' class='invisible'><code>type <a href='#associatedtype.Request' class='type'>Request</a></code></span></h3><div class='docblock'><p>Requests handled by the service.</p>
+</div><h3 id='associatedtype.Response' class='method stab '><span id='Response.t' class='invisible'><code>type <a href='#associatedtype.Response' class='type'>Response</a></code></span></h3><div class='docblock'><p>Responses given by the service.</p>
+</div><h3 id='associatedtype.Error' class='method stab '><span id='Error.t' class='invisible'><code>type <a href='#associatedtype.Error' class='type'>Error</a></code></span></h3><div class='docblock'><p>Errors produced by the service.</p>
+</div><h3 id='associatedtype.Future' class='method stab '><span id='Future.t' class='invisible'><code>type <a href='#associatedtype.Future' class='type'>Future</a>: <a class='trait' href='https://docs.rs/futures/0.1/futures/future/trait.Future.html' title='futures::future::Future'>Future</a></code></span></h3><div class='docblock'><p>The future response value.</p>
 </div></div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.call' class='method'><span id='call.v' class='invisible'><code>fn <a href='#tymethod.call' class='fnname'>call</a>(&amp;self, req: Self::<a class='trait' href='../../hyper/server/trait.Service.html' title='hyper::server::Service'>Request</a>) -&gt; Self::<a class='trait' href='../../hyper/server/trait.Service.html' title='hyper::server::Service'>Future</a></code></span></h3><div class='docblock'><p>Process the request and return the response asynchronously.</p>
+        <h3 id='tymethod.call' class='method stab '><span id='call.v' class='invisible'><code>fn <a href='#tymethod.call' class='fnname'>call</a>(&amp;self, req: Self::<a class='trait' href='../../hyper/server/trait.Service.html' title='hyper::server::Service'>Request</a>) -&gt; Self::<a class='trait' href='../../hyper/server/trait.Service.html' title='hyper::server::Service'>Future</a></code></span></h3><div class='docblock'><p>Process the request and return the response asynchronously.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
