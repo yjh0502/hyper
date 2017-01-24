@@ -818,7 +818,7 @@
                             <span class='ident'>other</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>UnexpectedEof</span>, <span class='ident'>other</span>)),
                         }
                     } <span class='kw'>else</span> {
-                        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;socket read eof&quot;</span>);
+                        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;socket complete&quot;</span>);
                         <span class='prelude-val'>Ok</span>(<span class='ident'>Async</span>::<span class='ident'>Ready</span>(<span class='prelude-val'>None</span>))
                     }
                 };
