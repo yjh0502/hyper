@@ -9,7 +9,6 @@
 
     <title>io.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
     
@@ -364,6 +363,12 @@
 <span id="319">319</span>
 <span id="320">320</span>
 <span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cmp</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
@@ -493,13 +498,18 @@ impl&lt;T: Read&gt; Read for Buffered&lt;T&gt; {
     }
 
     <span class='kw'>fn</span> <span class='ident'>flush</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>write_buf</span>.<span class='ident'>write_into</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>io</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>_n</span><span class='op'>|</span> {
-            <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>write_buf</span>.<span class='ident'>remaining</span>() <span class='op'>==</span> <span class='number'>0</span> {
-                <span class='prelude-val'>Ok</span>(())
-            } <span class='kw'>else</span> {
-                <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>WouldBlock</span>, <span class='string'>&quot;wouldblock&quot;</span>))
-            }
-        })
+        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>write_buf</span>.<span class='ident'>remaining</span>() <span class='op'>==</span> <span class='number'>0</span> {
+            <span class='prelude-val'>Ok</span>(())
+        } <span class='kw'>else</span> {
+            <span class='self'>self</span>.<span class='ident'>write_buf</span>.<span class='ident'>write_into</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>io</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>n</span><span class='op'>|</span> {
+                <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;flushed {} bytes&quot;</span>, <span class='ident'>n</span>);
+                <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>write_buf</span>.<span class='ident'>remaining</span>() <span class='op'>==</span> <span class='number'>0</span> {
+                    <span class='prelude-val'>Ok</span>(())
+                } <span class='kw'>else</span> {
+                    <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>WouldBlock</span>, <span class='string'>&quot;wouldblock&quot;</span>))
+                }
+            })
+        }
     }
 }
 
@@ -657,6 +667,7 @@ impl&lt;T: Write + ::vecio::Writev&gt; AtomicWrite for T {
             <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;WriteBuf reserving initial {}&quot;</span>, <span class='ident'>init</span>);
             <span class='ident'>vec</span>.<span class='ident'>reserve</span>(<span class='ident'>init</span>);
         } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>cap</span> <span class='op'>&lt;</span> <span class='ident'>MAX_BUFFER_SIZE</span> {
+            <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;maybe_reserve MAX={}, needed={}, cap={}&quot;</span>, <span class='ident'>MAX_BUFFER_SIZE</span>, <span class='ident'>needed</span>, <span class='ident'>cap</span>);
             <span class='ident'>vec</span>.<span class='ident'>reserve</span>(<span class='ident'>cmp</span>::<span class='ident'>min</span>(<span class='ident'>needed</span>, <span class='ident'>MAX_BUFFER_SIZE</span> <span class='op'>-</span> <span class='ident'>cap</span>));
             <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;WriteBuf reserved {}&quot;</span>, <span class='ident'>vec</span>.<span class='ident'>capacity</span>() <span class='op'>-</span> <span class='ident'>cap</span>);
         }
