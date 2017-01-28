@@ -9,7 +9,6 @@
 
     <title>chunk.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
     
@@ -198,7 +197,7 @@
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='number'>0</span> {
             <span class='ident'>Inner</span>::<span class='ident'>Owned</span>(<span class='kw-2'>ref</span> <span class='ident'>vec</span>) <span class='op'>=&gt;</span> <span class='ident'>vec</span>,
             <span class='ident'>Inner</span>::<span class='ident'>Referenced</span>(<span class='kw-2'>ref</span> <span class='ident'>vec</span>) <span class='op'>=&gt;</span> <span class='ident'>vec</span>,
-            <span class='ident'>Inner</span>::<span class='ident'>Mem</span>(<span class='kw-2'>ref</span> <span class='ident'>slice</span>) <span class='op'>=&gt;</span> <span class='ident'>slice</span>,
+            <span class='ident'>Inner</span>::<span class='ident'>Mem</span>(<span class='kw-2'>ref</span> <span class='ident'>slice</span>) <span class='op'>=&gt;</span> <span class='ident'>slice</span>.<span class='ident'>as_ref</span>(),
             <span class='ident'>Inner</span>::<span class='ident'>Static</span>(<span class='ident'>slice</span>) <span class='op'>=&gt;</span> <span class='ident'>slice</span>,
         }
     }

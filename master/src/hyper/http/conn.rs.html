@@ -9,7 +9,6 @@
 
     <title>conn.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
     
@@ -718,6 +717,21 @@
 <span id="673">673</span>
 <span id="674">674</span>
 <span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='self'>self</span>, <span class='ident'>Write</span>};
@@ -948,13 +962,13 @@
 
                         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>wbuf</span>.<span class='ident'>is_written</span>() {
                             <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;Conn::start_send frame not written, queued&quot;</span>);
-                            <span class='kw-2'>*</span><span class='ident'>queued</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>wbuf</span>);
+                            <span class='op'>*</span><span class='ident'>queued</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>wbuf</span>);
                         }
                     },
                     <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='kw'>match</span> <span class='ident'>e</span>.<span class='ident'>kind</span>() {
                         <span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>WouldBlock</span> <span class='op'>=&gt;</span> {
                             <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;Conn::start_send frame not written, queued&quot;</span>);
-                            <span class='kw-2'>*</span><span class='ident'>queued</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>wbuf</span>);
+                            <span class='op'>*</span><span class='ident'>queued</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>wbuf</span>);
                         },
                         _ <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>e</span>)
                     }
@@ -987,7 +1001,7 @@
                 };
                 <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;Conn::write_queued complete = {}&quot;</span>, <span class='ident'>complete</span>);
                 <span class='kw'>if</span> <span class='ident'>complete</span> {
-                    <span class='kw-2'>*</span><span class='ident'>queued</span> <span class='op'>=</span> <span class='prelude-val'>None</span>;
+                    <span class='op'>*</span><span class='ident'>queued</span> <span class='op'>=</span> <span class='prelude-val'>None</span>;
                     <span class='prelude-val'>Ok</span>(<span class='ident'>Async</span>::<span class='ident'>Ready</span>(()))
                 } <span class='kw'>else</span> {
                     <span class='prelude-val'>Ok</span>(<span class='ident'>Async</span>::<span class='ident'>NotReady</span>)
@@ -1146,7 +1160,7 @@
 <span class='kw'>impl</span> ::<span class='ident'>std</span>::<span class='ident'>ops</span>::<span class='ident'>BitAndAssign</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>KA</span> {
     <span class='kw'>fn</span> <span class='ident'>bitand_assign</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>enabled</span>: <span class='ident'>bool</span>) {
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>enabled</span> {
-            <span class='kw-2'>*</span><span class='self'>self</span> <span class='op'>=</span> <span class='ident'>KA</span>::<span class='ident'>Disabled</span>;
+            <span class='op'>*</span><span class='self'>self</span> <span class='op'>=</span> <span class='ident'>KA</span>::<span class='ident'>Disabled</span>;
         }
     }
 }
@@ -1173,19 +1187,19 @@
 
 <span class='kw'>impl</span> <span class='ident'>KeepAlive</span> <span class='kw'>for</span> <span class='ident'>KA</span> {
     <span class='kw'>fn</span> <span class='ident'>idle</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw-2'>*</span><span class='self'>self</span> <span class='op'>=</span> <span class='ident'>KA</span>::<span class='ident'>Idle</span>(<span class='ident'>Instant</span>::<span class='ident'>now</span>());
+        <span class='op'>*</span><span class='self'>self</span> <span class='op'>=</span> <span class='ident'>KA</span>::<span class='ident'>Idle</span>(<span class='ident'>Instant</span>::<span class='ident'>now</span>());
     }
 
     <span class='kw'>fn</span> <span class='ident'>busy</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw-2'>*</span><span class='self'>self</span> <span class='op'>=</span> <span class='ident'>KA</span>::<span class='ident'>Busy</span>;
+        <span class='op'>*</span><span class='self'>self</span> <span class='op'>=</span> <span class='ident'>KA</span>::<span class='ident'>Busy</span>;
     }
 
     <span class='kw'>fn</span> <span class='ident'>disable</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw-2'>*</span><span class='self'>self</span> <span class='op'>=</span> <span class='ident'>KA</span>::<span class='ident'>Disabled</span>;
+        <span class='op'>*</span><span class='self'>self</span> <span class='op'>=</span> <span class='ident'>KA</span>::<span class='ident'>Disabled</span>;
     }
 
     <span class='kw'>fn</span> <span class='ident'>status</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>KA</span> {
-        <span class='kw-2'>*</span><span class='self'>self</span>
+        <span class='op'>*</span><span class='self'>self</span>
     }
 }
 
@@ -1250,7 +1264,7 @@
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='op'>+</span> <span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='kw'>for</span> <span class='ident'>DebugFrame</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='kw'>match</span> <span class='kw-2'>*</span><span class='self'>self</span>.<span class='number'>0</span> {
+        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span>.<span class='number'>0</span> {
             <span class='ident'>Frame</span>::<span class='ident'>Message</span> { <span class='kw-2'>ref</span> <span class='ident'>message</span>, <span class='kw-2'>ref</span> <span class='ident'>body</span> } <span class='op'>=&gt;</span> {
                 <span class='ident'>f</span>.<span class='ident'>debug_struct</span>(<span class='string'>&quot;Message&quot;</span>)
                     .<span class='ident'>field</span>(<span class='string'>&quot;message&quot;</span>, <span class='ident'>message</span>)
@@ -1313,6 +1327,21 @@
                 })
             },
             <span class='ident'>f</span> <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;frame is not Frame::Message: {:?}&quot;</span>, <span class='ident'>f</span>)
+        }
+    }
+
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_conn_parse_partial</span>() {
+        <span class='kw'>let</span> <span class='ident'>good_message</span> <span class='op'>=</span> <span class='string'>b&quot;GET / HTTP/1.1\r\nHost: foo.bar\r\n\r\n&quot;</span>.<span class='ident'>to_vec</span>();
+        <span class='kw'>let</span> <span class='ident'>io</span> <span class='op'>=</span> <span class='ident'>AsyncIo</span>::<span class='ident'>new_buf</span>(<span class='ident'>good_message</span>, <span class='number'>10</span>);
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>conn</span> <span class='op'>=</span> <span class='ident'>Conn</span>::<span class='op'>&lt;</span>_, <span class='ident'>ServerTransaction</span><span class='op'>&gt;</span>::<span class='ident'>new</span>(<span class='ident'>io</span>, <span class='ident'>Default</span>::<span class='ident'>default</span>());
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>conn</span>.<span class='ident'>poll</span>().<span class='ident'>unwrap</span>().<span class='ident'>is_not_ready</span>());
+        <span class='ident'>conn</span>.<span class='ident'>io</span>.<span class='ident'>io_mut</span>().<span class='ident'>block_in</span>(<span class='number'>50</span>);
+        <span class='kw'>let</span> <span class='ident'>async</span> <span class='op'>=</span> <span class='ident'>conn</span>.<span class='ident'>poll</span>().<span class='ident'>unwrap</span>();
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>async</span>.<span class='ident'>is_ready</span>());
+        <span class='kw'>match</span> <span class='ident'>async</span> {
+            <span class='ident'>Async</span>::<span class='ident'>Ready</span>(<span class='prelude-val'>Some</span>(<span class='ident'>Frame</span>::<span class='ident'>Message</span> { .. })) <span class='op'>=&gt;</span> (),
+            <span class='ident'>f</span> <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;frame is not Message: {:?}&quot;</span>, <span class='ident'>f</span>),
         }
     }
 
