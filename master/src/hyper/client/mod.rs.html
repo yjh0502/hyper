@@ -9,7 +9,6 @@
 
     <title>mod.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
     
@@ -391,6 +390,12 @@
 <span id="346">346</span>
 <span id="347">347</span>
 <span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! HTTP Client</span>
 <span class='doccomment'>//!</span>
@@ -443,11 +448,17 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// # Example</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```dont_run</span>
-    <span class='doccomment'>/// # use hyper::Client;</span>
-    <span class='doccomment'>/// let client = Client::configure()</span>
+    <span class='doccomment'>/// ```no_run</span>
+    <span class='doccomment'>/// extern crate hyper;</span>
+    <span class='doccomment'>/// extern crate tokio_core;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// fn main() {</span>
+    <span class='doccomment'>/// let mut core = tokio_core::reactor::Core::new().unwrap();</span>
+    <span class='doccomment'>/// let handle = core.handle();</span>
+    <span class='doccomment'>/// let client = hyper::Client::configure()</span>
     <span class='doccomment'>///     .keep_alive(true)</span>
-    <span class='doccomment'>///     .build().unwrap();</span>
+    <span class='doccomment'>///     .build(&amp;handle);</span>
+    <span class='doccomment'>/// }</span>
     <span class='doccomment'>/// ```</span>
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>configure</span>() <span class='op'>-&gt;</span> <span class='ident'>Config</span><span class='op'>&lt;</span><span class='ident'>UseDefaultConnector</span><span class='op'>&gt;</span> {
