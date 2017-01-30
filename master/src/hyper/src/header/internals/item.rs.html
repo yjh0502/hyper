@@ -166,6 +166,7 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
+<span id="125">125</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>any</span>::<span class='ident'>Any</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>any</span>::<span class='ident'>TypeId</span>;
@@ -202,7 +203,8 @@
     }
 
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>mut_raw</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Raw</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>raw_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Raw</span> {
+        <span class='self'>self</span>.<span class='ident'>raw</span>();
         <span class='self'>self</span>.<span class='ident'>typed</span> <span class='op'>=</span> <span class='ident'>PtrMapCell</span>::<span class='ident'>new</span>();
         <span class='kw'>unsafe</span> {
             <span class='self'>self</span>.<span class='ident'>raw</span>.<span class='ident'>get_mut</span>()
