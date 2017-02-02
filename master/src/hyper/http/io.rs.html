@@ -368,6 +368,10 @@
 <span id="323">323</span>
 <span id="324">324</span>
 <span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cmp</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
@@ -613,8 +617,12 @@ impl&lt;T: Write + ::vecio::Writev&gt; AtomicWrite for T {
 */</span>
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Write</span><span class='op'>&gt;</span> <span class='ident'>AtomicWrite</span> <span class='kw'>for</span> <span class='ident'>T</span> {
     <span class='kw'>fn</span> <span class='ident'>write_atomic</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>bufs</span>: <span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]]) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>vec</span> <span class='op'>=</span> <span class='ident'>bufs</span>.<span class='ident'>concat</span>();
-        <span class='self'>self</span>.<span class='ident'>write</span>(<span class='kw-2'>&amp;</span><span class='ident'>vec</span>)
+        <span class='kw'>if</span> <span class='ident'>bufs</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>1</span> {
+            <span class='self'>self</span>.<span class='ident'>write</span>(<span class='ident'>bufs</span>[<span class='number'>0</span>])
+        } <span class='kw'>else</span> {
+            <span class='kw'>let</span> <span class='ident'>vec</span> <span class='op'>=</span> <span class='ident'>bufs</span>.<span class='ident'>concat</span>();
+            <span class='self'>self</span>.<span class='ident'>write</span>(<span class='kw-2'>&amp;</span><span class='ident'>vec</span>)
+        }
     }
 }
 <span class='comment'>//}</span>
