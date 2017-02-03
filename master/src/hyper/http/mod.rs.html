@@ -278,7 +278,7 @@ macro_rules! nonblocking {
 
 <span class='kw'>impl</span> <span class='ident'>From</span><span class='op'>&lt;</span><span class='ident'>StatusCode</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>RawStatus</span> {
     <span class='kw'>fn</span> <span class='ident'>from</span>(<span class='ident'>status</span>: <span class='ident'>StatusCode</span>) <span class='op'>-&gt;</span> <span class='ident'>RawStatus</span> {
-        <span class='ident'>RawStatus</span>(<span class='ident'>status</span>.<span class='ident'>to_u16</span>(), <span class='ident'>Cow</span>::<span class='ident'>Borrowed</span>(<span class='ident'>status</span>.<span class='ident'>canonical_reason</span>().<span class='ident'>unwrap_or</span>(<span class='string'>&quot;&quot;</span>)))
+        <span class='ident'>RawStatus</span>(<span class='ident'>status</span>.<span class='ident'>into</span>(), <span class='ident'>Cow</span>::<span class='ident'>Borrowed</span>(<span class='ident'>status</span>.<span class='ident'>canonical_reason</span>().<span class='ident'>unwrap_or</span>(<span class='string'>&quot;&quot;</span>)))
     }
 }
 
