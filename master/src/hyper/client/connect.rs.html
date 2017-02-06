@@ -9,6 +9,7 @@
 
     <title>connect.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
     
@@ -252,7 +253,7 @@
 <span class='kw'>use</span> <span class='ident'>tokio</span>::<span class='ident'>reactor</span>::<span class='ident'>Handle</span>;
 <span class='kw'>use</span> <span class='ident'>tokio</span>::<span class='ident'>net</span>::{<span class='ident'>TcpStream</span>, <span class='ident'>TcpStreamNew</span>};
 <span class='kw'>use</span> <span class='ident'>tokio_service</span>::<span class='ident'>Service</span>;
-<span class='kw'>use</span> <span class='ident'>url</span>::<span class='ident'>Url</span>;
+<span class='kw'>use</span> <span class='ident'>Url</span>;
 
 <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>dns</span>;
 
@@ -398,7 +399,7 @@
                         <span class='ident'>err</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>e</span>);
                         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>addr</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>addrs</span>.<span class='ident'>next</span>() {
                             <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;connecting to {:?}&quot;</span>, <span class='ident'>addr</span>);
-                            <span class='op'>*</span><span class='ident'>current</span> <span class='op'>=</span> <span class='ident'>TcpStream</span>::<span class='ident'>connect</span>(<span class='kw-2'>&amp;</span><span class='ident'>addr</span>, <span class='ident'>handle</span>);
+                            <span class='kw-2'>*</span><span class='ident'>current</span> <span class='op'>=</span> <span class='ident'>TcpStream</span>::<span class='ident'>connect</span>(<span class='kw-2'>&amp;</span><span class='ident'>addr</span>, <span class='ident'>handle</span>);
                             <span class='kw'>continue</span>;
                         }
                     }
@@ -430,7 +431,7 @@ impl&lt;S: SslClient&gt; HttpsConnector&lt;S&gt; {
 <span class='kw'>mod</span> <span class='ident'>tests</span> {
     <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
     <span class='kw'>use</span> <span class='ident'>tokio</span>::<span class='ident'>reactor</span>::<span class='ident'>Core</span>;
-    <span class='kw'>use</span> <span class='ident'>url</span>::<span class='ident'>Url</span>;
+    <span class='kw'>use</span> <span class='ident'>Url</span>;
     <span class='kw'>use</span> <span class='kw'>super</span>::{<span class='ident'>Connect</span>, <span class='ident'>HttpConnector</span>};
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>

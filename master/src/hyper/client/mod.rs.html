@@ -9,6 +9,7 @@
 
     <title>mod.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
     
@@ -423,7 +424,7 @@
 <span class='kw'>use</span> <span class='ident'>http</span>::{<span class='self'>self</span>, <span class='ident'>TokioBody</span>};
 <span class='kw'>use</span> <span class='ident'>method</span>::<span class='ident'>Method</span>;
 <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>pool</span>::{<span class='ident'>Pool</span>, <span class='ident'>Pooled</span>};
-<span class='kw'>use</span> {<span class='ident'>Url</span>};
+<span class='kw'>use</span> <span class='ident'>Url</span>;
 
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>connect</span>::{<span class='ident'>HttpConnector</span>, <span class='ident'>Connect</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>request</span>::<span class='ident'>Request</span>;
@@ -723,7 +724,7 @@
     use header::Server;
     use super::{Client};
     use super::pool::Pool;
-    use url::Url;
+    use Url;
 
     mock_connector!(Issue640Connector {
         b&quot;HTTP/1.1 200 OK\r\nContent-Length: 3\r\n\r\n&quot;,
