@@ -526,7 +526,7 @@
     <span class='kw'>fn</span> <span class='ident'>decoder</span>(<span class='ident'>inc</span>: <span class='kw-2'>&amp;</span><span class='ident'>MessageHead</span><span class='op'>&lt;</span><span class='self'>Self</span>::<span class='ident'>Incoming</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Decoder</span><span class='op'>&gt;</span> {
         <span class='kw'>use</span> ::<span class='ident'>header</span>;
         <span class='comment'>// According to https://tools.ietf.org/html/rfc7230#section-3.3.3</span>
-        <span class='comment'>// 1. HEAD reponses, and Status 1xx, 204, and 304 cannot have a body.</span>
+        <span class='comment'>// 1. HEAD responses, and Status 1xx, 204, and 304 cannot have a body.</span>
         <span class='comment'>// 2. Status 2xx to a CONNECT cannot have a body.</span>
         <span class='comment'>//</span>
         <span class='comment'>// First two steps taken care of before this method.</span>
@@ -540,7 +540,7 @@
             <span class='kw'>if</span> <span class='ident'>codings</span>.<span class='ident'>last</span>() <span class='op'>==</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>::<span class='ident'>Encoding</span>::<span class='ident'>Chunked</span>) {
                 <span class='prelude-val'>Ok</span>(<span class='ident'>Decoder</span>::<span class='ident'>chunked</span>())
             } <span class='kw'>else</span> {
-                <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;not chuncked. read till eof&quot;</span>);
+                <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;not chunked. read till eof&quot;</span>);
                 <span class='prelude-val'>Ok</span>(<span class='ident'>Decoder</span>::<span class='ident'>eof</span>())
             }
         } <span class='kw'>else</span> <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>::<span class='ident'>ContentLength</span>(<span class='ident'>len</span>)) <span class='op'>=</span> <span class='ident'>inc</span>.<span class='ident'>headers</span>.<span class='ident'>get</span>() {
