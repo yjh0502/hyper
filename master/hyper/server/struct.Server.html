@@ -9,7 +9,6 @@
 
     <title>hyper::server::Server - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
     
@@ -73,7 +72,7 @@ elapses then the server will be forcibly shut down.</p>
 
 <p>This method does not currently return, but it will return an error if
 one occurs.</p>
-</div><h4 id='method.run_until' class='method'><span id='run_until.v' class='invisible'><code>fn <a href='#method.run_until' class='fnname'>run_until</a>&lt;F&gt;(self, shutdown_signal: F) -&gt; <a class='type' href='../../hyper/error/type.Result.html' title='hyper::error::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt; <span class='where fmt-newline'>where F: <a class='trait' href='https://docs.rs/futures/0.1/futures/future/trait.Future.html' title='futures::future::Future'>Future</a>&lt;Item=<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, Error=<a class='enum' href='../../hyper/error/enum.Error.html' title='hyper::error::Error'>Error</a>&gt;</span></code></span></h4>
+</div><h4 id='method.run_until' class='method'><span id='run_until.v' class='invisible'><code>fn <a href='#method.run_until' class='fnname'>run_until</a>&lt;F&gt;(self, shutdown_signal: F) -&gt; <a class='type' href='../../hyper/error/type.Result.html' title='hyper::error::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt; <span class='where'>where F: <a class='trait' href='https://docs.rs/futures/0.1/futures/future/trait.Future.html' title='futures::future::Future'>Future</a>&lt;Item=<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, Error=<a class='enum' href='../../hyper/error/enum.Error.html' title='hyper::error::Error'>Error</a>&gt;</span></code></span></h4>
 <div class='docblock'><p>Execute this server until the given future, <code>shutdown_signal</code>, resolves.</p>
 
 <p>This method, like <code>run</code> above, is used to execute this HTTP server. The
