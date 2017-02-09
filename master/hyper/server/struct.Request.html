@@ -55,7 +55,7 @@
 <div class='docblock'><p>The <code>Method</code>, such as <code>Get</code>, <code>Post</code>, etc.</p>
 </div><h4 id='method.headers' class='method'><span id='headers.v' class='invisible'><code>fn <a href='#method.headers' class='fnname'>headers</a>(&amp;self) -&gt; &amp;<a class='struct' href='../../hyper/header/struct.Headers.html' title='hyper::header::Headers'>Headers</a></code></span></h4>
 <div class='docblock'><p>The headers of the incoming request.</p>
-</div><h4 id='method.uri' class='method'><span id='uri.v' class='invisible'><code>fn <a href='#method.uri' class='fnname'>uri</a>(&amp;self) -&gt; &amp;Uri</code></span></h4>
+</div><h4 id='method.uri' class='method'><span id='uri.v' class='invisible'><code>fn <a href='#method.uri' class='fnname'>uri</a>(&amp;self) -&gt; &amp;<a class='struct' href='../../hyper/struct.Uri.html' title='hyper::Uri'>Uri</a></code></span></h4>
 <div class='docblock'><p>The target request-uri for this request.</p>
 </div><h4 id='method.version' class='method'><span id='version.v' class='invisible'><code>fn <a href='#method.version' class='fnname'>version</a>(&amp;self) -&gt; &amp;<a class='enum' href='../../hyper/enum.HttpVersion.html' title='hyper::HttpVersion'>HttpVersion</a></code></span></h4>
 <div class='docblock'><p>The version of HTTP for this request.</p>
@@ -67,7 +67,7 @@
 <div class='docblock'><p>The query string of this Request.</p>
 </div><h4 id='method.body' class='method'><span id='body.v' class='invisible'><code>fn <a href='#method.body' class='fnname'>body</a>(self) -&gt; <a class='struct' href='../../hyper/struct.Body.html' title='hyper::Body'>Body</a></code></span></h4>
 <div class='docblock'><p>Take the <code>Body</code> of this <code>Request</code>.</p>
-</div><h4 id='method.deconstruct' class='method'><span id='deconstruct.v' class='invisible'><code>fn <a href='#method.deconstruct' class='fnname'>deconstruct</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='enum' href='../../hyper/enum.Method.html' title='hyper::Method'>Method</a>, Uri, <a class='enum' href='../../hyper/enum.HttpVersion.html' title='hyper::HttpVersion'>HttpVersion</a>, <a class='struct' href='../../hyper/header/struct.Headers.html' title='hyper::header::Headers'>Headers</a>, <a class='struct' href='../../hyper/struct.Body.html' title='hyper::Body'>Body</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code></span></h4>
+</div><h4 id='method.deconstruct' class='method'><span id='deconstruct.v' class='invisible'><code>fn <a href='#method.deconstruct' class='fnname'>deconstruct</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='enum' href='../../hyper/enum.Method.html' title='hyper::Method'>Method</a>, <a class='struct' href='../../hyper/struct.Uri.html' title='hyper::Uri'>Uri</a>, <a class='enum' href='../../hyper/enum.HttpVersion.html' title='hyper::HttpVersion'>HttpVersion</a>, <a class='struct' href='../../hyper/header/struct.Headers.html' title='hyper::header::Headers'>Headers</a>, <a class='struct' href='../../hyper/struct.Body.html' title='hyper::Body'>Body</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code></span></h4>
 <div class='docblock'><p>Deconstruct this Request into its pieces.</p>
 
 <p>Modifying these pieces will have no effect on how hyper behaves.</p>
