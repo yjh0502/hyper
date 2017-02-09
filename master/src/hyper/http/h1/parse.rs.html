@@ -373,6 +373,13 @@
 <span id="328">328</span>
 <span id="329">329</span>
 <span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>borrow</span>::<span class='ident'>Cow</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='self'>self</span>, <span class='ident'>Write</span>};
@@ -382,7 +389,7 @@
 <span class='kw'>use</span> <span class='ident'>header</span>::{<span class='self'>self</span>, <span class='ident'>Headers</span>, <span class='ident'>ContentLength</span>, <span class='ident'>TransferEncoding</span>};
 <span class='kw'>use</span> <span class='ident'>http</span>::{<span class='ident'>MessageHead</span>, <span class='ident'>RawStatus</span>, <span class='ident'>Http1Transaction</span>, <span class='ident'>ParseResult</span>, <span class='ident'>ServerTransaction</span>, <span class='ident'>ClientTransaction</span>, <span class='ident'>RequestLine</span>};
 <span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>h1</span>::{<span class='ident'>Encoder</span>, <span class='ident'>Decoder</span>};
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>buf</span>::{<span class='ident'>MemBuf</span>, <span class='ident'>MemSlice</span>};
+<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>buf</span>::{<span class='ident'>MemBuf</span>, <span class='ident'>MemSlice</span>, <span class='ident'>MemStr</span>};
 <span class='kw'>use</span> <span class='ident'>method</span>::<span class='ident'>Method</span>;
 <span class='kw'>use</span> <span class='ident'>status</span>::<span class='ident'>StatusCode</span>;
 <span class='kw'>use</span> <span class='ident'>version</span>::<span class='ident'>HttpVersion</span>::{<span class='ident'>Http10</span>, <span class='ident'>Http11</span>};
@@ -409,18 +416,26 @@
         <span class='prelude-val'>Ok</span>(<span class='kw'>match</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>req</span>.<span class='ident'>parse</span>(<span class='ident'>buf</span>.<span class='ident'>bytes</span>())) {
             <span class='ident'>httparse</span>::<span class='ident'>Status</span>::<span class='ident'>Complete</span>(<span class='ident'>len</span>) <span class='op'>=&gt;</span> {
                 <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;Request.parse Complete({})&quot;</span>, <span class='ident'>len</span>);
-                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='ident'>Headers</span>::<span class='ident'>with_capacity</span>(<span class='ident'>req</span>.<span class='ident'>headers</span>.<span class='ident'>len</span>());
                 <span class='kw'>let</span> <span class='ident'>slice</span> <span class='op'>=</span> <span class='ident'>buf</span>.<span class='ident'>slice</span>(<span class='ident'>len</span>);
+                <span class='kw'>let</span> <span class='ident'>path</span> <span class='op'>=</span> <span class='ident'>req</span>.<span class='ident'>path</span>.<span class='ident'>unwrap</span>();
+                <span class='kw'>let</span> <span class='ident'>path_start</span> <span class='op'>=</span> <span class='ident'>path</span>.<span class='ident'>as_ptr</span>() <span class='kw'>as</span> <span class='ident'>usize</span> <span class='op'>-</span> <span class='ident'>slice</span>.<span class='ident'>as_ref</span>().<span class='ident'>as_ptr</span>() <span class='kw'>as</span> <span class='ident'>usize</span>;
+                <span class='kw'>let</span> <span class='ident'>path_end</span> <span class='op'>=</span> <span class='ident'>path_start</span> <span class='op'>+</span> <span class='ident'>path</span>.<span class='ident'>len</span>();
+                <span class='kw'>let</span> <span class='ident'>path</span> <span class='op'>=</span> <span class='ident'>slice</span>.<span class='ident'>slice</span>(<span class='ident'>path_start</span>..<span class='ident'>path_end</span>);
+                <span class='comment'>// path was found to be utf8 by httparse</span>
+                <span class='kw'>let</span> <span class='ident'>path</span> <span class='op'>=</span> <span class='kw'>unsafe</span> { <span class='ident'>MemStr</span>::<span class='ident'>from_utf8_unchecked</span>(<span class='ident'>path</span>) };
+                <span class='kw'>let</span> <span class='ident'>subject</span> <span class='op'>=</span> <span class='ident'>RequestLine</span>(
+                    <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>req</span>.<span class='ident'>method</span>.<span class='ident'>unwrap</span>().<span class='ident'>parse</span>()),
+                    <span class='macro'>try</span><span class='macro'>!</span>(::<span class='ident'>uri</span>::<span class='ident'>from_mem_str</span>(<span class='ident'>path</span>)),
+                );
+                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='ident'>Headers</span>::<span class='ident'>with_capacity</span>(<span class='ident'>req</span>.<span class='ident'>headers</span>.<span class='ident'>len</span>());
                 <span class='ident'>headers</span>.<span class='ident'>extend</span>(<span class='ident'>HeadersAsMemSliceIter</span> {
                     <span class='ident'>headers</span>: <span class='ident'>req</span>.<span class='ident'>headers</span>.<span class='ident'>iter</span>(),
                     <span class='ident'>slice</span>: <span class='ident'>slice</span>,
                 });
+
                 <span class='prelude-val'>Some</span>((<span class='ident'>MessageHead</span> {
                     <span class='ident'>version</span>: <span class='kw'>if</span> <span class='ident'>req</span>.<span class='ident'>version</span>.<span class='ident'>unwrap</span>() <span class='op'>==</span> <span class='number'>1</span> { <span class='ident'>Http11</span> } <span class='kw'>else</span> { <span class='ident'>Http10</span> },
-                    <span class='ident'>subject</span>: <span class='ident'>RequestLine</span>(
-                        <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>req</span>.<span class='ident'>method</span>.<span class='ident'>unwrap</span>().<span class='ident'>parse</span>()),
-                        <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>req</span>.<span class='ident'>path</span>.<span class='ident'>unwrap</span>().<span class='ident'>parse</span>())
-                    ),
+                    <span class='ident'>subject</span>: <span class='ident'>subject</span>,
                     <span class='ident'>headers</span>: <span class='ident'>headers</span>,
                 }, <span class='ident'>len</span>))
             }
@@ -519,7 +534,7 @@
                     <span class='ident'>headers</span>: <span class='ident'>headers</span>,
                 }, <span class='ident'>len</span>))
             },
-            <span class='ident'>httparse</span>::<span class='ident'>Status</span>::<span class='ident'>Partial</span> <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>
+            <span class='ident'>httparse</span>::<span class='ident'>Status</span>::<span class='ident'>Partial</span> <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>,
         })
     }
 
@@ -702,7 +717,6 @@
             <span class='ident'>raw</span>.<span class='ident'>restart</span>();
         });
     }
-
 }
 </pre>
 </section>

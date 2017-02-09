@@ -733,6 +733,8 @@
 <span id="688">688</span>
 <span id="689">689</span>
 <span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='self'>self</span>, <span class='ident'>Write</span>};
@@ -1313,6 +1315,8 @@
     <span class='kw'>use</span> <span class='kw'>super</span>::{<span class='ident'>Conn</span>, <span class='ident'>Writing</span>};
     <span class='kw'>use</span> ::<span class='ident'>uri</span>::<span class='ident'>Uri</span>;
 
+    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::<span class='ident'>FromStr</span>;
+
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_conn_init_read</span>() {
         <span class='kw'>let</span> <span class='ident'>good_message</span> <span class='op'>=</span> <span class='string'>b&quot;GET / HTTP/1.1\r\n\r\n&quot;</span>.<span class='ident'>to_vec</span>();
@@ -1323,7 +1327,7 @@
         <span class='kw'>match</span> <span class='ident'>conn</span>.<span class='ident'>poll</span>().<span class='ident'>unwrap</span>() {
             <span class='ident'>Async</span>::<span class='ident'>Ready</span>(<span class='prelude-val'>Some</span>(<span class='ident'>Frame</span>::<span class='ident'>Message</span> { <span class='ident'>message</span>, <span class='ident'>body</span>: <span class='bool-val'>false</span> })) <span class='op'>=&gt;</span> {
                 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>message</span>, <span class='ident'>MessageHead</span> {
-                    <span class='ident'>subject</span>: ::<span class='ident'>http</span>::<span class='ident'>RequestLine</span>(::<span class='ident'>Get</span>, <span class='ident'>Uri</span>::<span class='ident'>new</span>(<span class='string'>&quot;/&quot;</span>).<span class='ident'>unwrap</span>()),
+                    <span class='ident'>subject</span>: ::<span class='ident'>http</span>::<span class='ident'>RequestLine</span>(::<span class='ident'>Get</span>, <span class='ident'>Uri</span>::<span class='ident'>from_str</span>(<span class='string'>&quot;/&quot;</span>).<span class='ident'>unwrap</span>()),
                     .. <span class='ident'>MessageHead</span>::<span class='ident'>default</span>()
                 })
             },
