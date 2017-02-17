@@ -9,6 +9,7 @@
 
     <title>hyper::server - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
     
@@ -56,7 +57,7 @@ them off to a <code>Service</code>.</p>
 <table>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.Http.html'
-                                  title='hyper::server::Http'>Http</a></td>
+                                  title='struct hyper::server::Http'>Http</a></td>
                            <td class='docblock-short'>
                                 <p>An instance of the HTTP protocol, and implementation of tokio-proto&#39;s
 <code>ServerProto</code> trait.</p>
@@ -64,21 +65,21 @@ them off to a <code>Service</code>.</p>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.Request.html'
-                                  title='hyper::server::Request'>Request</a></td>
+                                  title='struct hyper::server::Request'>Request</a></td>
                            <td class='docblock-short'>
                                 <p>A request bundles several parts of an incoming <code>NetworkStream</code>, given to a <code>Handler</code>.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.Response.html'
-                                  title='hyper::server::Response'>Response</a></td>
+                                  title='struct hyper::server::Response'>Response</a></td>
                            <td class='docblock-short'>
                                 <p>The Response sent to a client after receiving a Request in a Service.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.Server.html'
-                                  title='hyper::server::Server'>Server</a></td>
+                                  title='struct hyper::server::Server'>Server</a></td>
                            <td class='docblock-short'>
                                 <p>An instance of a server created through <code>Http::bind</code>.</p>
                            </td>
@@ -86,14 +87,14 @@ them off to a <code>Service</code>.</p>
 <table>
                        <tr class=' module-item'>
                            <td><a class='trait' href='trait.NewService.html'
-                                  title='hyper::server::NewService'>NewService</a></td>
+                                  title='trait hyper::server::NewService'>NewService</a></td>
                            <td class='docblock-short'>
                                 <p>Creates new <code>Service</code> values.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='trait' href='trait.Service.html'
-                                  title='hyper::server::Service'>Service</a></td>
+                                  title='trait hyper::server::Service'>Service</a></td>
                            <td class='docblock-short'>
                                 <p>An asynchronous function from <code>Request</code> to a <code>Response</code>.</p>
                            </td>
