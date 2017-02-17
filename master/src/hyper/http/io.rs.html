@@ -9,6 +9,7 @@
 
     <title>io.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
     
@@ -346,31 +347,6 @@
 <span id="302">302</span>
 <span id="303">303</span>
 <span id="304">304</span>
-<span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
-<span id="308">308</span>
-<span id="309">309</span>
-<span id="310">310</span>
-<span id="311">311</span>
-<span id="312">312</span>
-<span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
-<span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cmp</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
@@ -380,7 +356,7 @@
 <span class='kw'>use</span> <span class='ident'>futures</span>::<span class='ident'>Async</span>;
 <span class='kw'>use</span> <span class='ident'>tokio</span>::<span class='ident'>io</span>::<span class='ident'>Io</span>;
 
-<span class='kw'>use</span> <span class='ident'>http</span>::{<span class='ident'>Http1Transaction</span>, <span class='ident'>h1</span>, <span class='ident'>MessageHead</span>, <span class='ident'>ParseResult</span>};
+<span class='kw'>use</span> <span class='ident'>http</span>::{<span class='ident'>Http1Transaction</span>, <span class='ident'>h1</span>, <span class='ident'>MessageHead</span>, <span class='ident'>ParseResult</span>, <span class='ident'>DebugTruncate</span>};
 <span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>buf</span>::{<span class='ident'>MemBuf</span>, <span class='ident'>MemSlice</span>};
 
 <span class='kw'>const</span> <span class='ident'>INIT_BUFFER_SIZE</span>: <span class='ident'>usize</span> <span class='op'>=</span> <span class='number'>4096</span>;
@@ -465,8 +441,8 @@
         <span class='self'>self</span>.<span class='ident'>read_buf</span>.<span class='ident'>reserve</span>(<span class='ident'>INIT_BUFFER_SIZE</span>);
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>buffer</span><span class='op'>&lt;</span><span class='ident'>B</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span>[<span class='ident'>u8</span>]<span class='op'>&gt;&gt;</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>buf</span>: <span class='ident'>B</span>) {
-        <span class='self'>self</span>.<span class='ident'>write_buf</span>.<span class='ident'>buffer</span>(<span class='ident'>buf</span>.<span class='ident'>as_ref</span>());
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>buffer</span><span class='op'>&lt;</span><span class='ident'>B</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span>[<span class='ident'>u8</span>]<span class='op'>&gt;&gt;</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>buf</span>: <span class='ident'>B</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> {
+        <span class='self'>self</span>.<span class='ident'>write_buf</span>.<span class='ident'>buffer</span>(<span class='ident'>buf</span>.<span class='ident'>as_ref</span>())
     }
 
     <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
@@ -475,24 +451,6 @@
     }
 }
 
-<span class='comment'>/*
-impl&lt;T: Read&gt; Read for Buffered&lt;T&gt; {
-    fn read(&amp;mut self, buf: &amp;mut [u8]) -&gt; io::Result&lt;usize&gt; {
-        trace!(&quot;Buffered.read self={}, buf={}&quot;, self.read_buf.len(), buf.len());
-        unimplemented!()
-        /*
-        let n = try!(self.read_buf.bytes().read(buf));
-        self.read_buf.consume(n);
-        if n == 0 {
-            self.read_buf.reset();
-            self.io.read(&amp;mut buf[n..])
-        } else {
-            Ok(n)
-        }
-        */
-    }
-}
-*/</span>
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Write</span><span class='op'>&gt;</span> <span class='ident'>Write</span> <span class='kw'>for</span> <span class='ident'>Buffered</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>fn</span> <span class='ident'>write</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> {
@@ -538,7 +496,7 @@ impl&lt;T: Read&gt; Read for Buffered&lt;T&gt; {
 }
 
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Cursor</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span>[<span class='ident'>u8</span>]<span class='op'>&gt;&gt;</span> {
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Cursor</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='ident'>bytes</span>: <span class='ident'>T</span>,
     <span class='ident'>pos</span>: <span class='ident'>usize</span>,
 }
@@ -585,16 +543,9 @@ impl&lt;T: Read&gt; Read for Buffered&lt;T&gt; {
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span>[<span class='ident'>u8</span>]<span class='op'>&gt;&gt;</span> <span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='kw'>for</span> <span class='ident'>Cursor</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='kw'>let</span> <span class='ident'>bytes</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>buf</span>();
-        <span class='kw'>if</span> <span class='ident'>bytes</span>.<span class='ident'>len</span>() <span class='op'>&gt;</span> <span class='number'>32</span> {
-            <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>f</span>.<span class='ident'>write_str</span>(<span class='string'>&quot;Cursor([&quot;</span>));
-            <span class='kw'>for</span> <span class='ident'>byte</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='ident'>bytes</span>[..<span class='number'>32</span>] {
-                <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{:?}, &quot;</span>, <span class='ident'>byte</span>));
-            }
-            <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;... {}])&quot;</span>, <span class='ident'>bytes</span>.<span class='ident'>len</span>())
-        } <span class='kw'>else</span> {
-            <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;Cursor({:?})&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>bytes</span>)
-        }
+        <span class='ident'>f</span>.<span class='ident'>debug_tuple</span>(<span class='string'>&quot;Cursor&quot;</span>)
+            .<span class='ident'>field</span>(<span class='kw-2'>&amp;</span><span class='ident'>DebugTruncate</span>(<span class='self'>self</span>.<span class='ident'>buf</span>()))
+            .<span class='ident'>finish</span>()
     }
 }
 
