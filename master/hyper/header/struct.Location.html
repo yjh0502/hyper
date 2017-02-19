@@ -370,17 +370,17 @@ the standard library assumes that <code>String</code>s are valid UTF-8.</p>
 
 <span class='ident'>v</span>.<span class='ident'>push</span>(<span class='string'>&#39;a&#39;</span>);
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>v</span>.<span class='ident'>is_empty</span>());</pre>
-</div><h4 id='method.split_off' class='method'><span id='split_off.v' class='invisible'><code>fn <a href='#method.split_off' class='fnname'>split_off</a>(&amp;mut self, mid: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='struct collections::string::String'>String</a></code><div class='since' title='Stable since Rust version 1.16.0'>1.16.0</div></span></h4>
-<div class='docblock'><p>Divide one string into two at an index.</p>
+</div><h4 id='method.split_off' class='method'><span id='split_off.v' class='invisible'><code>fn <a href='#method.split_off' class='fnname'>split_off</a>(&amp;mut self, at: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='struct collections::string::String'>String</a></code><div class='since' title='Stable since Rust version 1.16.0'>1.16.0</div></span></h4>
+<div class='docblock'><p>Splits the string into two at the given index.</p>
 
-<p>The argument, <code>mid</code>, should be a byte offset from the start of the string. It must also
-be on the boundary of a UTF-8 code point.</p>
+<p>Returns a newly allocated <code>String</code>. <code>self</code> contains bytes <code>[0, at)</code>, and
+the returned <code>String</code> contains bytes <code>[at, len)</code>. <code>at</code> must be on the
+boundary of a UTF-8 code point.</p>
 
-<p>The two strings returned go from the start of the string to <code>mid</code>, and from <code>mid</code> to the end
-of the string.</p>
+<p>Note that the capacity of <code>self</code> does not change.</p>
 
 <h1 id='panics-6' class='section-header'><a href='#panics-6'>Panics</a></h1>
-<p>Panics if <code>mid</code> is not on a <code>UTF-8</code> code point boundary, or if it is beyond the last
+<p>Panics if <code>at</code> is not on a <code>UTF-8</code> code point boundary, or if it is beyond the last
 code point of the string.</p>
 
 <h1 id='examples-17' class='section-header'><a href='#examples-17'>Examples</a></h1>
