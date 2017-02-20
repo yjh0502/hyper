@@ -528,6 +528,10 @@
 <span id="483">483</span>
 <span id="484">484</span>
 <span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! HTTP Server</span>
 <span class='doccomment'>//!</span>
@@ -896,7 +900,7 @@
     <span class='doccomment'>/// Once the `shutdown_timeout` elapses or all active connections are</span>
     <span class='doccomment'>/// cleaned out then this method will return.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>run_until</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>shutdown_signal</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span>
-        <span class='kw'>where</span> <span class='ident'>F</span>: <span class='ident'>Future</span><span class='op'>&lt;</span><span class='ident'>Item</span> <span class='op'>=</span> (), <span class='ident'>Error</span> <span class='op'>=</span> ::<span class='ident'>Error</span><span class='op'>&gt;</span>,
+        <span class='kw'>where</span> <span class='ident'>F</span>: <span class='ident'>Future</span><span class='op'>&lt;</span><span class='ident'>Item</span> <span class='op'>=</span> (), <span class='ident'>Error</span> <span class='op'>=</span> ()<span class='op'>&gt;</span>,
     {
         <span class='kw'>let</span> <span class='ident'>Server</span> { <span class='ident'>protocol</span>, <span class='ident'>new_service</span>, <span class='kw-2'>mut</span> <span class='ident'>core</span>, <span class='ident'>listener</span>, <span class='ident'>shutdown_timeout</span> } <span class='op'>=</span> <span class='self'>self</span>;
         <span class='kw'>let</span> <span class='ident'>handle</span> <span class='op'>=</span> <span class='ident'>core</span>.<span class='ident'>handle</span>();
@@ -918,6 +922,10 @@
             <span class='prelude-val'>Ok</span>(())
         });
 
+        <span class='comment'>// for now, we don&#39;t care if the shutdown signal succeeds or errors</span>
+        <span class='comment'>// as long as it resolves, we will shutdown.</span>
+        <span class='kw'>let</span> <span class='ident'>shutdown_signal</span> <span class='op'>=</span> <span class='ident'>shutdown_signal</span>.<span class='ident'>then</span>(<span class='op'>|</span>_<span class='op'>|</span> <span class='prelude-val'>Ok</span>(()));
+
         <span class='comment'>// Main execution of the server. Here we use `select` to wait for either</span>
         <span class='comment'>// `incoming` or `f` to resolve. We know that `incoming` will never</span>
         <span class='comment'>// resolve with a success (it&#39;s infinite) so we&#39;re actually just waiting</span>
@@ -925,9 +933,9 @@
         <span class='comment'>//</span>
         <span class='comment'>// When we get a shutdown signal (`Ok`) then we drop the TCP listener to</span>
         <span class='comment'>// stop accepting incoming connections.</span>
-        <span class='kw'>match</span> <span class='ident'>core</span>.<span class='ident'>run</span>(<span class='ident'>shutdown_signal</span>.<span class='ident'>select</span>(<span class='ident'>srv</span>.<span class='ident'>map_err</span>(<span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span> <span class='ident'>e</span>.<span class='ident'>into</span>()))) {
+        <span class='kw'>match</span> <span class='ident'>core</span>.<span class='ident'>run</span>(<span class='ident'>shutdown_signal</span>.<span class='ident'>select</span>(<span class='ident'>srv</span>)) {
             <span class='prelude-val'>Ok</span>(((), <span class='ident'>_incoming</span>)) <span class='op'>=&gt;</span> {}
-            <span class='prelude-val'>Err</span>((<span class='ident'>e</span>, <span class='ident'>_other</span>)) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>e</span>),
+            <span class='prelude-val'>Err</span>((<span class='ident'>e</span>, <span class='ident'>_other</span>)) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>e</span>.<span class='ident'>into</span>()),
         }
 
         <span class='comment'>// Ok we&#39;ve stopped accepting new connections at this point, but we want</span>
