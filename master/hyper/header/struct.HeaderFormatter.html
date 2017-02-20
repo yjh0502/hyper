@@ -9,7 +9,6 @@
 
     <title>hyper::header::HeaderFormatter - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
     
@@ -49,8 +48,8 @@
                        [<span class='inner'>&#x2212;</span>]
                    </a>
                </span><a class='srclink' href='../../src/hyper/header/mod.rs.html#660' title='goto source code'>[src]</a></span></h1>
-<pre class='rust struct'>pub struct HeaderFormatter&lt;'a, H:&nbsp;<a class='trait' href='../../hyper/header/trait.Header.html' title='hyper::header::Header'>Header</a>&gt;(pub &amp;'a H);</pre><div class='stability'><div class='stab deprecated'>Deprecated<p>: The semantics of formatting a HeaderFormat directly are not clear</p>
-</div></div><div class='docblock'><p>A wrapper around any Header with a Display impl that calls <code>fmt_header</code>.</p>
+<pre class='rust struct'>pub struct HeaderFormatter&lt;'a, H:&nbsp;<a class='trait' href='../../hyper/header/trait.Header.html' title='hyper::header::Header'>Header</a>&gt;(pub &amp;'a H);</pre><div class='stability'><em class='stab deprecated'>Deprecated<p>: The semantics of formatting a HeaderFormat directly are not clear</p>
+</em></div><div class='docblock'><p>A wrapper around any Header with a Display impl that calls <code>fmt_header</code>.</p>
 
 <p>This can be used like so: <code>format!(&quot;{}&quot;, HeaderFormatter(&amp;header))</code> to
 get the &#39;value string&#39; representation of this Header.</p>

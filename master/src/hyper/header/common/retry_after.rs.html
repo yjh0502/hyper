@@ -9,7 +9,6 @@
 
     <title>retry_after.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
     
@@ -359,7 +358,7 @@
     }
 
     <span class='kw'>fn</span> <span class='ident'>fmt_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='kw'>match</span> <span class='kw-2'>*</span><span class='self'>self</span> {
+        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
             <span class='ident'>RetryAfter</span>::<span class='ident'>Delay</span>(<span class='kw-2'>ref</span> <span class='ident'>duration</span>) <span class='op'>=&gt;</span> {
                 <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>duration</span>.<span class='ident'>num_seconds</span>())
             },
