@@ -9,6 +9,7 @@
 
     <title>content_type.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
     
@@ -143,6 +144,8 @@
 <span id="99"> 99</span>
 <span id="100">100</span>
 <span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>mime</span>::<span class='ident'>Mime</span>;
 
@@ -243,6 +246,8 @@
         <span class='ident'>ContentType</span>(<span class='macro'>mime</span><span class='macro'>!</span>(<span class='ident'>Image</span><span class='op'>/</span><span class='ident'>Png</span>))
     }
 }
+
+<span class='kw'>impl</span> <span class='ident'>Eq</span> <span class='kw'>for</span> <span class='ident'>ContentType</span> {}
 
 <span class='macro'>bench_header</span><span class='macro'>!</span>(<span class='ident'>bench</span>, <span class='ident'>ContentType</span>, { <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;application/json; charset=utf-8&quot;</span>.<span class='ident'>to_vec</span>()] });
 </pre>
