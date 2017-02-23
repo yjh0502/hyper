@@ -474,6 +474,7 @@
 <span id="429">429</span>
 <span id="430">430</span>
 <span id="431">431</span>
+<span id="432">432</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>borrow</span>::<span class='ident'>Cow</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cell</span>::{<span class='ident'>Cell</span>, <span class='ident'>UnsafeCell</span>};
@@ -869,6 +870,7 @@
 
 <span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Send</span> <span class='kw'>for</span> <span class='ident'>MemBuf</span> {}
 <span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Send</span> <span class='kw'>for</span> <span class='ident'>MemSlice</span> {}
+<span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Sync</span> <span class='kw'>for</span> <span class='ident'>MemSlice</span> {}
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Read</span><span class='op'>&gt;</span> ::<span class='ident'>http</span>::<span class='ident'>io</span>::<span class='ident'>MemRead</span> <span class='kw'>for</span> ::<span class='ident'>mock</span>::<span class='ident'>AsyncIo</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
