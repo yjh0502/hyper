@@ -9,7 +9,6 @@
 
     <title>link.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
     
@@ -1851,7 +1850,7 @@
 
 <span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Display</span> <span class='kw'>for</span> <span class='ident'>MediaDesc</span> {
     <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='kw'>match</span> <span class='kw-2'>*</span><span class='self'>self</span> {
+        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
             <span class='ident'>MediaDesc</span>::<span class='ident'>Screen</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;screen&quot;</span>),
             <span class='ident'>MediaDesc</span>::<span class='ident'>Tty</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;tty&quot;</span>),
             <span class='ident'>MediaDesc</span>::<span class='ident'>Tv</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;tv&quot;</span>),
@@ -1887,7 +1886,7 @@
 
 <span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Display</span> <span class='kw'>for</span> <span class='ident'>RelationType</span> {
     <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='kw'>match</span> <span class='kw-2'>*</span><span class='self'>self</span> {
+        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
             <span class='ident'>RelationType</span>::<span class='ident'>Alternate</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;alternate&quot;</span>),
             <span class='ident'>RelationType</span>::<span class='ident'>Appendix</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;appendix&quot;</span>),
             <span class='ident'>RelationType</span>::<span class='ident'>Bookmark</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;bookmark&quot;</span>),
@@ -2054,7 +2053,7 @@
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>in_quotes</span> <span class='op'>=</span> <span class='bool-val'>false</span>;
 
             <span class='kw'>for</span> <span class='ident'>c</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>src</span>[<span class='ident'>prev_pos</span>..].<span class='ident'>as_bytes</span>().<span class='ident'>iter</span>() {
-                <span class='ident'>in_quotes</span> <span class='op'>^=</span> <span class='kw-2'>*</span><span class='ident'>c</span> <span class='op'>==</span> <span class='string'>b&#39;&quot;&#39;</span>;
+                <span class='ident'>in_quotes</span> <span class='op'>^=</span> <span class='op'>*</span><span class='ident'>c</span> <span class='op'>==</span> <span class='string'>b&#39;&quot;&#39;</span>;
 
                 <span class='comment'>// Ignore `c` if we&#39;re `in_quotes`.</span>
                 <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>in_quotes</span> <span class='op'>&amp;&amp;</span> <span class='self'>self</span>.<span class='ident'>del</span>.<span class='ident'>as_bytes</span>().<span class='ident'>contains</span>(<span class='ident'>c</span>) {
