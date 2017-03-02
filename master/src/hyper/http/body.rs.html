@@ -135,13 +135,19 @@
 <span id="90">90</span>
 <span id="91">91</span>
 <span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
 </pre><pre class='rust '>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>convert</span>::<span class='ident'>From</span>;
-
-<span class='kw'>use</span> <span class='ident'>tokio_proto</span>;
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>Chunk</span>;
+<span class='kw'>use</span> <span class='ident'>bytes</span>::<span class='ident'>Bytes</span>;
 <span class='kw'>use</span> <span class='ident'>futures</span>::{<span class='ident'>Poll</span>, <span class='ident'>Stream</span>};
 <span class='kw'>use</span> <span class='ident'>futures</span>::<span class='ident'>sync</span>::<span class='ident'>mpsc</span>;
+<span class='kw'>use</span> <span class='ident'>tokio_proto</span>;
+
+<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>Chunk</span>;
 
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>TokioBody</span> <span class='op'>=</span> <span class='ident'>tokio_proto</span>::<span class='ident'>streaming</span>::<span class='ident'>Body</span><span class='op'>&lt;</span><span class='ident'>Chunk</span>, ::<span class='ident'>Error</span><span class='op'>&gt;</span>;
 
@@ -193,6 +199,12 @@
 <span class='kw'>impl</span> <span class='ident'>From</span><span class='op'>&lt;</span><span class='ident'>Chunk</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Body</span> {
     <span class='kw'>fn</span> <span class='ident'>from</span> (<span class='ident'>chunk</span>: <span class='ident'>Chunk</span>) <span class='op'>-&gt;</span> <span class='ident'>Body</span> {
         <span class='ident'>Body</span>(<span class='ident'>TokioBody</span>::<span class='ident'>from</span>(<span class='ident'>chunk</span>))
+    }
+}
+
+<span class='kw'>impl</span> <span class='ident'>From</span><span class='op'>&lt;</span><span class='ident'>Bytes</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Body</span> {
+    <span class='kw'>fn</span> <span class='ident'>from</span> (<span class='ident'>bytes</span>: <span class='ident'>Bytes</span>) <span class='op'>-&gt;</span> <span class='ident'>Body</span> {
+        <span class='ident'>Body</span>(<span class='ident'>TokioBody</span>::<span class='ident'>from</span>(<span class='ident'>Chunk</span>::<span class='ident'>from</span>(<span class='ident'>bytes</span>)))
     }
 }
 

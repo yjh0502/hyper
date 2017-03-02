@@ -497,12 +497,14 @@
 <span id="452">452</span>
 <span id="453">453</span>
 <span id="454">454</span>
+<span id="455">455</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>borrow</span>::<span class='ident'>Cow</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='ident'>Display</span>, <span class='self'>self</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ops</span>::<span class='ident'>Deref</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::{<span class='self'>self</span>, <span class='ident'>FromStr</span>};
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>buf</span>::<span class='ident'>MemStr</span>;
+
+<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>ByteStr</span>;
 <span class='kw'>use</span> <span class='ident'>Url</span>;
 <span class='kw'>use</span> <span class='ident'>url</span>::<span class='ident'>ParseError</span> <span class='kw'>as</span> <span class='ident'>UrlError</span>;
 
@@ -779,14 +781,14 @@
     }
 }
 
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_mem_str</span>(<span class='ident'>s</span>: <span class='ident'>MemStr</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Uri</span>, <span class='ident'>Error</span><span class='op'>&gt;</span> {
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_mem_str</span>(<span class='ident'>s</span>: <span class='ident'>ByteStr</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Uri</span>, <span class='ident'>Error</span><span class='op'>&gt;</span> {
     <span class='ident'>Uri</span>::<span class='ident'>new</span>(<span class='ident'>InternalUri</span>::<span class='ident'>Shared</span>(<span class='ident'>s</span>))
 }
 
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>)]</span>
 <span class='kw'>enum</span> <span class='ident'>InternalUri</span> {
     <span class='ident'>Cow</span>(<span class='ident'>Cow</span><span class='op'>&lt;</span><span class='lifetime'>&#39;static</span>, <span class='ident'>str</span><span class='op'>&gt;</span>),
-    <span class='ident'>Shared</span>(<span class='ident'>MemStr</span>),
+    <span class='ident'>Shared</span>(<span class='ident'>ByteStr</span>),
 }
 
 <span class='kw'>impl</span> <span class='ident'>InternalUri</span> {

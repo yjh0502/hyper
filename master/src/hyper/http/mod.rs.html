@@ -215,6 +215,8 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>borrow</span>::<span class='ident'>Cow</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 
+<span class='kw'>use</span> <span class='ident'>bytes</span>::<span class='ident'>BytesMut</span>;
+
 <span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Connection</span>, <span class='ident'>ConnectionOption</span>};
 <span class='kw'>use</span> <span class='ident'>header</span>::<span class='ident'>Headers</span>;
 <span class='kw'>use</span> <span class='ident'>method</span>::<span class='ident'>Method</span>;
@@ -226,16 +228,15 @@
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>conn</span>::{<span class='ident'>Conn</span>, <span class='ident'>KeepAlive</span>, <span class='ident'>KA</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>body</span>::{<span class='ident'>Body</span>, <span class='ident'>TokioBody</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>chunk</span>::<span class='ident'>Chunk</span>;
-<span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>buf</span>::<span class='ident'>MemBuf</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>str</span>::<span class='ident'>ByteStr</span>;
 
 <span class='kw'>mod</span> <span class='ident'>body</span>;
-<span class='attribute'>#[<span class='ident'>doc</span>(<span class='ident'>hidden</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>buf</span>;
 <span class='kw'>mod</span> <span class='ident'>chunk</span>;
 <span class='kw'>mod</span> <span class='ident'>conn</span>;
 <span class='kw'>mod</span> <span class='ident'>io</span>;
 <span class='kw'>mod</span> <span class='ident'>h1</span>;
 <span class='comment'>//mod h2;</span>
+<span class='kw'>mod</span> <span class='ident'>str</span>;
 
 <span class='comment'>/*
 macro_rules! nonblocking {
@@ -337,8 +338,7 @@ macro_rules! nonblocking {
 <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Http1Transaction</span> {
     <span class='kw'>type</span> <span class='ident'>Incoming</span>;
     <span class='kw'>type</span> <span class='ident'>Outgoing</span>: <span class='ident'>Default</span>;
-    <span class='comment'>//type KeepAlive: KeepAlive;</span>
-    <span class='kw'>fn</span> <span class='ident'>parse</span>(<span class='ident'>bytes</span>: <span class='kw-2'>&amp;</span><span class='ident'>MemBuf</span>) <span class='op'>-&gt;</span> <span class='ident'>ParseResult</span><span class='op'>&lt;</span><span class='self'>Self</span>::<span class='ident'>Incoming</span><span class='op'>&gt;</span>;
+    <span class='kw'>fn</span> <span class='ident'>parse</span>(<span class='ident'>bytes</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>BytesMut</span>) <span class='op'>-&gt;</span> <span class='ident'>ParseResult</span><span class='op'>&lt;</span><span class='self'>Self</span>::<span class='ident'>Incoming</span><span class='op'>&gt;</span>;
     <span class='kw'>fn</span> <span class='ident'>decoder</span>(<span class='ident'>head</span>: <span class='kw-2'>&amp;</span><span class='ident'>MessageHead</span><span class='op'>&lt;</span><span class='self'>Self</span>::<span class='ident'>Incoming</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>h1</span>::<span class='ident'>Decoder</span><span class='op'>&gt;</span>;
     <span class='kw'>fn</span> <span class='ident'>encode</span>(<span class='ident'>head</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>MessageHead</span><span class='op'>&lt;</span><span class='self'>Self</span>::<span class='ident'>Outgoing</span><span class='op'>&gt;</span>, <span class='ident'>dst</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>h1</span>::<span class='ident'>Encoder</span>;
     <span class='kw'>fn</span> <span class='ident'>should_set_length</span>(<span class='ident'>head</span>: <span class='kw-2'>&amp;</span><span class='ident'>MessageHead</span><span class='op'>&lt;</span><span class='self'>Self</span>::<span class='ident'>Outgoing</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span>;
