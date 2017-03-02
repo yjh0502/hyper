@@ -9,7 +9,6 @@
 
     <title>hyper::client::Connect - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
     
@@ -52,7 +51,7 @@
 <pre class='rust trait'>pub trait Connect: <a class='trait' href='../../hyper/server/trait.Service.html' title='hyper::server::Service'>Service</a>&lt;Request=<a class='struct' href='../../hyper/struct.Url.html' title='hyper::Url'>Url</a>, Error=<a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>&gt; + 'static {
     type <a href='#associatedtype.Output' class='type'>Output</a>: <a class='trait' href='https://docs.rs/tokio-core/0.1/tokio_core/io/trait.Io.html' title='tokio_core::io::Io'>Io</a> + 'static;
     type <a href='#associatedtype.Future' class='type'>Future</a>: <a class='trait' href='https://docs.rs/futures/0.1/futures/future/trait.Future.html' title='futures::future::Future'>Future</a>&lt;Item=Self::<a class='trait' href='../../hyper/client/trait.Connect.html' title='hyper::client::Connect'>Output</a>, Error=<a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>&gt; + 'static;
-    fn <a href='#tymethod.connect' class='fnname'>connect</a>(&amp;self, _: <a class='struct' href='../../hyper/struct.Url.html' title='hyper::Url'>Url</a>) -&gt; Self::<a class='trait' href='../../hyper/client/trait.Connect.html' title='hyper::client::Connect'>Future</a>;
+    fn <a href='#tymethod.connect' class='fnname'>connect</a>(&amp;self, <a class='struct' href='../../hyper/struct.Url.html' title='hyper::Url'>Url</a>) -&gt; Self::<a class='trait' href='../../hyper/client/trait.Connect.html' title='hyper::client::Connect'>Future</a>;
 }</pre><div class='docblock'><p>A connector creates an Io to a remote address..</p>
 
 <p>This trait is not implemented directly, and only exists to make
@@ -61,12 +60,12 @@ the intent clearer. A connector should implement <code>Service</code> with
 </div>
             <h2 id='associated-types'>Associated Types</h2>
             <div class='methods'>
-        <h3 id='associatedtype.Output' class='method'><span id='Output.t' class='invisible'><code>type <a href='#associatedtype.Output' class='type'>Output</a>: <a class='trait' href='https://docs.rs/tokio-core/0.1/tokio_core/io/trait.Io.html' title='tokio_core::io::Io'>Io</a> + 'static</code></span></h3><div class='docblock'><p>The connected Io Stream.</p>
-</div><h3 id='associatedtype.Future' class='method'><span id='Future.t' class='invisible'><code>type <a href='#associatedtype.Future' class='type'>Future</a>: <a class='trait' href='https://docs.rs/futures/0.1/futures/future/trait.Future.html' title='futures::future::Future'>Future</a>&lt;Item=Self::<a class='trait' href='../../hyper/client/trait.Connect.html' title='hyper::client::Connect'>Output</a>, Error=<a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>&gt; + 'static</code></span></h3><div class='docblock'><p>A Future that will resolve to the connected Stream.</p>
+        <h3 id='associatedtype.Output' class='method stab '><span id='Output.t' class='invisible'><code>type <a href='#associatedtype.Output' class='type'>Output</a>: <a class='trait' href='https://docs.rs/tokio-core/0.1/tokio_core/io/trait.Io.html' title='tokio_core::io::Io'>Io</a> + 'static</code></span></h3><div class='docblock'><p>The connected Io Stream.</p>
+</div><h3 id='associatedtype.Future' class='method stab '><span id='Future.t' class='invisible'><code>type <a href='#associatedtype.Future' class='type'>Future</a>: <a class='trait' href='https://docs.rs/futures/0.1/futures/future/trait.Future.html' title='futures::future::Future'>Future</a>&lt;Item=Self::<a class='trait' href='../../hyper/client/trait.Connect.html' title='hyper::client::Connect'>Output</a>, Error=<a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>&gt; + 'static</code></span></h3><div class='docblock'><p>A Future that will resolve to the connected Stream.</p>
 </div></div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.connect' class='method'><span id='connect.v' class='invisible'><code>fn <a href='#tymethod.connect' class='fnname'>connect</a>(&amp;self, _: <a class='struct' href='../../hyper/struct.Url.html' title='hyper::Url'>Url</a>) -&gt; Self::<a class='trait' href='../../hyper/client/trait.Connect.html' title='hyper::client::Connect'>Future</a></code></span></h3><div class='docblock'><p>Connect to a remote address.</p>
+        <h3 id='tymethod.connect' class='method stab '><span id='connect.v' class='invisible'><code>fn <a href='#tymethod.connect' class='fnname'>connect</a>(&amp;self, <a class='struct' href='../../hyper/struct.Url.html' title='hyper::Url'>Url</a>) -&gt; Self::<a class='trait' href='../../hyper/client/trait.Connect.html' title='hyper::client::Connect'>Future</a></code></span></h3><div class='docblock'><p>Connect to a remote address.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
