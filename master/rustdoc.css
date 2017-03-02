@@ -1,3 +1,5 @@
+@import "normalize.css";
+
 /**
  * Copyright 2013 The Rust Project Developers. See the COPYRIGHT
  * file at the top-level directory of this distribution and at
@@ -89,7 +91,7 @@ h2 {
 h3 {
 	font-size: 1.3em;
 }
-h1, h2, h3:not(.impl):not(.method):not(.type):not(.tymethod), h4:not(.method):not(.type):not(.tymethod):not(.associatedconstant) {
+h1, h2, h3:not(.impl):not(.method):not(.type):not(.tymethod), h4:not(.method):not(.type):not(.tymethod) {
 	font-weight: 500;
 	margin: 20px 0 15px 0;
 	padding-bottom: 6px;
@@ -99,10 +101,10 @@ h1.fqn {
 	margin-top: 0;
 	position: relative;
 }
-h2, h3:not(.impl):not(.method):not(.type):not(.tymethod), h4:not(.method):not(.type):not(.tymethod):not(.associatedconstant) {
+h2, h3:not(.impl):not(.method):not(.type):not(.tymethod), h4:not(.method):not(.type):not(.tymethod) {
 	border-bottom: 1px solid;
 }
-h3.impl, h3.method, h4.method, h3.type, h4.type, h4.associatedconstant {
+h3.impl, h3.method, h4.method, h3.type, h4.type {
 	font-weight: 600;
 	margin-top: 10px;
 	margin-bottom: 10px;
@@ -382,7 +384,7 @@ h4 > code, h3 > code, .invisible > code {
 .content .impl-items .docblock, .content .impl-items .stability {
 	margin-left: 40px;
 }
-.content .impl-items .method, .content .impl-items > .type, .impl-items > .associatedconstant {
+.content .impl-items .method, .content .impl-items > .type {
 	margin-left: 20px;
 }
 
@@ -523,28 +525,20 @@ body.blur > :not(#help) {
 	padding: 20px;
 }
 
-.stab {
-	display: table;
+em.stab {
+	display: inline-block;
 	border-width: 1px;
 	border-style: solid;
 	padding: 3px;
 	margin-bottom: 5px;
 	font-size: 90%;
+	font-style: normal;
 }
-.stab p {
+em.stab p {
 	display: inline;
-}
-
-.stab summary {
-	display: list-item;
-}
-
-.stab .microscope {
-	font-size: 1.5em;
 }
 
 .module-item .stab {
-	display: inline;
 	border-width: 0;
 	padding: 0;
 	margin: 0;
