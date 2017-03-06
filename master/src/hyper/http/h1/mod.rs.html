@@ -9,7 +9,6 @@
 
     <title>mod.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
     
@@ -161,17 +160,17 @@
 <span id="116">116</span>
 <span id="117">117</span>
 <span id="118">118</span>
-</pre><pre class="rust ">
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">decode</span>::<span class="ident">Decoder</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">encode</span>::<span class="ident">Encoder</span>;
+</pre><pre class='rust '>
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>decode</span>::<span class='ident'>Decoder</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>encode</span>::<span class='ident'>Encoder</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">parse</span>::<span class="ident">parse</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>parse</span>::<span class='ident'>parse</span>;
 
-<span class="kw">mod</span> <span class="ident">decode</span>;
-<span class="kw">mod</span> <span class="ident">encode</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">parse</span>;
+<span class='kw'>mod</span> <span class='ident'>decode</span>;
+<span class='kw'>mod</span> <span class='ident'>encode</span>;
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>parse</span>;
 
-<span class="comment">/*
+<span class='comment'>/*
 fn should_have_response_body(method: &amp;Method, status: u16) -&gt; bool {
     trace!(&quot;should_have_response_body({:?}, {})&quot;, method, status);
     match (method, status) {
@@ -184,7 +183,7 @@ fn should_have_response_body(method: &amp;Method, status: u16) -&gt; bool {
     }
 }
 */</span>
-<span class="comment">/*
+<span class='comment'>/*
 const MAX_INVALID_RESPONSE_BYTES: usize = 1024 * 128;
 impl HttpMessage for Http11Message {
 
