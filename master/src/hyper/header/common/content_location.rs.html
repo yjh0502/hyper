@@ -9,7 +9,6 @@
 
     <title>content_location.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
     
@@ -87,49 +86,49 @@
 <span id="42">42</span>
 <span id="43">43</span>
 <span id="44">44</span>
-</pre><pre class="rust ">
-<span class="macro">header</span><span class="macro">!</span> {
-    <span class="doccomment">/// `Content-Location` header, defined in</span>
-    <span class="doccomment">/// [RFC7231](https://tools.ietf.org/html/rfc7231#section-3.1.4.2)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The header can be used by both the client in requests and the server</span>
-    <span class="doccomment">/// in responses with different semantics. Client sets `Content-Location`</span>
-    <span class="doccomment">/// to refer to the URI where original representation of the body was</span>
-    <span class="doccomment">/// obtained.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In responses `Content-Location` represents URI for the representation</span>
-    <span class="doccomment">/// that was content negotiated, created or for the response payload.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # ABNF</span>
-    <span class="doccomment">/// ```plain</span>
-    <span class="doccomment">/// Content-Location = absolute-URI / partial-URI</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example values</span>
-    <span class="doccomment">/// * `/hypertext/Overview.html`</span>
-    <span class="doccomment">/// * `http://www.example.org/hypertext/Overview.html`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use hyper::header::{Headers, ContentLocation};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut headers = Headers::new();</span>
-    <span class="doccomment">/// headers.set(ContentLocation(&quot;/hypertext/Overview.html&quot;.to_owned()));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use hyper::header::{Headers, ContentLocation};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut headers = Headers::new();</span>
-    <span class="doccomment">/// headers.set(ContentLocation(&quot;http://www.example.org/hypertext/Overview.html&quot;.to_owned()));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="comment">// TODO: use URL</span>
-    (<span class="ident">ContentLocation</span>, <span class="string">&quot;Content-Location&quot;</span>) <span class="op">=&gt;</span> [<span class="ident">String</span>]
+</pre><pre class='rust '>
+<span class='macro'>header</span><span class='macro'>!</span> {
+    <span class='doccomment'>/// `Content-Location` header, defined in</span>
+    <span class='doccomment'>/// [RFC7231](https://tools.ietf.org/html/rfc7231#section-3.1.4.2)</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// The header can be used by both the client in requests and the server</span>
+    <span class='doccomment'>/// in responses with different semantics. Client sets `Content-Location`</span>
+    <span class='doccomment'>/// to refer to the URI where original representation of the body was</span>
+    <span class='doccomment'>/// obtained.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// In responses `Content-Location` represents URI for the representation</span>
+    <span class='doccomment'>/// that was content negotiated, created or for the response payload.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # ABNF</span>
+    <span class='doccomment'>/// ```plain</span>
+    <span class='doccomment'>/// Content-Location = absolute-URI / partial-URI</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Example values</span>
+    <span class='doccomment'>/// * `/hypertext/Overview.html`</span>
+    <span class='doccomment'>/// * `http://www.example.org/hypertext/Overview.html`</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use hyper::header::{Headers, ContentLocation};</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let mut headers = Headers::new();</span>
+    <span class='doccomment'>/// headers.set(ContentLocation(&quot;/hypertext/Overview.html&quot;.to_owned()));</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use hyper::header::{Headers, ContentLocation};</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let mut headers = Headers::new();</span>
+    <span class='doccomment'>/// headers.set(ContentLocation(&quot;http://www.example.org/hypertext/Overview.html&quot;.to_owned()));</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='comment'>// TODO: use URL</span>
+    (<span class='ident'>ContentLocation</span>, <span class='string'>&quot;Content-Location&quot;</span>) <span class='op'>=&gt;</span> [<span class='ident'>String</span>]
 
-    <span class="ident">test_content_location</span> {
-        <span class="macro">test_header</span><span class="macro">!</span>(<span class="ident">partial_query</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;/hypertext/Overview.html?q=tim&quot;</span>]);
+    <span class='ident'>test_content_location</span> {
+        <span class='macro'>test_header</span><span class='macro'>!</span>(<span class='ident'>partial_query</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;/hypertext/Overview.html?q=tim&quot;</span>]);
 
-        <span class="macro">test_header</span><span class="macro">!</span>(<span class="ident">absolute</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;http://www.example.org/hypertext/Overview.html&quot;</span>]);
+        <span class='macro'>test_header</span><span class='macro'>!</span>(<span class='ident'>absolute</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;http://www.example.org/hypertext/Overview.html&quot;</span>]);
     }
 }
 </pre>
