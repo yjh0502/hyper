@@ -825,7 +825,7 @@
                 <span class='kw'>let</span> (<span class='ident'>a</span>, <span class='ident'>b</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>split_at</span>(<span class='ident'>n</span>);
                 <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>BytesMut</span>::<span class='ident'>from</span>(<span class='ident'>a</span>);
                 <span class='kw-2'>*</span><span class='self'>self</span> <span class='op'>=</span> <span class='ident'>b</span>;
-                <span class='prelude-val'>Ok</span>(<span class='ident'>buf</span>.<span class='ident'>drain_to</span>(<span class='ident'>n</span>).<span class='ident'>freeze</span>())
+                <span class='prelude-val'>Ok</span>(<span class='ident'>buf</span>.<span class='ident'>split_to</span>(<span class='ident'>n</span>).<span class='ident'>freeze</span>())
             } <span class='kw'>else</span> {
                 <span class='prelude-val'>Ok</span>(<span class='ident'>Bytes</span>::<span class='ident'>new</span>())
             }
