@@ -242,180 +242,179 @@
 <span id="197">197</span>
 <span id="198">198</span>
 <span id="199">199</span>
-<span id="200">200</span>
-</pre><pre class='rust '>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
-<span class='comment'>//use std::net::SocketAddr;</span>
+</pre><pre class="rust ">
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
+<span class="comment">//use std::net::SocketAddr;</span>
 
-<span class='kw'>use</span> <span class='ident'>futures</span>::{<span class='ident'>Future</span>, <span class='ident'>Poll</span>, <span class='ident'>Async</span>};
-<span class='kw'>use</span> <span class='ident'>tokio_io</span>::{<span class='ident'>AsyncRead</span>, <span class='ident'>AsyncWrite</span>};
-<span class='kw'>use</span> <span class='ident'>tokio</span>::<span class='ident'>reactor</span>::<span class='ident'>Handle</span>;
-<span class='kw'>use</span> <span class='ident'>tokio</span>::<span class='ident'>net</span>::{<span class='ident'>TcpStream</span>, <span class='ident'>TcpStreamNew</span>};
-<span class='kw'>use</span> <span class='ident'>tokio_service</span>::<span class='ident'>Service</span>;
-<span class='kw'>use</span> <span class='ident'>Url</span>;
+<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Future</span>, <span class="ident">Poll</span>, <span class="ident">Async</span>};
+<span class="kw">use</span> <span class="ident">tokio_io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
+<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">reactor</span>::<span class="ident">Handle</span>;
+<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">net</span>::{<span class="ident">TcpStream</span>, <span class="ident">TcpStreamNew</span>};
+<span class="kw">use</span> <span class="ident">tokio_service</span>::<span class="ident">Service</span>;
+<span class="kw">use</span> <span class="ident">Uri</span>;
 
-<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>dns</span>;
+<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">dns</span>;
 
-<span class='doccomment'>/// A connector creates an Io to a remote address..</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// This trait is not implemented directly, and only exists to make</span>
-<span class='doccomment'>/// the intent clearer. A connector should implement `Service` with</span>
-<span class='doccomment'>/// `Request=Url` and `Response: Io` instead.</span>
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Connect</span>: <span class='ident'>Service</span><span class='op'>&lt;</span><span class='ident'>Request</span><span class='op'>=</span><span class='ident'>Url</span>, <span class='ident'>Error</span><span class='op'>=</span><span class='ident'>io</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> <span class='op'>+</span> <span class='lifetime'>&#39;static</span> {
-    <span class='doccomment'>/// The connected Io Stream.</span>
-    <span class='kw'>type</span> <span class='ident'>Output</span>: <span class='ident'>AsyncRead</span> <span class='op'>+</span> <span class='ident'>AsyncWrite</span> <span class='op'>+</span> <span class='lifetime'>&#39;static</span>;
-    <span class='doccomment'>/// A Future that will resolve to the connected Stream.</span>
-    <span class='kw'>type</span> <span class='ident'>Future</span>: <span class='ident'>Future</span><span class='op'>&lt;</span><span class='ident'>Item</span><span class='op'>=</span><span class='self'>Self</span>::<span class='ident'>Output</span>, <span class='ident'>Error</span><span class='op'>=</span><span class='ident'>io</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> <span class='op'>+</span> <span class='lifetime'>&#39;static</span>;
-    <span class='doccomment'>/// Connect to a remote address.</span>
-    <span class='kw'>fn</span> <span class='ident'>connect</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>Url</span>) <span class='op'>-&gt;</span> <span class='op'>&lt;</span><span class='self'>Self</span> <span class='kw'>as</span> <span class='ident'>Connect</span><span class='op'>&gt;</span>::<span class='ident'>Future</span>;
+<span class="doccomment">/// A connector creates an Io to a remote address..</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This trait is not implemented directly, and only exists to make</span>
+<span class="doccomment">/// the intent clearer. A connector should implement `Service` with</span>
+<span class="doccomment">/// `Request=Uri` and `Response: Io` instead.</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Connect</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">=</span><span class="ident">Uri</span>, <span class="ident">Error</span><span class="op">=</span><span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
+    <span class="doccomment">/// The connected Io Stream.</span>
+    <span class="kw">type</span> <span class="ident">Output</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+    <span class="doccomment">/// A Future that will resolve to the connected Stream.</span>
+    <span class="kw">type</span> <span class="ident">Future</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="self">Self</span>::<span class="ident">Output</span>, <span class="ident">Error</span><span class="op">=</span><span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+    <span class="doccomment">/// Connect to a remote address.</span>
+    <span class="kw">fn</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">Uri</span>) <span class="op">-&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Connect</span><span class="op">&gt;</span>::<span class="ident">Future</span>;
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>Connect</span> <span class='kw'>for</span> <span class='ident'>T</span>
-<span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Service</span><span class='op'>&lt;</span><span class='ident'>Request</span><span class='op'>=</span><span class='ident'>Url</span>, <span class='ident'>Error</span><span class='op'>=</span><span class='ident'>io</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> <span class='op'>+</span> <span class='lifetime'>&#39;static</span>,
-      <span class='ident'>T</span>::<span class='ident'>Response</span>: <span class='ident'>AsyncRead</span> <span class='op'>+</span> <span class='ident'>AsyncWrite</span>,
-      <span class='ident'>T</span>::<span class='ident'>Future</span>: <span class='ident'>Future</span><span class='op'>&lt;</span><span class='ident'>Error</span><span class='op'>=</span><span class='ident'>io</span>::<span class='ident'>Error</span><span class='op'>&gt;</span>,
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Connect</span> <span class="kw">for</span> <span class="ident">T</span>
+<span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">=</span><span class="ident">Uri</span>, <span class="ident">Error</span><span class="op">=</span><span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+      <span class="ident">T</span>::<span class="ident">Response</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span>,
+      <span class="ident">T</span>::<span class="ident">Future</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">=</span><span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
 {
-    <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span>::<span class='ident'>Response</span>;
-    <span class='kw'>type</span> <span class='ident'>Future</span> <span class='op'>=</span> <span class='ident'>T</span>::<span class='ident'>Future</span>;
+    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span>::<span class="ident">Response</span>;
+    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">T</span>::<span class="ident">Future</span>;
 
-    <span class='kw'>fn</span> <span class='ident'>connect</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>url</span>: <span class='ident'>Url</span>) <span class='op'>-&gt;</span> <span class='op'>&lt;</span><span class='self'>Self</span> <span class='kw'>as</span> <span class='ident'>Connect</span><span class='op'>&gt;</span>::<span class='ident'>Future</span> {
-        <span class='self'>self</span>.<span class='ident'>call</span>(<span class='ident'>url</span>)
+    <span class="kw">fn</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="ident">Uri</span>) <span class="op">-&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Connect</span><span class="op">&gt;</span>::<span class="ident">Future</span> {
+        <span class="self">self</span>.<span class="ident">call</span>(<span class="ident">url</span>)
     }
 }
 
-<span class='doccomment'>/// A connector for the `http` scheme.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>HttpConnector</span> {
-    <span class='ident'>dns</span>: <span class='ident'>dns</span>::<span class='ident'>Dns</span>,
-    <span class='ident'>handle</span>: <span class='ident'>Handle</span>,
+<span class="doccomment">/// A connector for the `http` scheme.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HttpConnector</span> {
+    <span class="ident">dns</span>: <span class="ident">dns</span>::<span class="ident">Dns</span>,
+    <span class="ident">handle</span>: <span class="ident">Handle</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>HttpConnector</span> {
+<span class="kw">impl</span> <span class="ident">HttpConnector</span> {
 
-    <span class='doccomment'>/// Construct a new HttpConnector.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Takes number of DNS worker threads.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>threads</span>: <span class='ident'>usize</span>, <span class='ident'>handle</span>: <span class='kw-2'>&amp;</span><span class='ident'>Handle</span>) <span class='op'>-&gt;</span> <span class='ident'>HttpConnector</span> {
-        <span class='ident'>HttpConnector</span> {
-            <span class='ident'>dns</span>: <span class='ident'>dns</span>::<span class='ident'>Dns</span>::<span class='ident'>new</span>(<span class='ident'>threads</span>),
-            <span class='ident'>handle</span>: <span class='ident'>handle</span>.<span class='ident'>clone</span>(),
+    <span class="doccomment">/// Construct a new HttpConnector.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Takes number of DNS worker threads.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">threads</span>: <span class="ident">usize</span>, <span class="ident">handle</span>: <span class="kw-2">&amp;</span><span class="ident">Handle</span>) <span class="op">-&gt;</span> <span class="ident">HttpConnector</span> {
+        <span class="ident">HttpConnector</span> {
+            <span class="ident">dns</span>: <span class="ident">dns</span>::<span class="ident">Dns</span>::<span class="ident">new</span>(<span class="ident">threads</span>),
+            <span class="ident">handle</span>: <span class="ident">handle</span>.<span class="ident">clone</span>(),
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='kw'>for</span> <span class='ident'>HttpConnector</span> {
-    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='ident'>f</span>.<span class='ident'>debug_struct</span>(<span class='string'>&quot;HttpConnector&quot;</span>)
-            .<span class='ident'>finish</span>()
+<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">HttpConnector</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;HttpConnector&quot;</span>)
+            .<span class="ident">finish</span>()
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Service</span> <span class='kw'>for</span> <span class='ident'>HttpConnector</span> {
-    <span class='kw'>type</span> <span class='ident'>Request</span> <span class='op'>=</span> <span class='ident'>Url</span>;
-    <span class='kw'>type</span> <span class='ident'>Response</span> <span class='op'>=</span> <span class='ident'>TcpStream</span>;
-    <span class='kw'>type</span> <span class='ident'>Error</span> <span class='op'>=</span> <span class='ident'>io</span>::<span class='ident'>Error</span>;
-    <span class='kw'>type</span> <span class='ident'>Future</span> <span class='op'>=</span> <span class='ident'>HttpConnecting</span>;
+<span class="kw">impl</span> <span class="ident">Service</span> <span class="kw">for</span> <span class="ident">HttpConnector</span> {
+    <span class="kw">type</span> <span class="ident">Request</span> <span class="op">=</span> <span class="ident">Uri</span>;
+    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">TcpStream</span>;
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io</span>::<span class="ident">Error</span>;
+    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">HttpConnecting</span>;
 
-    <span class='kw'>fn</span> <span class='ident'>call</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>url</span>: <span class='ident'>Url</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span>::<span class='ident'>Future</span> {
-        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Http::connect({:?})&quot;</span>, <span class='ident'>url</span>);
-        <span class='kw'>let</span> <span class='ident'>host</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>url</span>.<span class='ident'>host_str</span>() {
-            <span class='prelude-val'>Some</span>(<span class='ident'>s</span>) <span class='op'>=&gt;</span> <span class='ident'>s</span>,
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='ident'>HttpConnecting</span> {
-                <span class='ident'>state</span>: <span class='ident'>State</span>::<span class='ident'>Error</span>(<span class='prelude-val'>Some</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidInput</span>, <span class='string'>&quot;invalid url&quot;</span>))),
-                <span class='ident'>handle</span>: <span class='self'>self</span>.<span class='ident'>handle</span>.<span class='ident'>clone</span>(),
+    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="ident">Uri</span>) <span class="op">-&gt;</span> <span class="self">Self</span>::<span class="ident">Future</span> {
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Http::connect({:?})&quot;</span>, <span class="ident">url</span>);
+        <span class="kw">let</span> <span class="ident">host</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">url</span>.<span class="ident">host</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=&gt;</span> <span class="ident">s</span>,
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="ident">HttpConnecting</span> {
+                <span class="ident">state</span>: <span class="ident">State</span>::<span class="ident">Error</span>(<span class="prelude-val">Some</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">InvalidInput</span>, <span class="string">&quot;invalid url&quot;</span>))),
+                <span class="ident">handle</span>: <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">clone</span>(),
             },
         };
-        <span class='kw'>let</span> <span class='ident'>port</span> <span class='op'>=</span> <span class='ident'>url</span>.<span class='ident'>port_or_known_default</span>().<span class='ident'>unwrap_or</span>(<span class='number'>80</span>);
+        <span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">port</span>().<span class="ident">unwrap_or</span>(<span class="number">80</span>);
 
-        <span class='ident'>HttpConnecting</span> {
-            <span class='ident'>state</span>: <span class='ident'>State</span>::<span class='ident'>Resolving</span>(<span class='self'>self</span>.<span class='ident'>dns</span>.<span class='ident'>resolve</span>(<span class='ident'>host</span>.<span class='ident'>into</span>(), <span class='ident'>port</span>)),
-            <span class='ident'>handle</span>: <span class='self'>self</span>.<span class='ident'>handle</span>.<span class='ident'>clone</span>(),
+        <span class="ident">HttpConnecting</span> {
+            <span class="ident">state</span>: <span class="ident">State</span>::<span class="ident">Resolving</span>(<span class="self">self</span>.<span class="ident">dns</span>.<span class="ident">resolve</span>(<span class="ident">host</span>.<span class="ident">into</span>(), <span class="ident">port</span>)),
+            <span class="ident">handle</span>: <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">clone</span>(),
         }
     }
 
 }
 
-<span class='doccomment'>/// A Future representing work to connect to a URL.</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>HttpConnecting</span> {
-    <span class='ident'>state</span>: <span class='ident'>State</span>,
-    <span class='ident'>handle</span>: <span class='ident'>Handle</span>,
+<span class="doccomment">/// A Future representing work to connect to a URL.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HttpConnecting</span> {
+    <span class="ident">state</span>: <span class="ident">State</span>,
+    <span class="ident">handle</span>: <span class="ident">Handle</span>,
 }
 
-<span class='kw'>enum</span> <span class='ident'>State</span> {
-    <span class='ident'>Resolving</span>(<span class='ident'>dns</span>::<span class='ident'>Query</span>),
-    <span class='ident'>Connecting</span>(<span class='ident'>ConnectingTcp</span>),
-    <span class='ident'>Error</span>(<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>io</span>::<span class='ident'>Error</span><span class='op'>&gt;</span>),
+<span class="kw">enum</span> <span class="ident">State</span> {
+    <span class="ident">Resolving</span>(<span class="ident">dns</span>::<span class="ident">Query</span>),
+    <span class="ident">Connecting</span>(<span class="ident">ConnectingTcp</span>),
+    <span class="ident">Error</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span>),
 }
 
-<span class='kw'>impl</span> <span class='ident'>Future</span> <span class='kw'>for</span> <span class='ident'>HttpConnecting</span> {
-    <span class='kw'>type</span> <span class='ident'>Item</span> <span class='op'>=</span> <span class='ident'>TcpStream</span>;
-    <span class='kw'>type</span> <span class='ident'>Error</span> <span class='op'>=</span> <span class='ident'>io</span>::<span class='ident'>Error</span>;
+<span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">HttpConnecting</span> {
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">TcpStream</span>;
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io</span>::<span class="ident">Error</span>;
 
-    <span class='kw'>fn</span> <span class='ident'>poll</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Poll</span><span class='op'>&lt;</span><span class='self'>Self</span>::<span class='ident'>Item</span>, <span class='self'>Self</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>loop</span> {
-            <span class='kw'>let</span> <span class='ident'>state</span>;
-            <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>state</span> {
-                <span class='ident'>State</span>::<span class='ident'>Resolving</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>query</span>) <span class='op'>=&gt;</span> {
-                    <span class='kw'>match</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>query</span>.<span class='ident'>poll</span>()) {
-                        <span class='ident'>Async</span>::<span class='ident'>NotReady</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Ok</span>(<span class='ident'>Async</span>::<span class='ident'>NotReady</span>),
-                        <span class='ident'>Async</span>::<span class='ident'>Ready</span>(<span class='ident'>addrs</span>) <span class='op'>=&gt;</span> {
-                            <span class='ident'>state</span> <span class='op'>=</span> <span class='ident'>State</span>::<span class='ident'>Connecting</span>(<span class='ident'>ConnectingTcp</span> {
-                                <span class='ident'>addrs</span>: <span class='ident'>addrs</span>,
-                                <span class='ident'>current</span>: <span class='prelude-val'>None</span>,
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">loop</span> {
+            <span class="kw">let</span> <span class="ident">state</span>;
+            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
+                <span class="ident">State</span>::<span class="ident">Resolving</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">query</span>) <span class="op">=&gt;</span> {
+                    <span class="kw">match</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">query</span>.<span class="ident">poll</span>()) {
+                        <span class="ident">Async</span>::<span class="ident">NotReady</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>),
+                        <span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">addrs</span>) <span class="op">=&gt;</span> {
+                            <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">Connecting</span>(<span class="ident">ConnectingTcp</span> {
+                                <span class="ident">addrs</span>: <span class="ident">addrs</span>,
+                                <span class="ident">current</span>: <span class="prelude-val">None</span>,
                             })
                         }
                     };
                 },
-                <span class='ident'>State</span>::<span class='ident'>Connecting</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>c</span>) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='ident'>c</span>.<span class='ident'>poll</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>handle</span>).<span class='ident'>map_err</span>(<span class='ident'>From</span>::<span class='ident'>from</span>),
-                <span class='ident'>State</span>::<span class='ident'>Error</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>e</span>.<span class='ident'>take</span>().<span class='ident'>expect</span>(<span class='string'>&quot;polled more than once&quot;</span>)),
+                <span class="ident">State</span>::<span class="ident">Connecting</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">c</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="ident">c</span>.<span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">handle</span>).<span class="ident">map_err</span>(<span class="ident">From</span>::<span class="ident">from</span>),
+                <span class="ident">State</span>::<span class="ident">Error</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">e</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;polled more than once&quot;</span>)),
             }
-            <span class='self'>self</span>.<span class='ident'>state</span> <span class='op'>=</span> <span class='ident'>state</span>;
+            <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>;
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='kw'>for</span> <span class='ident'>HttpConnecting</span> {
-    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='ident'>f</span>.<span class='ident'>pad</span>(<span class='string'>&quot;HttpConnecting&quot;</span>)
+<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">HttpConnecting</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;HttpConnecting&quot;</span>)
     }
 }
 
-<span class='kw'>struct</span> <span class='ident'>ConnectingTcp</span> {
-    <span class='ident'>addrs</span>: <span class='ident'>dns</span>::<span class='ident'>IpAddrs</span>,
-    <span class='ident'>current</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>TcpStreamNew</span><span class='op'>&gt;</span>,
+<span class="kw">struct</span> <span class="ident">ConnectingTcp</span> {
+    <span class="ident">addrs</span>: <span class="ident">dns</span>::<span class="ident">IpAddrs</span>,
+    <span class="ident">current</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TcpStreamNew</span><span class="op">&gt;</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>ConnectingTcp</span> {
-    <span class='comment'>// not a Future, since passing a &amp;Handle to poll</span>
-    <span class='kw'>fn</span> <span class='ident'>poll</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>handle</span>: <span class='kw-2'>&amp;</span><span class='ident'>Handle</span>) <span class='op'>-&gt;</span> <span class='ident'>Poll</span><span class='op'>&lt;</span><span class='ident'>TcpStream</span>, <span class='ident'>io</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>err</span> <span class='op'>=</span> <span class='prelude-val'>None</span>;
-        <span class='kw'>loop</span> {
-            <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>current</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>current</span> {
-                <span class='kw'>match</span> <span class='ident'>current</span>.<span class='ident'>poll</span>() {
-                    <span class='prelude-val'>Ok</span>(<span class='ident'>ok</span>) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Ok</span>(<span class='ident'>ok</span>),
-                    <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> {
-                        <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;connect error {:?}&quot;</span>, <span class='ident'>e</span>);
-                        <span class='ident'>err</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>e</span>);
-                        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>addr</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>addrs</span>.<span class='ident'>next</span>() {
-                            <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;connecting to {:?}&quot;</span>, <span class='ident'>addr</span>);
-                            <span class='kw-2'>*</span><span class='ident'>current</span> <span class='op'>=</span> <span class='ident'>TcpStream</span>::<span class='ident'>connect</span>(<span class='kw-2'>&amp;</span><span class='ident'>addr</span>, <span class='ident'>handle</span>);
-                            <span class='kw'>continue</span>;
+<span class="kw">impl</span> <span class="ident">ConnectingTcp</span> {
+    <span class="comment">// not a Future, since passing a &amp;Handle to poll</span>
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">handle</span>: <span class="kw-2">&amp;</span><span class="ident">Handle</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">TcpStream</span>, <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">err</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="kw">loop</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">current</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">current</span> {
+                <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">poll</span>() {
+                    <span class="prelude-val">Ok</span>(<span class="ident">ok</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">ok</span>),
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> {
+                        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;connect error {:?}&quot;</span>, <span class="ident">e</span>);
+                        <span class="ident">err</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>);
+                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">addr</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">addrs</span>.<span class="ident">next</span>() {
+                            <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;connecting to {:?}&quot;</span>, <span class="ident">addr</span>);
+                            <span class="kw-2">*</span><span class="ident">current</span> <span class="op">=</span> <span class="ident">TcpStream</span>::<span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>, <span class="ident">handle</span>);
+                            <span class="kw">continue</span>;
                         }
                     }
                 }
-            } <span class='kw'>else</span> <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>addr</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>addrs</span>.<span class='ident'>next</span>() {
-                <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;connecting to {:?}&quot;</span>, <span class='ident'>addr</span>);
-                <span class='self'>self</span>.<span class='ident'>current</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>TcpStream</span>::<span class='ident'>connect</span>(<span class='kw-2'>&amp;</span><span class='ident'>addr</span>, <span class='ident'>handle</span>));
-                <span class='kw'>continue</span>;
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">addr</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">addrs</span>.<span class="ident">next</span>() {
+                <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;connecting to {:?}&quot;</span>, <span class="ident">addr</span>);
+                <span class="self">self</span>.<span class="ident">current</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">TcpStream</span>::<span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>, <span class="ident">handle</span>));
+                <span class="kw">continue</span>;
             }
 
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>err</span>.<span class='ident'>take</span>().<span class='ident'>expect</span>(<span class='string'>&quot;missing connect error&quot;</span>));
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;missing connect error&quot;</span>));
         }
     }
 }
 
-<span class='comment'>/*
+<span class="comment">/*
 impl&lt;S: SslClient&gt; HttpsConnector&lt;S&gt; {
     /// Create a new connector using the provided SSL implementation.
     pub fn new(s: S) -&gt; HttpsConnector&lt;S&gt; {
@@ -427,20 +426,19 @@ impl&lt;S: SslClient&gt; HttpsConnector&lt;S&gt; {
 }
 */</span>
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
-    <span class='kw'>use</span> <span class='ident'>tokio</span>::<span class='ident'>reactor</span>::<span class='ident'>Core</span>;
-    <span class='kw'>use</span> <span class='ident'>Url</span>;
-    <span class='kw'>use</span> <span class='kw'>super</span>::{<span class='ident'>Connect</span>, <span class='ident'>HttpConnector</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
+    <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">reactor</span>::<span class="ident">Core</span>;
+    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Connect</span>, <span class="ident">HttpConnector</span>};
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_non_http_url</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>core</span> <span class='op'>=</span> <span class='ident'>Core</span>::<span class='ident'>new</span>().<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='ident'>url</span> <span class='op'>=</span> <span class='ident'>Url</span>::<span class='ident'>parse</span>(<span class='string'>&quot;file:///home/sean/foo.txt&quot;</span>).<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='ident'>connector</span> <span class='op'>=</span> <span class='ident'>HttpConnector</span>::<span class='ident'>new</span>(<span class='number'>1</span>, <span class='kw-2'>&amp;</span><span class='ident'>core</span>.<span class='ident'>handle</span>());
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_non_http_url</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">core</span> <span class="op">=</span> <span class="ident">Core</span>::<span class="ident">new</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="string">&quot;/foo/bar?baz&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">HttpConnector</span>::<span class="ident">new</span>(<span class="number">1</span>, <span class="kw-2">&amp;</span><span class="ident">core</span>.<span class="ident">handle</span>());
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>core</span>.<span class='ident'>run</span>(<span class='ident'>connector</span>.<span class='ident'>connect</span>(<span class='ident'>url</span>)).<span class='ident'>unwrap_err</span>().<span class='ident'>kind</span>(), <span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidInput</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">core</span>.<span class="ident">run</span>(<span class="ident">connector</span>.<span class="ident">connect</span>(<span class="ident">url</span>)).<span class="ident">unwrap_err</span>().<span class="ident">kind</span>(), <span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">InvalidInput</span>);
     }
 
 }
