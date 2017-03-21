@@ -144,8 +144,8 @@ may still inform the vector that there is space for a few more elements.</p>
 <div class='docblock'><p>Converts the vector into <a href="../../std/boxed/struct.Box.html"><code>Box&lt;[T]&gt;</code></a>.</p>
 
 <p>Note that this will drop any excess capacity. Calling this and
-converting back to a vector with <a href="../../std/primitive.slice.html#method.into_vec"><code>into_vec</code></a> is equivalent to calling
-<a href="#method.shrink_to_fit"><code>shrink_to_fit</code></a>.</p>
+converting back to a vector with <a href="../../std/primitive.slice.html#method.into_vec"><code>into_vec()</code></a> is equivalent to calling
+<a href="#method.shrink_to_fit"><code>shrink_to_fit()</code></a>.</p>
 
 <h1 id='examples-5' class='section-header'><a href='#examples-5'>Examples</a></h1>
 <pre class="rust rust-example-rendered">
@@ -327,11 +327,7 @@ elements.</p>
 
 <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">vec</span>, [<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">20</span>]);</pre>
 </div><h4 id='method.dedup_by' class="method"><span id='dedup_by.v' class='invisible'><code>fn <a href='#method.dedup_by' class='fnname'>dedup_by</a>&lt;F&gt;(&amp;mut self, same_bucket: F) <span class="where fmt-newline">where F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html" title="trait core::ops::FnMut">FnMut</a>(&amp;mut T, &amp;mut T) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></span></code><div class='since' title='Stable since Rust version 1.16.0'>1.16.0</div></span></h4>
-<div class='docblock'><p>Removes consecutive elements in the vector according to a predicate.</p>
-
-<p>The <code>same_bucket</code> function is passed references to two elements from the vector, and
-returns <code>true</code> if the elements compare equal, or <code>false</code> if they do not. Only the first
-of adjacent equal items is kept.</p>
+<div class='docblock'><p>Removes consecutive elements in the vector that resolve to the same key.</p>
 
 <p>If the vector is sorted, this removes all duplicates.</p>
 
