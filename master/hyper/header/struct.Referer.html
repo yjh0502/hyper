@@ -79,7 +79,7 @@ URI reference, if any, when generating the Referer field value.</p>
 
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">Headers</span>::<span class="ident">new</span>();
 <span class="ident">headers</span>.<span class="ident">set</span>(<span class="ident">Referer</span>(<span class="string">&quot;http://www.example.com/index.html&quot;</span>.<span class="ident">to_owned</span>()));</pre>
-</div><h2 id='deref-methods'>Methods from <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html" title="trait core::ops::Deref">Deref</a>&lt;Target=<a class="struct" href="https://doc.rust-lang.org/nightly/collections/string/struct.String.html" title="struct collections::string::String">String</a>&gt;</h2><div class='impl-items'><h4 id='method.into_bytes' class="method"><span id='into_bytes.v' class='invisible'><code>fn <a href='#method.into_bytes' class='fnname'>into_bytes</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+</div><h2 id='deref-methods'>Methods from <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html" title="trait core::ops::Deref">Deref</a>&lt;Target = <a class="struct" href="https://doc.rust-lang.org/nightly/collections/string/struct.String.html" title="struct collections::string::String">String</a>&gt;</h2><div class='impl-items'><h4 id='method.into_bytes' class="method"><span id='into_bytes.v' class='invisible'><code>fn <a href='#method.into_bytes' class='fnname'>into_bytes</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Converts a <code>String</code> into a byte vector.</p>
 
 <p>This consumes the <code>String</code>, so we do not need to copy its contents.</p>
@@ -125,7 +125,7 @@ larger than its length.</p>
 <p>The capacity may be increased by more than <code>additional</code> bytes if it
 chooses, to prevent frequent reallocations.</p>
 
-<p>If you do not want this &quot;at least&quot; behavior, see the <a href="#method.reserve_exact"><code>reserve_exact()</code></a>
+<p>If you do not want this &quot;at least&quot; behavior, see the <a href="#method.reserve_exact"><code>reserve_exact</code></a>
 method.</p>
 
 <h1 id='panics' class='section-header'><a href='#panics'>Panics</a></h1>
@@ -161,7 +161,7 @@ method.</p>
 <div class='docblock'><p>Ensures that this <code>String</code>&#39;s capacity is <code>additional</code> bytes
 larger than its length.</p>
 
-<p>Consider using the <a href="#method.reserve"><code>reserve()</code></a> method unless you absolutely know
+<p>Consider using the <a href="#method.reserve"><code>reserve</code></a> method unless you absolutely know
 better than the allocator.</p>
 
 <h1 id='panics-1' class='section-header'><a href='#panics-1'>Panics</a></h1>

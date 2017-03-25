@@ -95,7 +95,7 @@ those charsets.</p>
 <span class="ident">headers</span>.<span class="ident">set</span>(
     <span class="ident">AcceptCharset</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">qitem</span>(<span class="ident">Charset</span>::<span class="ident">Ext</span>(<span class="string">&quot;utf-8&quot;</span>.<span class="ident">to_owned</span>()))])
 );</pre>
-</div><h2 id='deref-methods'>Methods from <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html" title="trait core::ops::Deref">Deref</a>&lt;Target=<a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="struct" href="../../hyper/header/struct.QualityItem.html" title="struct hyper::header::QualityItem">QualityItem</a>&lt;<a class="enum" href="../../hyper/header/enum.Charset.html" title="enum hyper::header::Charset">Charset</a>&gt;&gt;&gt;</h2><div class='impl-items'><h4 id='method.capacity' class="method"><span id='capacity.v' class='invisible'><code>fn <a href='#method.capacity' class='fnname'>capacity</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+</div><h2 id='deref-methods'>Methods from <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html" title="trait core::ops::Deref">Deref</a>&lt;Target = <a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="struct" href="../../hyper/header/struct.QualityItem.html" title="struct hyper::header::QualityItem">QualityItem</a>&lt;<a class="enum" href="../../hyper/header/enum.Charset.html" title="enum hyper::header::Charset">Charset</a>&gt;&gt;&gt;</h2><div class='impl-items'><h4 id='method.capacity' class="method"><span id='capacity.v' class='invisible'><code>fn <a href='#method.capacity' class='fnname'>capacity</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Returns the number of elements the vector can hold without
 reallocating.</p>
 
@@ -153,8 +153,8 @@ may still inform the vector that there is space for a few more elements.</p>
 <div class='docblock'><p>Converts the vector into <a href="../../std/boxed/struct.Box.html"><code>Box&lt;[T]&gt;</code></a>.</p>
 
 <p>Note that this will drop any excess capacity. Calling this and
-converting back to a vector with <a href="../../std/primitive.slice.html#method.into_vec"><code>into_vec()</code></a> is equivalent to calling
-<a href="#method.shrink_to_fit"><code>shrink_to_fit()</code></a>.</p>
+converting back to a vector with <a href="../../std/primitive.slice.html#method.into_vec"><code>into_vec</code></a> is equivalent to calling
+<a href="#method.shrink_to_fit"><code>shrink_to_fit</code></a>.</p>
 
 <h1 id='examples-5' class='section-header'><a href='#examples-5'>Examples</a></h1>
 <pre class="rust rust-example-rendered">
@@ -336,7 +336,11 @@ elements.</p>
 
 <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">vec</span>, [<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">20</span>]);</pre>
 </div><h4 id='method.dedup_by' class="method"><span id='dedup_by.v' class='invisible'><code>fn <a href='#method.dedup_by' class='fnname'>dedup_by</a>&lt;F&gt;(&amp;mut self, same_bucket: F) <span class="where fmt-newline">where F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html" title="trait core::ops::FnMut">FnMut</a>(&amp;mut T, &amp;mut T) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></span></code><div class='since' title='Stable since Rust version 1.16.0'>1.16.0</div></span></h4>
-<div class='docblock'><p>Removes consecutive elements in the vector that resolve to the same key.</p>
+<div class='docblock'><p>Removes consecutive elements in the vector according to a predicate.</p>
+
+<p>The <code>same_bucket</code> function is passed references to two elements from the vector, and
+returns <code>true</code> if the elements compare equal, or <code>false</code> if they do not. Only the first
+of adjacent equal items is kept.</p>
 
 <p>If the vector is sorted, this removes all duplicates.</p>
 
