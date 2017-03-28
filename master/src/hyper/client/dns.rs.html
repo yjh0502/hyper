@@ -96,59 +96,59 @@
 <span id="51">51</span>
 <span id="52">52</span>
 <span id="53">53</span>
-</pre><pre class="rust ">
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">net</span>::{<span class="ident">SocketAddr</span>, <span class="ident">ToSocketAddrs</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">vec</span>;
+</pre><pre class='rust '>
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>net</span>::{<span class='ident'>SocketAddr</span>, <span class='ident'>ToSocketAddrs</span>};
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>vec</span>;
 
-<span class="kw">use</span> ::<span class="ident">futures</span>::{<span class="ident">Future</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> ::<span class="ident">futures_cpupool</span>::{<span class="ident">CpuPool</span>, <span class="ident">CpuFuture</span>};
+<span class='kw'>use</span> ::<span class='ident'>futures</span>::{<span class='ident'>Future</span>, <span class='ident'>Poll</span>};
+<span class='kw'>use</span> ::<span class='ident'>futures_cpupool</span>::{<span class='ident'>CpuPool</span>, <span class='ident'>CpuFuture</span>};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Dns</span> {
-    <span class="ident">pool</span>: <span class="ident">CpuPool</span>,
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Dns</span> {
+    <span class='ident'>pool</span>: <span class='ident'>CpuPool</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">Dns</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">threads</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">Dns</span> {
-        <span class="ident">Dns</span> {
-            <span class="ident">pool</span>: <span class="ident">CpuPool</span>::<span class="ident">new</span>(<span class="ident">threads</span>)
+<span class='kw'>impl</span> <span class='ident'>Dns</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>threads</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Dns</span> {
+        <span class='ident'>Dns</span> {
+            <span class='ident'>pool</span>: <span class='ident'>CpuPool</span>::<span class='ident'>new</span>(<span class='ident'>threads</span>)
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resolve</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">host</span>: <span class="ident">String</span>, <span class="ident">port</span>: <span class="ident">u16</span>) <span class="op">-&gt;</span> <span class="ident">Query</span> {
-        <span class="ident">Query</span>(<span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">spawn_fn</span>(<span class="kw">move</span> <span class="op">||</span> <span class="ident">work</span>(<span class="ident">host</span>, <span class="ident">port</span>)))
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>resolve</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>host</span>: <span class='ident'>String</span>, <span class='ident'>port</span>: <span class='ident'>u16</span>) <span class='op'>-&gt;</span> <span class='ident'>Query</span> {
+        <span class='ident'>Query</span>(<span class='self'>self</span>.<span class='ident'>pool</span>.<span class='ident'>spawn_fn</span>(<span class='kw'>move</span> <span class='op'>||</span> <span class='ident'>work</span>(<span class='ident'>host</span>, <span class='ident'>port</span>)))
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Query</span>(<span class="ident">CpuFuture</span><span class="op">&lt;</span><span class="ident">IpAddrs</span>, <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span>);
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Query</span>(<span class='ident'>CpuFuture</span><span class='op'>&lt;</span><span class='ident'>IpAddrs</span>, <span class='ident'>io</span>::<span class='ident'>Error</span><span class='op'>&gt;</span>);
 
-<span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Query</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">IpAddrs</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io</span>::<span class="ident">Error</span>;
+<span class='kw'>impl</span> <span class='ident'>Future</span> <span class='kw'>for</span> <span class='ident'>Query</span> {
+    <span class='kw'>type</span> <span class='ident'>Item</span> <span class='op'>=</span> <span class='ident'>IpAddrs</span>;
+    <span class='kw'>type</span> <span class='ident'>Error</span> <span class='op'>=</span> <span class='ident'>io</span>::<span class='ident'>Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">poll</span>()
+    <span class='kw'>fn</span> <span class='ident'>poll</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Poll</span><span class='op'>&lt;</span><span class='self'>Self</span>::<span class='ident'>Item</span>, <span class='self'>Self</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>poll</span>()
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IpAddrs</span> {
-    <span class="ident">iter</span>: <span class="ident">vec</span>::<span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>,
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>IpAddrs</span> {
+    <span class='ident'>iter</span>: <span class='ident'>vec</span>::<span class='ident'>IntoIter</span><span class='op'>&lt;</span><span class='ident'>SocketAddr</span><span class='op'>&gt;</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">IpAddrs</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">SocketAddr</span>;
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>()
+<span class='kw'>impl</span> <span class='ident'>Iterator</span> <span class='kw'>for</span> <span class='ident'>IpAddrs</span> {
+    <span class='kw'>type</span> <span class='ident'>Item</span> <span class='op'>=</span> <span class='ident'>SocketAddr</span>;
+    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>next</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>SocketAddr</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>iter</span>.<span class='ident'>next</span>()
     }
 }
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Answer</span> <span class="op">=</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IpAddrs</span><span class="op">&gt;</span>;
+<span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>Answer</span> <span class='op'>=</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>IpAddrs</span><span class='op'>&gt;</span>;
 
-<span class="kw">fn</span> <span class="ident">work</span>(<span class="ident">hostname</span>: <span class="ident">String</span>, <span class="ident">port</span>: <span class="ident">u16</span>) <span class="op">-&gt;</span> <span class="ident">Answer</span> {
-    <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;resolve {:?}:{:?}&quot;</span>, <span class="ident">hostname</span>, <span class="ident">port</span>);
-    (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">hostname</span>, <span class="ident">port</span>).<span class="ident">to_socket_addrs</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">IpAddrs</span> { <span class="ident">iter</span>: <span class="ident">i</span> })
+<span class='kw'>fn</span> <span class='ident'>work</span>(<span class='ident'>hostname</span>: <span class='ident'>String</span>, <span class='ident'>port</span>: <span class='ident'>u16</span>) <span class='op'>-&gt;</span> <span class='ident'>Answer</span> {
+    <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;resolve {:?}:{:?}&quot;</span>, <span class='ident'>hostname</span>, <span class='ident'>port</span>);
+    (<span class='kw-2'>&amp;</span><span class='kw-2'>*</span><span class='ident'>hostname</span>, <span class='ident'>port</span>).<span class='ident'>to_socket_addrs</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>i</span><span class='op'>|</span> <span class='ident'>IpAddrs</span> { <span class='ident'>iter</span>: <span class='ident'>i</span> })
 }
 </pre>
 </section>
