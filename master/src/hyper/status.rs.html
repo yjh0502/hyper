@@ -1353,9 +1353,9 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StatusCode</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">to_u16</span>()
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">code</span>: <span class="ident">StatusCode</span>) <span class="op">-&gt;</span> <span class="ident">u16</span> {
+        <span class="ident">code</span>.<span class="ident">to_u16</span>()
     }
 }
 

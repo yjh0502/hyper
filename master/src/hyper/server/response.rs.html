@@ -183,13 +183,13 @@
 
     <span class="doccomment">/// The status of this response.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">StatusCode</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">head</span>.<span class="ident">subject</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">StatusCode</span> {
+        <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">subject</span>
     }
 
     <span class="doccomment">/// The HTTP version of this response.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">version</span>::<span class="ident">HttpVersion</span> { <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">head</span>.<span class="ident">version</span> }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">version</span>::<span class="ident">HttpVersion</span> { <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">version</span> }
 
     <span class="doccomment">/// Get a mutable reference to the Headers.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>

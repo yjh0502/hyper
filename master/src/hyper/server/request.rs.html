@@ -196,14 +196,14 @@
 
     <span class="doccomment">/// The version of HTTP for this request.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">HttpVersion</span> { <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">version</span> }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">HttpVersion</span> { <span class="self">self</span>.<span class="ident">version</span> }
 
     <span class="doccomment">/// The remote socket address of this request</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is an `Option`, because some underlying transports may not have</span>
     <span class="doccomment">/// a socket address, such as Unix Sockets.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remote_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">remote_addr</span>.<span class="ident">as_ref</span>() }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remote_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">remote_addr</span> }
 
     <span class="doccomment">/// The target path of this Request.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
