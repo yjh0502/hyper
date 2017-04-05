@@ -17,7 +17,7 @@
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc mod">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -43,100 +43,91 @@
         </form>
     </nav>
 
-    <section id='main' class="content mod">
-<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>hyper</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Crate <a class="mod" href=''>hyper</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
                </span><a class='srclink' href='../src/hyper/lib.rs.html#1-76' title='goto source code'>[src]</a></span></h1>
-<div class='docblock'>
-<h1 id='hyper' class='section-header'><a href='#hyper'>Hyper</a></h1>
-<p>Hyper is a fast, modern HTTP implementation written in and for Rust. It
-is a low-level typesafe abstraction over raw HTTP, providing an elegant
-layer over &quot;stringly-typed&quot; HTTP.</p>
-
-<p>Hyper provides both a <a href="client/index.html">Client</a> and a
-<a href="server/index.html">Server</a>, along with a
-<a href="header/index.html">typed Headers system</a>.</p>
-</div><h2 id='reexports' class='section-header'><a href="#reexports">Reexports</a></h2>
-<table><tr><td><code>pub extern crate <a class='mod' href='https://hyperium.github.io/mime.rs/mime/index.html' title='mime'>mime</a>;</code></td></tr><tr><td><code>pub use client::<a class='struct' href='../hyper/client/struct.Client.html' title='hyper::client::Client'>Client</a>;</code></td></tr><tr><td><code>pub use error::<a class='type' href='../hyper/error/type.Result.html' title='hyper::error::Result'>Result</a>;</code></td></tr><tr><td><code>pub use error::<a class='enum' href='../hyper/error/enum.Error.html' title='hyper::error::Error'>Error</a>;</code></td></tr><tr><td><code>pub use header::<a class='struct' href='../hyper/header/struct.Headers.html' title='hyper::header::Headers'>Headers</a>;</code></td></tr><tr><td><code>pub use method::Method::<a class='enum' href='../hyper/enum.Method.html' title='hyper::Method'>Get</a>;</code></td></tr><tr><td><code>pub use method::Method::<a class='enum' href='../hyper/enum.Method.html' title='hyper::Method'>Head</a>;</code></td></tr><tr><td><code>pub use method::Method::<a class='enum' href='../hyper/enum.Method.html' title='hyper::Method'>Post</a>;</code></td></tr><tr><td><code>pub use method::Method::<a class='enum' href='../hyper/enum.Method.html' title='hyper::Method'>Put</a>;</code></td></tr><tr><td><code>pub use method::Method::<a class='enum' href='../hyper/enum.Method.html' title='hyper::Method'>Delete</a>;</code></td></tr><tr><td><code>pub use status::<a class='enum' href='../hyper/status/enum.StatusCode.html' title='hyper::status::StatusCode'>StatusCode</a>;</code></td></tr><tr><td><code>pub use status::StatusCode::<a class='enum' href='../hyper/status/enum.StatusCode.html' title='hyper::status::StatusCode'>Ok</a>;</code></td></tr><tr><td><code>pub use status::StatusCode::<a class='enum' href='../hyper/status/enum.StatusCode.html' title='hyper::status::StatusCode'>BadRequest</a>;</code></td></tr><tr><td><code>pub use status::StatusCode::<a class='enum' href='../hyper/status/enum.StatusCode.html' title='hyper::status::StatusCode'>NotFound</a>;</code></td></tr><tr><td><code>pub use server::<a class='struct' href='../hyper/server/struct.Server.html' title='hyper::server::Server'>Server</a>;</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+<div class='docblock'><h1 id="hyper" class="section-header"><a href="#hyper">Hyper</a></h1><p>Hyper is a fast, modern HTTP implementation written in and for Rust. It is a low-level typesafe abstraction over raw HTTP, providing an elegant layer over &quot;stringly-typed&quot; HTTP.</p><p>Hyper provides both a <a href="client/index.html">Client</a> and a <a href="server/index.html">Server</a>, along with a <a href="header/index.html">typed Headers system</a>.</p></div><h2 id='reexports' class='section-header'><a href="#reexports">Reexports</a></h2>
+<table><tr><td><code>pub extern crate <a class="mod" href="https://hyperium.github.io/mime.rs/mime/index.html" title="mod mime">mime</a>;</code></td></tr><tr><td><code>pub use client::<a class="struct" href="../hyper/client/struct.Client.html" title="struct hyper::client::Client">Client</a>;</code></td></tr><tr><td><code>pub use error::<a class="type" href="../hyper/error/type.Result.html" title="type hyper::error::Result">Result</a>;</code></td></tr><tr><td><code>pub use error::<a class="enum" href="../hyper/error/enum.Error.html" title="enum hyper::error::Error">Error</a>;</code></td></tr><tr><td><code>pub use header::<a class="struct" href="../hyper/header/struct.Headers.html" title="struct hyper::header::Headers">Headers</a>;</code></td></tr><tr><td><code>pub use method::Method::<a class="enum" href="../hyper/enum.Method.html" title="enum hyper::Method">Get</a>;</code></td></tr><tr><td><code>pub use method::Method::<a class="enum" href="../hyper/enum.Method.html" title="enum hyper::Method">Head</a>;</code></td></tr><tr><td><code>pub use method::Method::<a class="enum" href="../hyper/enum.Method.html" title="enum hyper::Method">Post</a>;</code></td></tr><tr><td><code>pub use method::Method::<a class="enum" href="../hyper/enum.Method.html" title="enum hyper::Method">Put</a>;</code></td></tr><tr><td><code>pub use method::Method::<a class="enum" href="../hyper/enum.Method.html" title="enum hyper::Method">Delete</a>;</code></td></tr><tr><td><code>pub use status::<a class="enum" href="../hyper/status/enum.StatusCode.html" title="enum hyper::status::StatusCode">StatusCode</a>;</code></td></tr><tr><td><code>pub use status::StatusCode::<a class="enum" href="../hyper/status/enum.StatusCode.html" title="enum hyper::status::StatusCode">Ok</a>;</code></td></tr><tr><td><code>pub use status::StatusCode::<a class="enum" href="../hyper/status/enum.StatusCode.html" title="enum hyper::status::StatusCode">BadRequest</a>;</code></td></tr><tr><td><code>pub use status::StatusCode::<a class="enum" href="../hyper/status/enum.StatusCode.html" title="enum hyper::status::StatusCode">NotFound</a>;</code></td></tr><tr><td><code>pub use server::<a class="struct" href="../hyper/server/struct.Server.html" title="struct hyper::server::Server">Server</a>;</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class='mod' href='client/index.html'
-                                  title='hyper::client'>client</a></td>
+                           <td><a class="mod" href="client/index.html"
+                                  title='mod hyper::client'>client</a></td>
                            <td class='docblock-short'>
                                 <p>HTTP Client</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='mod' href='error/index.html'
-                                  title='hyper::error'>error</a></td>
+                           <td><a class="mod" href="error/index.html"
+                                  title='mod hyper::error'>error</a></td>
                            <td class='docblock-short'>
                                 <p>Error and Result module.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='mod' href='header/index.html'
-                                  title='hyper::header'>header</a></td>
+                           <td><a class="mod" href="header/index.html"
+                                  title='mod hyper::header'>header</a></td>
                            <td class='docblock-short'>
                                 <p>Headers container, and common header fields.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='mod' href='server/index.html'
-                                  title='hyper::server'>server</a></td>
+                           <td><a class="mod" href="server/index.html"
+                                  title='mod hyper::server'>server</a></td>
                            <td class='docblock-short'>
                                 <p>HTTP Server</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='mod' href='status/index.html'
-                                  title='hyper::status'>status</a></td>
+                           <td><a class="mod" href="status/index.html"
+                                  title='mod hyper::status'>status</a></td>
                            <td class='docblock-short'>
                                 <p>HTTP status codes</p>
                            </td>
                        </tr></table><h2 id='macros' class='section-header'><a href="#macros">Macros</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class='macro' href='macro.header.html'
-                                  title='hyper::header'>header</a></td>
+                           <td><a class="macro" href="macro.header.html"
+                                  title='macro hyper::header'>header</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
                        </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.Body.html'
-                                  title='hyper::Body'>Body</a></td>
+                           <td><a class="struct" href="struct.Body.html"
+                                  title='struct hyper::Body'>Body</a></td>
                            <td class='docblock-short'>
                                 <p>A <code>Stream</code> for <code>Chunk</code>s used in requests and responses.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.Chunk.html'
-                                  title='hyper::Chunk'>Chunk</a></td>
+                           <td><a class="struct" href="struct.Chunk.html"
+                                  title='struct hyper::Chunk'>Chunk</a></td>
                            <td class='docblock-short'>
                                 <p>A piece of a message body.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.Uri.html'
-                                  title='hyper::Uri'>Uri</a></td>
+                           <td><a class="struct" href="struct.Uri.html"
+                                  title='struct hyper::Uri'>Uri</a></td>
                            <td class='docblock-short'>
                                 <p>The Request-URI of a Request&#39;s StartLine.</p>
                            </td>
                        </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class='enum' href='enum.HttpVersion.html'
-                                  title='hyper::HttpVersion'>HttpVersion</a></td>
+                           <td><a class="enum" href="enum.HttpVersion.html"
+                                  title='enum hyper::HttpVersion'>HttpVersion</a></td>
                            <td class='docblock-short'>
                                 <p>Represents a version of the HTTP spec.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='enum' href='enum.Method.html'
-                                  title='hyper::Method'>Method</a></td>
+                           <td><a class="enum" href="enum.Method.html"
+                                  title='enum hyper::Method'>Method</a></td>
                            <td class='docblock-short'>
                                 <p>The Request Method (VERB)</p>
                            </td>
