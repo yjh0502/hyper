@@ -54,10 +54,12 @@
     None,
     Unregistered(<a class="struct" href="https://doc.rust-lang.org/nightly/collections/string/struct.String.html" title="struct collections::string::String">String</a>),
 }</pre><div class='docblock'><p>Range Units, described in <a href="http://tools.ietf.org/html/rfc7233#section-2">RFC7233</a></p>
+
 <p>A representation can be partitioned into subranges according to
 various structural units, depending on the structure inherent in the
-representation's media type.</p>
-<h1 id="abnf" class="section-header"><a href="#abnf">ABNF</a></h1>
+representation&#39;s media type.</p>
+
+<h1 id='abnf' class='section-header'><a href='#abnf'>ABNF</a></h1>
 <pre><code class="language-plain">range-unit       = bytes-unit / other-range-unit
 bytes-unit       = &quot;bytes&quot;
 other-range-unit = token

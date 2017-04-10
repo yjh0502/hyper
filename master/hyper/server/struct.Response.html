@@ -50,6 +50,7 @@
                    </a>
                </span><a class='srclink' href='../../src/hyper/server/response.rs.html#11-14' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Response&lt;B&nbsp;=&nbsp;<a class="struct" href="../../hyper/struct.Body.html" title="struct hyper::Body">Body</a>&gt; { /* fields omitted */ }</pre><div class='docblock'><p>The Response sent to a client after receiving a Request in a Service.</p>
+
 <p>The default <code>StatusCode</code> for a <code>Response</code> is <code>200 OK</code>.</p>
 </div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;B&gt; <a class="struct" href="../../hyper/server/struct.Response.html" title="struct hyper::server::Response">Response</a>&lt;B&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/server/response.rs.html#16-88' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.new' class="method"><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class="struct" href="../../hyper/server/struct.Response.html" title="struct hyper::server::Response">Response</a>&lt;B&gt;</code></span></h4>
@@ -68,15 +69,19 @@
 <div class='docblock'><p>Set the body.</p>
 </div><h4 id='method.with_status' class="method"><span id='with_status.v' class='invisible'><code>fn <a href='#method.with_status' class='fnname'>with_status</a>(self, status: <a class="enum" href="../../hyper/status/enum.StatusCode.html" title="enum hyper::status::StatusCode">StatusCode</a>) -&gt; Self</code></span></h4>
 <div class='docblock'><p>Set the status and move the Response.</p>
+
 <p>Useful for the &quot;builder-style&quot; pattern.</p>
 </div><h4 id='method.with_header' class="method"><span id='with_header.v' class='invisible'><code>fn <a href='#method.with_header' class='fnname'>with_header</a>&lt;H:&nbsp;<a class="trait" href="../../hyper/header/trait.Header.html" title="trait hyper::header::Header">Header</a>&gt;(self, header: H) -&gt; Self</code></span></h4>
 <div class='docblock'><p>Set a header and move the Response.</p>
+
 <p>Useful for the &quot;builder-style&quot; pattern.</p>
 </div><h4 id='method.with_headers' class="method"><span id='with_headers.v' class='invisible'><code>fn <a href='#method.with_headers' class='fnname'>with_headers</a>(self, headers: <a class="struct" href="../../hyper/header/struct.Headers.html" title="struct hyper::header::Headers">Headers</a>) -&gt; Self</code></span></h4>
 <div class='docblock'><p>Set the headers and move the Response.</p>
+
 <p>Useful for the &quot;builder-style&quot; pattern.</p>
 </div><h4 id='method.with_body' class="method"><span id='with_body.v' class='invisible'><code>fn <a href='#method.with_body' class='fnname'>with_body</a>&lt;T:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;B&gt;&gt;(self, body: T) -&gt; Self</code></span></h4>
 <div class='docblock'><p>Set the body and move the Response.</p>
+
 <p>Useful for the &quot;builder-style&quot; pattern.</p>
 </div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;B&gt; <a class="trait" href="https://doc.rust-lang.org/nightly/core/default/trait.Default.html" title="trait core::default::Default">Default</a> for <a class="struct" href="../../hyper/server/struct.Response.html" title="struct hyper::server::Response">Response</a>&lt;B&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/server/response.rs.html#90-97' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.default' class="method"><span id='default.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default' class='fnname'>default</a>() -&gt; <a class="struct" href="../../hyper/server/struct.Response.html" title="struct hyper::server::Response">Response</a>&lt;B&gt;</code></span></h4>

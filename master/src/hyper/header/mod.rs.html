@@ -1195,7 +1195,7 @@
     <span class="kw">use</span> ::<span class="ident">header</span>::{<span class="ident">ContentLength</span>, <span class="ident">UserAgent</span>};
 
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">ContentLength</span>(<span class="number">5</span>);
-    <span class="kw">let</span> <span class="ident">agent</span> <span class="op">=</span> <span class="ident">UserAgent</span>(<span class="string">&quot;hyper&quot;</span>.<span class="ident">to_owned</span>());
+    <span class="kw">let</span> <span class="ident">agent</span> <span class="op">=</span> <span class="ident">UserAgent</span>::<span class="ident">new</span>(<span class="string">&quot;hyper&quot;</span>);
 
     <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">TypeId</span>::<span class="ident">of</span>::<span class="op">&lt;</span><span class="ident">ContentLength</span><span class="op">&gt;</span>(), <span class="ident">len</span>.<span class="ident">get_type</span>());
     <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">TypeId</span>::<span class="ident">of</span>::<span class="op">&lt;</span><span class="ident">UserAgent</span><span class="op">&gt;</span>(), <span class="ident">agent</span>.<span class="ident">get_type</span>());
