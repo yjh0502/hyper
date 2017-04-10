@@ -988,7 +988,7 @@
         <span class='kw'>let</span> <span class='ident'>content_len</span> <span class='op'>=</span> <span class='ident'>content</span>.<span class='ident'>len</span>();
         <span class='kw'>for</span> <span class='ident'>block_at</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>content_len</span> {
             <span class='kw'>let</span> <span class='ident'>actual</span> <span class='op'>=</span> <span class='ident'>read_async</span>(<span class='ident'>decoder</span>.<span class='ident'>clone</span>(), <span class='ident'>content</span>.<span class='ident'>as_bytes</span>(), <span class='ident'>block_at</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>expected</span>, <span class='kw-2'>&amp;</span><span class='ident'>actual</span>, <span class='string'>&quot;Failed async. Blocking at {}&quot;</span>, <span class='ident'>block_at</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>expected</span>, <span class='kw-2'>&amp;</span><span class='ident'>actual</span>) <span class='comment'>//, &quot;Failed async. Blocking at {}&quot;, block_at);</span>
         }
     }
 
