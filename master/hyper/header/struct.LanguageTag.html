@@ -58,6 +58,7 @@
     pub extensions: <a class="struct" href="https://doc.rust-lang.org/nightly/collections/btree/map/struct.BTreeMap.html" title="struct collections::btree::map::BTreeMap">BTreeMap</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>, <a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/collections/string/struct.String.html" title="struct collections::string::String">String</a>&gt;&gt;,
     pub privateuse: <a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/collections/string/struct.String.html" title="struct collections::string::String">String</a>&gt;,
 }</pre><div class='docblock'><p>A language tag as described in <a href="http://tools.ietf.org/html/bcp47">BCP47</a>.</p>
+
 <p>Language tags are used to help identify languages, whether spoken,
 written, signed, or otherwise signaled, for the purpose of
 communication.  This includes constructed and artificial languages
@@ -117,12 +118,15 @@ tag has more extlangs than the range these extlangs are ignored. Matches are
 case-insensitive. <code>*</code> in language ranges are represented using <code>None</code> values. The language
 range <code>*</code> that matches language tags is created by the default language tag:
 <code>let wildcard: LanguageTag = Default::default();.</code></p>
+
 <p>For example the range <code>en-GB</code> matches only <code>en-GB</code> and <code>en-Arab-GB</code> but not <code>en</code>.
 The range <code>en</code> matches all language tags starting with <code>en</code> including <code>en</code>, <code>en-GB</code>,
 <code>en-Arab</code> and <code>en-Arab-GB</code>.</p>
-<h1 id="panics" class="section-header"><a href="#panics">Panics</a></h1>
+
+<h1 id='panics' class='section-header'><a href='#panics'>Panics</a></h1>
 <p>If the language range has extensions or private use tags.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+
+<h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1>
 <pre class="rust rust-example-rendered">
 <span class="kw">let</span> <span class="ident">range_italian</span> <span class="op">=</span> <span class="macro">langtag</span><span class="macro">!</span>(<span class="ident">it</span>);
 <span class="kw">let</span> <span class="ident">tag_german</span> <span class="op">=</span> <span class="macro">langtag</span><span class="macro">!</span>(<span class="ident">de</span>);
@@ -137,7 +141,9 @@ The range <code>en</code> matches all language tags starting with <code>en</code
 <div class='docblock'><p>Checks if it is a language range, meaning that there are no extension and privateuse tags.</p>
 </div><h4 id='method.canonicalize' class="method"><span id='canonicalize.v' class='invisible'><code>fn <a href='#method.canonicalize' class='fnname'>canonicalize</a>(&amp;self) -&gt; <a class="struct" href="../../hyper/header/struct.LanguageTag.html" title="struct hyper::header::LanguageTag">LanguageTag</a></code></span></h4>
 <div class='docblock'><p>Returns the canonical version of the language tag.</p>
+
 <p>It currently applies the following steps:</p>
+
 <ul>
 <li>Grandfathered tags are replaced with the canonical version if possible.</li>
 <li>Extension languages are promoted to primary language.</li>
@@ -145,19 +151,10 @@ The range <code>en</code> matches all language tags starting with <code>en</code
 <li>Deprecated regions are replaced with new country names.</li>
 <li>The <code>heploc</code> variant is replaced with <code>alalc97</code>.</li>
 </ul>
+
 <p>The returned language tags may not be completly canonical and they are
 not validated.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html" title="trait core::str::FromStr">FromStr</a> for <a class="struct" href="../../hyper/header/struct.LanguageTag.html" title="struct hyper::header::LanguageTag">LanguageTag</a></code></span><span class='out-of-band'></span></h3>
-<div class='impl-items'><h4 id='associatedtype.Err' class="type"><span id='Err.t' class='invisible'><code>type <a href='https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html#associatedtype.Err' class="type">Err</a> = Error</code></span></h4>
-<div class='docblock'><p>The associated error which can be returned from parsing.</p>
-</div><h4 id='method.from_str' class="method"><span id='from_str.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html#tymethod.from_str' class='fnname'>from_str</a>(s: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="../../hyper/header/struct.LanguageTag.html" title="struct hyper::header::LanguageTag">LanguageTag</a>, Error&gt;</code></span></h4>
-<div class='docblock'><p>Parses a string <code>s</code> to return a value of this type. <a href="https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html#tymethod.from_str">Read more</a></p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html" title="trait core::cmp::PartialEq">PartialEq</a>&lt;<a class="struct" href="../../hyper/header/struct.LanguageTag.html" title="struct hyper::header::LanguageTag">LanguageTag</a>&gt; for <a class="struct" href="../../hyper/header/struct.LanguageTag.html" title="struct hyper::header::LanguageTag">LanguageTag</a></code></span><span class='out-of-band'></span></h3>
-<div class='impl-items'><h4 id='method.eq' class="method"><span id='eq.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq' class='fnname'>eq</a>(&amp;self, other: &amp;<a class="struct" href="../../hyper/header/struct.LanguageTag.html" title="struct hyper::header::LanguageTag">LanguageTag</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h4>
-<div class='docblock'><p>This method tests for <code>self</code> and <code>other</code> values to be equal, and is used by <code>==</code>. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq">Read more</a></p>
-</div><h4 id='method.ne' class="method"><span id='ne.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, other: &amp;Rhs) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
-<div class='docblock'><p>This method tests for <code>!=</code>.</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html" title="trait core::cmp::Eq">Eq</a> for <a class="struct" href="../../hyper/header/struct.LanguageTag.html" title="struct hyper::header::LanguageTag">LanguageTag</a></code></span><span class='out-of-band'></span></h3>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html" title="trait core::cmp::Eq">Eq</a> for <a class="struct" href="../../hyper/header/struct.LanguageTag.html" title="struct hyper::header::LanguageTag">LanguageTag</a></code></span><span class='out-of-band'></span></h3>
 <div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="struct" href="../../hyper/header/struct.LanguageTag.html" title="struct hyper::header::LanguageTag">LanguageTag</a></code></span><span class='out-of-band'></span></h3>
 <div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">()</a>, <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Error.html" title="struct core::fmt::Error">Error</a>&gt;</code></span></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
@@ -172,6 +169,16 @@ not validated.</p>
 <div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
 </div><h4 id='method.clone_from' class="method"><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html" title="trait core::cmp::PartialEq">PartialEq</a>&lt;<a class="struct" href="../../hyper/header/struct.LanguageTag.html" title="struct hyper::header::LanguageTag">LanguageTag</a>&gt; for <a class="struct" href="../../hyper/header/struct.LanguageTag.html" title="struct hyper::header::LanguageTag">LanguageTag</a></code></span><span class='out-of-band'></span></h3>
+<div class='impl-items'><h4 id='method.eq' class="method"><span id='eq.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq' class='fnname'>eq</a>(&amp;self, other: &amp;<a class="struct" href="../../hyper/header/struct.LanguageTag.html" title="struct hyper::header::LanguageTag">LanguageTag</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h4>
+<div class='docblock'><p>This method tests for <code>self</code> and <code>other</code> values to be equal, and is used by <code>==</code>. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq">Read more</a></p>
+</div><h4 id='method.ne' class="method"><span id='ne.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, other: &amp;Rhs) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+<div class='docblock'><p>This method tests for <code>!=</code>.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html" title="trait core::str::FromStr">FromStr</a> for <a class="struct" href="../../hyper/header/struct.LanguageTag.html" title="struct hyper::header::LanguageTag">LanguageTag</a></code></span><span class='out-of-band'></span></h3>
+<div class='impl-items'><h4 id='associatedtype.Err' class="type"><span id='Err.t' class='invisible'><code>type <a href='https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html#associatedtype.Err' class="type">Err</a> = Error</code></span></h4>
+<div class='docblock'><p>The associated error which can be returned from parsing.</p>
+</div><h4 id='method.from_str' class="method"><span id='from_str.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html#tymethod.from_str' class='fnname'>from_str</a>(s: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="../../hyper/header/struct.LanguageTag.html" title="struct hyper::header::LanguageTag">LanguageTag</a>, Error&gt;</code></span></h4>
+<div class='docblock'><p>Parses a string <code>s</code> to return a value of this type. <a href="https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html#tymethod.from_str">Read more</a></p>
 </div></div></section>
     <section id='search' class="content hidden"></section>
 
