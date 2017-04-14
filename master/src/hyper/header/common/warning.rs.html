@@ -17,7 +17,7 @@
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -43,7 +43,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -217,178 +217,178 @@
 <span id="172">172</span>
 <span id="173">173</span>
 <span id="174">174</span>
-</pre><pre class='rust '>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::{<span class='ident'>FromStr</span>};
-<span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Header</span>, <span class='ident'>HttpDate</span>, <span class='ident'>Raw</span>};
-<span class='kw'>use</span> <span class='ident'>header</span>::<span class='ident'>parsing</span>::<span class='ident'>from_one_raw_str</span>;
+</pre><pre class="rust ">
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::{<span class="ident">FromStr</span>};
+<span class="kw">use</span> <span class="ident">header</span>::{<span class="ident">Header</span>, <span class="ident">HttpDate</span>, <span class="ident">Raw</span>};
+<span class="kw">use</span> <span class="ident">header</span>::<span class="ident">parsing</span>::<span class="ident">from_one_raw_str</span>;
 
-<span class='doccomment'>/// `Warning` header, defined in [RFC7234](https://tools.ietf.org/html/rfc7234#section-5.5)</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// The `Warning` header field can be be used to carry additional information</span>
-<span class='doccomment'>/// about the status or transformation of a message that might not be reflected</span>
-<span class='doccomment'>/// in the status code. This header is sometimes used as backwards</span>
-<span class='doccomment'>/// compatible way to notify of a deprecated API. </span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # ABNF</span>
-<span class='doccomment'>/// ```plain</span>
-<span class='doccomment'>/// Warning       = 1#warning-value</span>
-<span class='doccomment'>/// warning-value = warn-code SP warn-agent SP warn-text</span>
-<span class='doccomment'>///                                       [ SP warn-date ]</span>
-<span class='doccomment'>/// warn-code  = 3DIGIT</span>
-<span class='doccomment'>/// warn-agent = ( uri-host [ &quot;:&quot; port ] ) / pseudonym</span>
-<span class='doccomment'>///                 ; the name or pseudonym of the server adding</span>
-<span class='doccomment'>///                 ; the Warning header field, for use in debugging</span>
-<span class='doccomment'>///                 ; a single &quot;-&quot; is recommended when agent unknown</span>
-<span class='doccomment'>/// warn-text  = quoted-string</span>
-<span class='doccomment'>/// warn-date  = DQUOTE HTTP-date DQUOTE</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # Example values</span>
-<span class='doccomment'>/// * `Warning: 112 - &quot;network down&quot; &quot;Sat, 25 Aug 2012 23:34:45 GMT&quot;`</span>
-<span class='doccomment'>/// * `Warning: 299 - &quot;Deprecated API &quot; &quot;Tue, 15 Nov 1994 08:12:31 GMT&quot;`</span>
-<span class='doccomment'>/// * `Warning: 299 api.hyper.rs:8080 &quot;Deprecated API : use newapi.hyper.rs instead.&quot;`</span>
-<span class='doccomment'>/// * `Warning: 299 api.hyper.rs:8080 &quot;Deprecated API : use newapi.hyper.rs instead.&quot; &quot;Tue, 15 Nov 1994 08:12:31 GMT&quot;` </span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # Examples</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// use hyper::header::{Headers, Warning};</span>
-<span class='doccomment'>/// </span>
-<span class='doccomment'>/// let mut headers = Headers::new();</span>
-<span class='doccomment'>/// headers.set(</span>
-<span class='doccomment'>///     Warning{</span>
-<span class='doccomment'>///         code: 299,</span>
-<span class='doccomment'>///         agent: &quot;api.hyper.rs&quot;.to_owned(),</span>
-<span class='doccomment'>///         text: &quot;Deprecated&quot;.to_owned(),</span>
-<span class='doccomment'>///         date: None</span>
-<span class='doccomment'>///     }</span>
-<span class='doccomment'>/// );</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// use hyper::header::{Headers, HttpDate, Warning};</span>
-<span class='doccomment'>/// </span>
-<span class='doccomment'>/// let mut headers = Headers::new();</span>
-<span class='doccomment'>/// headers.set(</span>
-<span class='doccomment'>///     Warning{</span>
-<span class='doccomment'>///         code: 299,</span>
-<span class='doccomment'>///         agent: &quot;api.hyper.rs&quot;.to_owned(),</span>
-<span class='doccomment'>///         text: &quot;Deprecated&quot;.to_owned(),</span>
-<span class='doccomment'>///         date: &quot;Tue, 15 Nov 1994 08:12:31 GMT&quot;.parse::&lt;HttpDate&gt;().ok()</span>
-<span class='doccomment'>///     }</span>
-<span class='doccomment'>/// );</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// # extern crate hyper;</span>
-<span class='doccomment'>/// # extern crate time;</span>
-<span class='doccomment'>/// # fn main() {</span>
-<span class='doccomment'>/// use hyper::header::{Headers, HttpDate, Warning};</span>
-<span class='doccomment'>/// </span>
-<span class='doccomment'>/// let mut headers = Headers::new();</span>
-<span class='doccomment'>/// headers.set(</span>
-<span class='doccomment'>///     Warning{</span>
-<span class='doccomment'>///         code: 199,</span>
-<span class='doccomment'>///         agent: &quot;api.hyper.rs&quot;.to_owned(),</span>
-<span class='doccomment'>///         text: &quot;Deprecated&quot;.to_owned(),</span>
-<span class='doccomment'>///         date: Some(HttpDate(time::now()))</span>
-<span class='doccomment'>///     }</span>
-<span class='doccomment'>/// );</span>
-<span class='doccomment'>/// # }</span>
-<span class='doccomment'>/// ```</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>PartialEq</span>, <span class='ident'>Clone</span>, <span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Warning</span> {
-    <span class='doccomment'>/// The 3 digit warn code.</span>
-    <span class='kw'>pub</span> <span class='ident'>code</span>: <span class='ident'>u16</span>,
-    <span class='doccomment'>/// The name or pseudonym of the server adding this header.</span>
-    <span class='kw'>pub</span> <span class='ident'>agent</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>/// The warning message describing the error.</span>
-    <span class='kw'>pub</span> <span class='ident'>text</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>/// An optional warning date.</span>
-    <span class='kw'>pub</span> <span class='ident'>date</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>HttpDate</span><span class='op'>&gt;</span>
+<span class="doccomment">/// `Warning` header, defined in [RFC7234](https://tools.ietf.org/html/rfc7234#section-5.5)</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The `Warning` header field can be be used to carry additional information</span>
+<span class="doccomment">/// about the status or transformation of a message that might not be reflected</span>
+<span class="doccomment">/// in the status code. This header is sometimes used as backwards</span>
+<span class="doccomment">/// compatible way to notify of a deprecated API. </span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # ABNF</span>
+<span class="doccomment">/// ```plain</span>
+<span class="doccomment">/// Warning       = 1#warning-value</span>
+<span class="doccomment">/// warning-value = warn-code SP warn-agent SP warn-text</span>
+<span class="doccomment">///                                       [ SP warn-date ]</span>
+<span class="doccomment">/// warn-code  = 3DIGIT</span>
+<span class="doccomment">/// warn-agent = ( uri-host [ &quot;:&quot; port ] ) / pseudonym</span>
+<span class="doccomment">///                 ; the name or pseudonym of the server adding</span>
+<span class="doccomment">///                 ; the Warning header field, for use in debugging</span>
+<span class="doccomment">///                 ; a single &quot;-&quot; is recommended when agent unknown</span>
+<span class="doccomment">/// warn-text  = quoted-string</span>
+<span class="doccomment">/// warn-date  = DQUOTE HTTP-date DQUOTE</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Example values</span>
+<span class="doccomment">/// * `Warning: 112 - &quot;network down&quot; &quot;Sat, 25 Aug 2012 23:34:45 GMT&quot;`</span>
+<span class="doccomment">/// * `Warning: 299 - &quot;Deprecated API &quot; &quot;Tue, 15 Nov 1994 08:12:31 GMT&quot;`</span>
+<span class="doccomment">/// * `Warning: 299 api.hyper.rs:8080 &quot;Deprecated API : use newapi.hyper.rs instead.&quot;`</span>
+<span class="doccomment">/// * `Warning: 299 api.hyper.rs:8080 &quot;Deprecated API : use newapi.hyper.rs instead.&quot; &quot;Tue, 15 Nov 1994 08:12:31 GMT&quot;` </span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// use hyper::header::{Headers, Warning};</span>
+<span class="doccomment">/// </span>
+<span class="doccomment">/// let mut headers = Headers::new();</span>
+<span class="doccomment">/// headers.set(</span>
+<span class="doccomment">///     Warning{</span>
+<span class="doccomment">///         code: 299,</span>
+<span class="doccomment">///         agent: &quot;api.hyper.rs&quot;.to_owned(),</span>
+<span class="doccomment">///         text: &quot;Deprecated&quot;.to_owned(),</span>
+<span class="doccomment">///         date: None</span>
+<span class="doccomment">///     }</span>
+<span class="doccomment">/// );</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// use hyper::header::{Headers, HttpDate, Warning};</span>
+<span class="doccomment">/// </span>
+<span class="doccomment">/// let mut headers = Headers::new();</span>
+<span class="doccomment">/// headers.set(</span>
+<span class="doccomment">///     Warning{</span>
+<span class="doccomment">///         code: 299,</span>
+<span class="doccomment">///         agent: &quot;api.hyper.rs&quot;.to_owned(),</span>
+<span class="doccomment">///         text: &quot;Deprecated&quot;.to_owned(),</span>
+<span class="doccomment">///         date: &quot;Tue, 15 Nov 1994 08:12:31 GMT&quot;.parse::&lt;HttpDate&gt;().ok()</span>
+<span class="doccomment">///     }</span>
+<span class="doccomment">/// );</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// # extern crate hyper;</span>
+<span class="doccomment">/// # extern crate time;</span>
+<span class="doccomment">/// # fn main() {</span>
+<span class="doccomment">/// use hyper::header::{Headers, HttpDate, Warning};</span>
+<span class="doccomment">/// </span>
+<span class="doccomment">/// let mut headers = Headers::new();</span>
+<span class="doccomment">/// headers.set(</span>
+<span class="doccomment">///     Warning{</span>
+<span class="doccomment">///         code: 199,</span>
+<span class="doccomment">///         agent: &quot;api.hyper.rs&quot;.to_owned(),</span>
+<span class="doccomment">///         text: &quot;Deprecated&quot;.to_owned(),</span>
+<span class="doccomment">///         date: Some(HttpDate(time::now()))</span>
+<span class="doccomment">///     }</span>
+<span class="doccomment">/// );</span>
+<span class="doccomment">/// # }</span>
+<span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Warning</span> {
+    <span class="doccomment">/// The 3 digit warn code.</span>
+    <span class="kw">pub</span> <span class="ident">code</span>: <span class="ident">u16</span>,
+    <span class="doccomment">/// The name or pseudonym of the server adding this header.</span>
+    <span class="kw">pub</span> <span class="ident">agent</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The warning message describing the error.</span>
+    <span class="kw">pub</span> <span class="ident">text</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// An optional warning date.</span>
+    <span class="kw">pub</span> <span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HttpDate</span><span class="op">&gt;</span>
 }
 
-<span class='kw'>impl</span> <span class='ident'>Header</span> <span class='kw'>for</span> <span class='ident'>Warning</span> {
-    <span class='kw'>fn</span> <span class='ident'>header_name</span>() <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> {
-        <span class='kw'>static</span> <span class='ident'>NAME</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;Warning&quot;</span>;
-        <span class='ident'>NAME</span>
+<span class="kw">impl</span> <span class="ident">Header</span> <span class="kw">for</span> <span class="ident">Warning</span> {
+    <span class="kw">fn</span> <span class="ident">header_name</span>() <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="kw">static</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Warning&quot;</span>;
+        <span class="ident">NAME</span>
     }
 
-    <span class='kw'>fn</span> <span class='ident'>parse_header</span>(<span class='ident'>raw</span>: <span class='kw-2'>&amp;</span><span class='ident'>Raw</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Warning</span><span class='op'>&gt;</span> {
-        <span class='ident'>from_one_raw_str</span>(<span class='ident'>raw</span>)
+    <span class="kw">fn</span> <span class="ident">parse_header</span>(<span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="ident">Raw</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Warning</span><span class="op">&gt;</span> {
+        <span class="ident">from_one_raw_str</span>(<span class="ident">raw</span>)
     }
 
-    <span class='kw'>fn</span> <span class='ident'>fmt_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>date</span> {
-            <span class='prelude-val'>Some</span>(<span class='ident'>date</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{:03} {} \&quot;{}\&quot; \&quot;{}\&quot;&quot;</span>, <span class='self'>self</span>.<span class='ident'>code</span>, <span class='self'>self</span>.<span class='ident'>agent</span>, <span class='self'>self</span>.<span class='ident'>text</span>, <span class='ident'>date</span>),
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{:03} {} \&quot;{}\&quot;&quot;</span>, <span class='self'>self</span>.<span class='ident'>code</span>, <span class='self'>self</span>.<span class='ident'>agent</span>, <span class='self'>self</span>.<span class='ident'>text</span>)
+    <span class="kw">fn</span> <span class="ident">fmt_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">date</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">date</span>) <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{:03} {} \&quot;{}\&quot; \&quot;{}\&quot;&quot;</span>, <span class="self">self</span>.<span class="ident">code</span>, <span class="self">self</span>.<span class="ident">agent</span>, <span class="self">self</span>.<span class="ident">text</span>, <span class="ident">date</span>),
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{:03} {} \&quot;{}\&quot;&quot;</span>, <span class="self">self</span>.<span class="ident">code</span>, <span class="self">self</span>.<span class="ident">agent</span>, <span class="self">self</span>.<span class="ident">text</span>)
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>FromStr</span> <span class='kw'>for</span> <span class='ident'>Warning</span> {
-    <span class='kw'>type</span> <span class='prelude-val'>Err</span> <span class='op'>=</span> ::<span class='ident'>Error</span>;
+<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Warning</span> {
+    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> ::<span class="ident">Error</span>;
 
-    <span class='kw'>fn</span> <span class='ident'>from_str</span>(<span class='ident'>s</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Warning</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>warning_split</span> <span class='op'>=</span> <span class='ident'>s</span>.<span class='ident'>split_whitespace</span>();
-        <span class='kw'>let</span> <span class='ident'>code</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>warning_split</span>.<span class='ident'>next</span>() {
-            <span class='prelude-val'>Some</span>(<span class='ident'>c</span>) <span class='op'>=&gt;</span> <span class='kw'>match</span> <span class='ident'>c</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>u16</span><span class='op'>&gt;</span>() {
-                <span class='prelude-val'>Ok</span>(<span class='ident'>c</span>) <span class='op'>=&gt;</span> <span class='ident'>c</span>,
-                <span class='prelude-val'>Err</span>(..) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Warning</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">warning_split</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">split_whitespace</span>();
+        <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">warning_split</span>.<span class="ident">next</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">c</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>() {
+                <span class="prelude-val">Ok</span>(<span class="ident">c</span>) <span class="op">=&gt;</span> <span class="ident">c</span>,
+                <span class="prelude-val">Err</span>(..) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>)
             },
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>)
         };
-        <span class='kw'>let</span> <span class='ident'>agent</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>warning_split</span>.<span class='ident'>next</span>() {
-            <span class='prelude-val'>Some</span>(<span class='ident'>a</span>) <span class='op'>=&gt;</span> <span class='ident'>a</span>.<span class='ident'>to_string</span>(),
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
-        };
-
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>warning_split</span> <span class='op'>=</span> <span class='ident'>s</span>.<span class='ident'>split</span>(<span class='string'>&#39;&quot;&#39;</span>).<span class='ident'>skip</span>(<span class='number'>1</span>);
-        <span class='kw'>let</span> <span class='ident'>text</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>warning_split</span>.<span class='ident'>next</span>() {
-            <span class='prelude-val'>Some</span>(<span class='ident'>t</span>) <span class='op'>=&gt;</span> <span class='ident'>t</span>.<span class='ident'>to_string</span>(),
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
-        };
-        <span class='kw'>let</span> <span class='ident'>date</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>warning_split</span>.<span class='ident'>skip</span>(<span class='number'>1</span>).<span class='ident'>next</span>() {
-            <span class='prelude-val'>Some</span>(<span class='ident'>d</span>) <span class='op'>=&gt;</span> <span class='ident'>d</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>HttpDate</span><span class='op'>&gt;</span>().<span class='ident'>ok</span>(),
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='prelude-val'>None</span> <span class='comment'>// Optional</span>
+        <span class="kw">let</span> <span class="ident">agent</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">warning_split</span>.<span class="ident">next</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">a</span>) <span class="op">=&gt;</span> <span class="ident">a</span>.<span class="ident">to_string</span>(),
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>)
         };
 
-        <span class='prelude-val'>Ok</span>(<span class='ident'>Warning</span> {
-            <span class='ident'>code</span>: <span class='ident'>code</span>,
-            <span class='ident'>agent</span>: <span class='ident'>agent</span>,
-            <span class='ident'>text</span>: <span class='ident'>text</span>,
-            <span class='ident'>date</span>: <span class='ident'>date</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">warning_split</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;&quot;&#39;</span>).<span class="ident">skip</span>(<span class="number">1</span>);
+        <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">warning_split</span>.<span class="ident">next</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=&gt;</span> <span class="ident">t</span>.<span class="ident">to_string</span>(),
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>)
+        };
+        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">warning_split</span>.<span class="ident">skip</span>(<span class="number">1</span>).<span class="ident">next</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="op">=&gt;</span> <span class="ident">d</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">HttpDate</span><span class="op">&gt;</span>().<span class="ident">ok</span>(),
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="prelude-val">None</span> <span class="comment">// Optional</span>
+        };
+
+        <span class="prelude-val">Ok</span>(<span class="ident">Warning</span> {
+            <span class="ident">code</span>: <span class="ident">code</span>,
+            <span class="ident">agent</span>: <span class="ident">agent</span>,
+            <span class="ident">text</span>: <span class="ident">text</span>,
+            <span class="ident">date</span>: <span class="ident">date</span>
         })
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>Warning</span>;
-    <span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Header</span>, <span class='ident'>HttpDate</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Warning</span>;
+    <span class="kw">use</span> <span class="ident">header</span>::{<span class="ident">Header</span>, <span class="ident">HttpDate</span>};
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_parsing</span>() {
-        <span class='kw'>let</span> <span class='ident'>warning</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;112 - \&quot;network down\&quot; \&quot;Sat, 25 Aug 2012 23:34:45 GMT\&quot;&quot;</span>.<span class='ident'>to_vec</span>()].<span class='ident'>into</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>warning</span>.<span class='ident'>ok</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Warning</span> {
-            <span class='ident'>code</span>: <span class='number'>112</span>,
-            <span class='ident'>agent</span>: <span class='string'>&quot;-&quot;</span>.<span class='ident'>to_owned</span>(),
-            <span class='ident'>text</span>: <span class='string'>&quot;network down&quot;</span>.<span class='ident'>to_owned</span>(),
-            <span class='ident'>date</span>: <span class='string'>&quot;Sat, 25 Aug 2012 23:34:45 GMT&quot;</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>HttpDate</span><span class='op'>&gt;</span>().<span class='ident'>ok</span>()
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_parsing</span>() {
+        <span class="kw">let</span> <span class="ident">warning</span> <span class="op">=</span> <span class="ident">Header</span>::<span class="ident">parse_header</span>(<span class="kw-2">&amp;</span><span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;112 - \&quot;network down\&quot; \&quot;Sat, 25 Aug 2012 23:34:45 GMT\&quot;&quot;</span>.<span class="ident">to_vec</span>()].<span class="ident">into</span>());
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">warning</span>.<span class="ident">ok</span>(), <span class="prelude-val">Some</span>(<span class="ident">Warning</span> {
+            <span class="ident">code</span>: <span class="number">112</span>,
+            <span class="ident">agent</span>: <span class="string">&quot;-&quot;</span>.<span class="ident">to_owned</span>(),
+            <span class="ident">text</span>: <span class="string">&quot;network down&quot;</span>.<span class="ident">to_owned</span>(),
+            <span class="ident">date</span>: <span class="string">&quot;Sat, 25 Aug 2012 23:34:45 GMT&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">HttpDate</span><span class="op">&gt;</span>().<span class="ident">ok</span>()
         }));
 
-        <span class='kw'>let</span> <span class='ident'>warning</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;299 api.hyper.rs:8080 \&quot;Deprecated API : use newapi.hyper.rs instead.\&quot;&quot;</span>.<span class='ident'>to_vec</span>()].<span class='ident'>into</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>warning</span>.<span class='ident'>ok</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Warning</span> {
-            <span class='ident'>code</span>: <span class='number'>299</span>,
-            <span class='ident'>agent</span>: <span class='string'>&quot;api.hyper.rs:8080&quot;</span>.<span class='ident'>to_owned</span>(),
-            <span class='ident'>text</span>: <span class='string'>&quot;Deprecated API : use newapi.hyper.rs instead.&quot;</span>.<span class='ident'>to_owned</span>(),
-            <span class='ident'>date</span>: <span class='prelude-val'>None</span>
+        <span class="kw">let</span> <span class="ident">warning</span> <span class="op">=</span> <span class="ident">Header</span>::<span class="ident">parse_header</span>(<span class="kw-2">&amp;</span><span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;299 api.hyper.rs:8080 \&quot;Deprecated API : use newapi.hyper.rs instead.\&quot;&quot;</span>.<span class="ident">to_vec</span>()].<span class="ident">into</span>());
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">warning</span>.<span class="ident">ok</span>(), <span class="prelude-val">Some</span>(<span class="ident">Warning</span> {
+            <span class="ident">code</span>: <span class="number">299</span>,
+            <span class="ident">agent</span>: <span class="string">&quot;api.hyper.rs:8080&quot;</span>.<span class="ident">to_owned</span>(),
+            <span class="ident">text</span>: <span class="string">&quot;Deprecated API : use newapi.hyper.rs instead.&quot;</span>.<span class="ident">to_owned</span>(),
+            <span class="ident">date</span>: <span class="prelude-val">None</span>
         }));
 
-        <span class='kw'>let</span> <span class='ident'>warning</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;299 api.hyper.rs:8080 \&quot;Deprecated API : use newapi.hyper.rs instead.\&quot; \&quot;Tue, 15 Nov 1994 08:12:31 GMT\&quot;&quot;</span>.<span class='ident'>to_vec</span>()].<span class='ident'>into</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>warning</span>.<span class='ident'>ok</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Warning</span> {
-            <span class='ident'>code</span>: <span class='number'>299</span>,
-            <span class='ident'>agent</span>: <span class='string'>&quot;api.hyper.rs:8080&quot;</span>.<span class='ident'>to_owned</span>(),
-            <span class='ident'>text</span>: <span class='string'>&quot;Deprecated API : use newapi.hyper.rs instead.&quot;</span>.<span class='ident'>to_owned</span>(),
-            <span class='ident'>date</span>: <span class='string'>&quot;Tue, 15 Nov 1994 08:12:31 GMT&quot;</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>HttpDate</span><span class='op'>&gt;</span>().<span class='ident'>ok</span>()
+        <span class="kw">let</span> <span class="ident">warning</span> <span class="op">=</span> <span class="ident">Header</span>::<span class="ident">parse_header</span>(<span class="kw-2">&amp;</span><span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;299 api.hyper.rs:8080 \&quot;Deprecated API : use newapi.hyper.rs instead.\&quot; \&quot;Tue, 15 Nov 1994 08:12:31 GMT\&quot;&quot;</span>.<span class="ident">to_vec</span>()].<span class="ident">into</span>());
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">warning</span>.<span class="ident">ok</span>(), <span class="prelude-val">Some</span>(<span class="ident">Warning</span> {
+            <span class="ident">code</span>: <span class="number">299</span>,
+            <span class="ident">agent</span>: <span class="string">&quot;api.hyper.rs:8080&quot;</span>.<span class="ident">to_owned</span>(),
+            <span class="ident">text</span>: <span class="string">&quot;Deprecated API : use newapi.hyper.rs instead.&quot;</span>.<span class="ident">to_owned</span>(),
+            <span class="ident">date</span>: <span class="string">&quot;Tue, 15 Nov 1994 08:12:31 GMT&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">HttpDate</span><span class="op">&gt;</span>().<span class="ident">ok</span>()
         }));
     }
 }
