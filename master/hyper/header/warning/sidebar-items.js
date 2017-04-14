@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Warning","`Warning` header, defined in RFC7234"]]});
