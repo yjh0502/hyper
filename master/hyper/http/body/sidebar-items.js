@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Body","A `Stream` for `Chunk`s used in requests and responses."]]});
