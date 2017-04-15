@@ -52,17 +52,14 @@
 <pre class='rust enum'>pub enum Expect {
     Continue,
 }</pre><div class='docblock'><p>The <code>Expect</code> header.</p>
-
 <blockquote>
 <p>The &quot;Expect&quot; header field in a request indicates a certain set of
 behaviors (expectations) that need to be supported by the server in
 order to properly handle this request.  The only such expectation
 defined by this specification is 100-continue.</p>
-
 <p>Expect  = &quot;100-continue&quot;</p>
 </blockquote>
-
-<h1 id='example' class='section-header'><a href='#example'>Example</a></h1>
+<h1 id="example" class="section-header"><a href="#example">Example</a></h1>
 <pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">hyper</span>::<span class="ident">header</span>::{<span class="ident">Headers</span>, <span class="ident">Expect</span>};
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">Headers</span>::<span class="ident">new</span>();
