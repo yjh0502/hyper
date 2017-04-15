@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["HttpConnector","A connector for the `http` scheme."]],"trait":[["Connect","A connector creates an Io to a remote address.."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["MediaDesc","A Media Descriptors Enum based on: https://www.w3.org/TR/html401/types.html#h-6.13"],["RelationType","A Link Relation Type Enum based on: RFC5988"]],"struct":[["Link","The `Link` header, defined in RFC5988"],["LinkValue","A single `link-value` of a `Link` header, based on: RFC5988"]]});
