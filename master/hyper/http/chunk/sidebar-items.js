@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Chunk","A piece of a message body."]]});
