@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Response","The Response sent to a client after receiving a Request in a Service."]]});
