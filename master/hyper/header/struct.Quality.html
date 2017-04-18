@@ -55,7 +55,7 @@
 
 <h1 id='implementation-notes' class='section-header'><a href='#implementation-notes'>Implementation notes</a></h1>
 <p>The quality value is defined as a number between 0 and 1 with three decimal places. This means
-there are 1000 possible values. Since floating point numbers are not exact and the smallest
+there are 1001 possible values. Since floating point numbers are not exact and the smallest
 floating point data type (<code>f32</code>) consumes four bytes, hyper uses an <code>u16</code> value to store the
 quality internally. For performance reasons you may set quality directly to a value between
 0 and 1000 e.g. <code>Quality(532)</code> matches the quality <code>q=0.532</code>.</p>
