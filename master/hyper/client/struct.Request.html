@@ -50,7 +50,7 @@
                    </a>
                </span><a class='srclink' href='../../src/hyper/client/request.rs.html#10-17' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Request&lt;B&nbsp;=&nbsp;<a class='struct' href='../../hyper/struct.Body.html' title='hyper::Body'>Body</a>&gt; { /* fields omitted */ }</pre><div class='docblock'><p>A client request to a remote server.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;B&gt; <a class='struct' href='../../hyper/client/struct.Request.html' title='hyper::client::Request'>Request</a>&lt;B&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/client/request.rs.html#19-75' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;B&gt; <a class='struct' href='../../hyper/client/struct.Request.html' title='hyper::client::Request'>Request</a>&lt;B&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/client/request.rs.html#19-79' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.new' class='method'><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>(method: <a class='enum' href='../../hyper/enum.Method.html' title='hyper::Method'>Method</a>, uri: <a class='struct' href='../../hyper/struct.Uri.html' title='hyper::Uri'>Uri</a>) -&gt; <a class='struct' href='../../hyper/client/struct.Request.html' title='hyper::client::Request'>Request</a>&lt;B&gt;</code></span></h4>
 <div class='docblock'><p>Construct a new Request.</p>
 </div><h4 id='method.uri' class='method'><span id='uri.v' class='invisible'><code>fn <a href='#method.uri' class='fnname'>uri</a>(&amp;self) -&gt; &amp;<a class='struct' href='../../hyper/struct.Uri.html' title='hyper::Uri'>Uri</a></code></span></h4>
@@ -61,6 +61,8 @@
 <div class='docblock'><p>Read the Request headers.</p>
 </div><h4 id='method.method' class='method'><span id='method.v' class='invisible'><code>fn <a href='#method.method' class='fnname'>method</a>(&amp;self) -&gt; &amp;<a class='enum' href='../../hyper/enum.Method.html' title='hyper::Method'>Method</a></code></span></h4>
 <div class='docblock'><p>Read the Request method.</p>
+</div><h4 id='method.body' class='method'><span id='body.v' class='invisible'><code>fn <a href='#method.body' class='fnname'>body</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;B&gt;</code></span></h4>
+<div class='docblock'><p>Read the Request body.</p>
 </div><h4 id='method.set_method' class='method'><span id='set_method.v' class='invisible'><code>fn <a href='#method.set_method' class='fnname'>set_method</a>(&amp;mut self, method: <a class='enum' href='../../hyper/enum.Method.html' title='hyper::Method'>Method</a>)</code></span></h4>
 <div class='docblock'><p>Set the Method of this request.</p>
 </div><h4 id='method.headers_mut' class='method'><span id='headers_mut.v' class='invisible'><code>fn <a href='#method.headers_mut' class='fnname'>headers_mut</a>(&amp;mut self) -&gt; &amp;mut <a class='struct' href='../../hyper/header/struct.Headers.html' title='hyper::header::Headers'>Headers</a></code></span></h4>
@@ -76,7 +78,7 @@
 
 <p>This is only needed when talking to HTTP/1 proxies to URLs not
 protected by TLS.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;B&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../hyper/client/struct.Request.html' title='hyper::client::Request'>Request</a>&lt;B&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/client/request.rs.html#77-86' title='goto source code'>[src]</a></span></h3>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;B&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../hyper/client/struct.Request.html' title='hyper::client::Request'>Request</a>&lt;B&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/client/request.rs.html#81-90' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
 </div></div></section>
