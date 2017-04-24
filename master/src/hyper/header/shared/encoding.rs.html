@@ -96,11 +96,15 @@
 <span id="51">51</span>
 <span id="52">52</span>
 <span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>;
 
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>Encoding</span>::{<span class='ident'>Chunked</span>, <span class='ident'>Brotli</span>, <span class='ident'>Gzip</span>, <span class='ident'>Deflate</span>, <span class='ident'>Compress</span>, <span class='ident'>Identity</span>, <span class='ident'>EncodingExt</span>};
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>Encoding</span>::{<span class='ident'>Chunked</span>, <span class='ident'>Brotli</span>, <span class='ident'>Gzip</span>, <span class='ident'>Deflate</span>, <span class='ident'>Compress</span>, <span class='ident'>Identity</span>, <span class='ident'>EncodingExt</span>, <span class='ident'>Trailers</span>};
 
 <span class='doccomment'>/// A value to represent an encoding used in `Transfer-Encoding`</span>
 <span class='doccomment'>/// or `Accept-Encoding` header.</span>
@@ -118,6 +122,8 @@
     <span class='ident'>Compress</span>,
     <span class='doccomment'>/// The `identity` encoding.</span>
     <span class='ident'>Identity</span>,
+    <span class='doccomment'>/// The `trailers` encoding.</span>
+    <span class='ident'>Trailers</span>,
     <span class='doccomment'>/// Some other encoding that is less common, can be any String.</span>
     <span class='ident'>EncodingExt</span>(<span class='ident'>String</span>)
 }
@@ -131,6 +137,7 @@
             <span class='ident'>Deflate</span> <span class='op'>=&gt;</span> <span class='string'>&quot;deflate&quot;</span>,
             <span class='ident'>Compress</span> <span class='op'>=&gt;</span> <span class='string'>&quot;compress&quot;</span>,
             <span class='ident'>Identity</span> <span class='op'>=&gt;</span> <span class='string'>&quot;identity&quot;</span>,
+            <span class='ident'>Trailers</span> <span class='op'>=&gt;</span> <span class='string'>&quot;trailers&quot;</span>,
             <span class='ident'>EncodingExt</span>(<span class='kw-2'>ref</span> <span class='ident'>s</span>) <span class='op'>=&gt;</span> <span class='ident'>s</span>.<span class='ident'>as_ref</span>()
         })
     }
@@ -146,6 +153,7 @@
             <span class='string'>&quot;gzip&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>Gzip</span>),
             <span class='string'>&quot;compress&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>Compress</span>),
             <span class='string'>&quot;identity&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>Identity</span>),
+            <span class='string'>&quot;trailers&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>Trailers</span>),
             _ <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>EncodingExt</span>(<span class='ident'>s</span>.<span class='ident'>to_owned</span>()))
         }
     }
