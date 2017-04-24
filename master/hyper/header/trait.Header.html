@@ -48,11 +48,11 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/hyper/header/mod.rs.html#103-134' title='goto source code'>[src]</a></span></h1>
-<pre class='rust trait'>pub trait Header: HeaderClone + <a class='trait' href='https://doc.rust-lang.org/nightly/core/any/trait.Any.html' title='core::any::Any'>Any</a> + GetType + <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html' title='core::marker::Sync'>Sync</a> {
+               </span><a class='srclink' href='../../src/hyper/header/mod.rs.html#104-132' title='goto source code'>[src]</a></span></h1>
+<pre class='rust trait'>pub trait Header: HeaderClone + GetType + <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html' title='core::marker::Sync'>Sync</a> {
     fn <a href='#tymethod.header_name' class='fnname'>header_name</a>() -&gt; &amp;'static <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a> <span class='where fmt-newline'>where Self: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html' title='core::marker::Sized'>Sized</a></span>;
     fn <a href='#tymethod.parse_header' class='fnname'>parse_header</a>(raw: &amp;<a class='struct' href='../../hyper/header/struct.Raw.html' title='hyper::header::Raw'>Raw</a>) -&gt; <a class='type' href='../../hyper/error/type.Result.html' title='hyper::error::Result'>Result</a>&lt;Self&gt; <span class='where fmt-newline'>where Self: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html' title='core::marker::Sized'>Sized</a></span>;
-    fn <a href='#tymethod.fmt_header' class='fnname'>fmt_header</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a>;
+    fn <a href='#tymethod.fmt_header' class='fnname'>fmt_header</a>(&amp;self, f: &amp;mut <a class='struct' href='../../hyper/header/struct.Formatter.html' title='hyper::header::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a>;
 }</pre><div class='docblock'><p>A trait for any object that will represent a header field and value.</p>
 
 <p>This trait represents the construction and identification of headers,
@@ -70,10 +70,18 @@ and in that case, the slice will have a length greater than 1. However,
 it&#39;s not necessarily the case that a Header is <em>allowed</em> to have more
 than one field value. If that&#39;s the case, you <strong>should</strong> return <code>None</code>
 if <code>raw.len() &gt; 1</code>.</p>
-</div><h3 id='tymethod.fmt_header' class='method'><span id='fmt_header.v' class='invisible'><code>fn <a href='#tymethod.fmt_header' class='fnname'>fmt_header</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h3><div class='docblock'><p>Format a header to be output into a TcpStream.</p>
+</div><h3 id='tymethod.fmt_header' class='method'><span id='fmt_header.v' class='invisible'><code>fn <a href='#tymethod.fmt_header' class='fnname'>fmt_header</a>(&amp;self, f: &amp;mut <a class='struct' href='../../hyper/header/struct.Formatter.html' title='hyper::header::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h3><div class='docblock'><p>Format a header to outgoing stream.</p>
 
-<p>This method is not allowed to introduce an Err not produced
-by the passed-in Formatter.</p>
+<p>Most headers should be formatted on one line, and so a common pattern
+would be to implement <code>std::fmt::Display</code> for this type as well, and
+then just call <code>f.fmt_line(self)</code>.</p>
+
+<h2 id='note' class='section-header'><a href='#note'>Note</a></h2>
+<p>This has the ability to format a header over multiple lines.</p>
+
+<p>The main example here is <code>Set-Cookie</code>, which requires that every
+cookie being set be specified in a separate line. Almost every other
+case should only format as 1 single line.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>

@@ -48,7 +48,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/hyper/client/connect.rs.html#19-26' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/hyper/client/connect.rs.html#20-27' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait Connect: <a class='trait' href='../../hyper/server/trait.Service.html' title='hyper::server::Service'>Service</a>&lt;Request=<a class='struct' href='../../hyper/struct.Uri.html' title='hyper::Uri'>Uri</a>, Error=<a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>&gt; + 'static {
     type <a href='#associatedtype.Output' class='type'>Output</a>: <a class='trait' href='https://docs.rs/tokio-io/0.1/tokio_io/trait.AsyncRead.html' title='tokio_io::AsyncRead'>AsyncRead</a> + <a class='trait' href='https://docs.rs/tokio-io/0.1/tokio_io/trait.AsyncWrite.html' title='tokio_io::AsyncWrite'>AsyncWrite</a> + 'static;
     type <a href='#associatedtype.Future' class='type'>Future</a>: <a class='trait' href='https://docs.rs/futures/0.1/futures/future/trait.Future.html' title='futures::future::Future'>Future</a>&lt;Item=Self::<a class='trait' href='../../hyper/client/trait.Connect.html' title='hyper::client::Connect'>Output</a>, Error=<a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>&gt; + 'static;
