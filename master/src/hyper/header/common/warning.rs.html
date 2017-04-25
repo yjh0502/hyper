@@ -220,9 +220,6 @@
 <span id="175">175</span>
 <span id="176">176</span>
 <span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::{<span class='ident'>FromStr</span>};
@@ -259,7 +256,7 @@
 <span class='doccomment'>/// # Examples</span>
 <span class='doccomment'>/// ```</span>
 <span class='doccomment'>/// use hyper::header::{Headers, Warning};</span>
-<span class='doccomment'>/// </span>
+<span class='doccomment'>///</span>
 <span class='doccomment'>/// let mut headers = Headers::new();</span>
 <span class='doccomment'>/// headers.set(</span>
 <span class='doccomment'>///     Warning{</span>
@@ -272,7 +269,7 @@
 <span class='doccomment'>/// ```</span>
 <span class='doccomment'>/// ```</span>
 <span class='doccomment'>/// use hyper::header::{Headers, HttpDate, Warning};</span>
-<span class='doccomment'>/// </span>
+<span class='doccomment'>///</span>
 <span class='doccomment'>/// let mut headers = Headers::new();</span>
 <span class='doccomment'>/// headers.set(</span>
 <span class='doccomment'>///     Warning{</span>
@@ -284,21 +281,18 @@
 <span class='doccomment'>/// );</span>
 <span class='doccomment'>/// ```</span>
 <span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// # extern crate hyper;</span>
-<span class='doccomment'>/// # extern crate time;</span>
-<span class='doccomment'>/// # fn main() {</span>
-<span class='doccomment'>/// use hyper::header::{Headers, HttpDate, Warning};</span>
-<span class='doccomment'>/// </span>
+<span class='doccomment'>/// use std::time::SystemTime;</span>
+<span class='doccomment'>/// use hyper::header::{Headers, Warning};</span>
+<span class='doccomment'>///</span>
 <span class='doccomment'>/// let mut headers = Headers::new();</span>
 <span class='doccomment'>/// headers.set(</span>
 <span class='doccomment'>///     Warning{</span>
 <span class='doccomment'>///         code: 199,</span>
 <span class='doccomment'>///         agent: &quot;api.hyper.rs&quot;.to_owned(),</span>
 <span class='doccomment'>///         text: &quot;Deprecated&quot;.to_owned(),</span>
-<span class='doccomment'>///         date: Some(HttpDate(time::now()))</span>
+<span class='doccomment'>///         date: Some(SystemTime::now().into())</span>
 <span class='doccomment'>///     }</span>
 <span class='doccomment'>/// );</span>
-<span class='doccomment'>/// # }</span>
 <span class='doccomment'>/// ```</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>PartialEq</span>, <span class='ident'>Clone</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Warning</span> {

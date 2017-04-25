@@ -469,9 +469,11 @@
 <span id="424">424</span>
 <span id="425">425</span>
 <span id="426">426</span>
+<span id="427">427</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>borrow</span>::<span class='ident'>Cow</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='self'>self</span>, <span class='ident'>Write</span>};
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>time</span>::<span class='ident'>SystemTime</span>;
 
 <span class='kw'>use</span> <span class='ident'>httparse</span>;
 <span class='kw'>use</span> <span class='ident'>bytes</span>::{<span class='ident'>BytesMut</span>, <span class='ident'>Bytes</span>};
@@ -566,7 +568,7 @@
         <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;writing head: {:?}&quot;</span>, <span class='ident'>head</span>);
 
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>head</span>.<span class='ident'>headers</span>.<span class='ident'>has</span>::<span class='op'>&lt;</span><span class='ident'>header</span>::<span class='ident'>Date</span><span class='op'>&gt;</span>() {
-            <span class='ident'>head</span>.<span class='ident'>headers</span>.<span class='ident'>set</span>(<span class='ident'>header</span>::<span class='ident'>Date</span>(<span class='ident'>header</span>::<span class='ident'>HttpDate</span>(::<span class='ident'>time</span>::<span class='ident'>now_utc</span>())));
+            <span class='ident'>head</span>.<span class='ident'>headers</span>.<span class='ident'>set</span>(<span class='ident'>header</span>::<span class='ident'>Date</span>(<span class='ident'>SystemTime</span>::<span class='ident'>now</span>().<span class='ident'>into</span>()));
         }
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>is_chunked</span> <span class='op'>=</span> <span class='bool-val'>true</span>;

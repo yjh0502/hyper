@@ -68,13 +68,12 @@ conclusion of handling the request.</p>
 
 <h1 id='example' class='section-header'><a href='#example'>Example</a></h1>
 <pre class='rust rust-example-rendered'>
-<span class='comment'>// extern crate time;</span>
- 
-<span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>header</span>::{<span class='ident'>Headers</span>, <span class='ident'>LastModified</span>, <span class='ident'>HttpDate</span>};
-<span class='kw'>use</span> <span class='ident'>time</span>::{<span class='self'>self</span>, <span class='ident'>Duration</span>};
- 
+<span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>header</span>::{<span class='ident'>Headers</span>, <span class='ident'>LastModified</span>};
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>time</span>::{<span class='ident'>SystemTime</span>, <span class='ident'>Duration</span>};
+
 <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='ident'>Headers</span>::<span class='ident'>new</span>();
-<span class='ident'>headers</span>.<span class='ident'>set</span>(<span class='ident'>LastModified</span>(<span class='ident'>HttpDate</span>(<span class='ident'>time</span>::<span class='ident'>now</span>() <span class='op'>-</span> <span class='ident'>Duration</span>::<span class='ident'>days</span>(<span class='number'>1</span>))));</pre>
+<span class='kw'>let</span> <span class='ident'>modified</span> <span class='op'>=</span> <span class='ident'>SystemTime</span>::<span class='ident'>now</span>() <span class='op'>-</span> <span class='ident'>Duration</span>::<span class='ident'>from_secs</span>(<span class='number'>60</span> <span class='op'>*</span> <span class='number'>60</span> <span class='op'>*</span> <span class='number'>24</span>);
+<span class='ident'>headers</span>.<span class='ident'>set</span>(<span class='ident'>LastModified</span>(<span class='ident'>modified</span>.<span class='ident'>into</span>()));</pre>
 </div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../../hyper/header/struct.LastModified.html' title='hyper::header::LastModified'>LastModified</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/mod.rs.html#244' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.clone' class='method'><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../../hyper/header/struct.LastModified.html' title='hyper::header::LastModified'>LastModified</a></code></span></h4>
 <div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>

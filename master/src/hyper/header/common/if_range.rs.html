@@ -133,11 +133,6 @@
 <span id="88">88</span>
 <span id="89">89</span>
 <span id="90">90</span>
-<span id="91">91</span>
-<span id="92">92</span>
-<span id="93">93</span>
-<span id="94">94</span>
-<span id="95">95</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='self'>self</span>, <span class='ident'>Display</span>};
 <span class='kw'>use</span> <span class='ident'>header</span>::{<span class='self'>self</span>, <span class='ident'>Header</span>, <span class='ident'>Raw</span>, <span class='ident'>EntityTag</span>, <span class='ident'>HttpDate</span>};
@@ -174,17 +169,12 @@
 <span class='doccomment'>/// headers.set(IfRange::EntityTag(EntityTag::new(false, &quot;xyzzy&quot;.to_owned())));</span>
 <span class='doccomment'>/// ```</span>
 <span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// # extern crate hyper;</span>
-<span class='doccomment'>/// # extern crate time;</span>
-<span class='doccomment'>/// # fn main() {</span>
-<span class='doccomment'>/// // extern crate time;</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// use hyper::header::{Headers, IfRange, HttpDate};</span>
-<span class='doccomment'>/// use time::{self, Duration};</span>
+<span class='doccomment'>/// use hyper::header::{Headers, IfRange};</span>
+<span class='doccomment'>/// use std::time::{SystemTime, Duration};</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// let mut headers = Headers::new();</span>
-<span class='doccomment'>/// headers.set(IfRange::Date(HttpDate(time::now() - Duration::days(1))));</span>
-<span class='doccomment'>/// # }</span>
+<span class='doccomment'>/// let fetched = SystemTime::now() - Duration::from_secs(60 * 60 * 24);</span>
+<span class='doccomment'>/// headers.set(IfRange::Date(fetched.into()));</span>
 <span class='doccomment'>/// ```</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Debug</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>IfRange</span> {
