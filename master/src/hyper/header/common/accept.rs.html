@@ -249,7 +249,7 @@
     <span class='doccomment'>/// );</span>
     <span class='doccomment'>/// ```</span>
     <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use hyper::header::{Headers, Accept, QualityItem, Quality, qitem};</span>
+    <span class='doccomment'>/// use hyper::header::{Headers, Accept, QualityItem, q, qitem};</span>
     <span class='doccomment'>/// use hyper::mime::{Mime, TopLevel, SubLevel};</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// let mut headers = Headers::new();</span>
@@ -260,11 +260,11 @@
     <span class='doccomment'>///         qitem(Mime(TopLevel::Application,</span>
     <span class='doccomment'>///                    SubLevel::Ext(&quot;xhtml+xml&quot;.to_owned()), vec![])),</span>
     <span class='doccomment'>///         QualityItem::new(Mime(TopLevel::Application, SubLevel::Xml, vec![]),</span>
-    <span class='doccomment'>///                          Quality(900)),</span>
+    <span class='doccomment'>///                          q(900)),</span>
     <span class='doccomment'>///                          qitem(Mime(TopLevel::Image,</span>
     <span class='doccomment'>///                                     SubLevel::Ext(&quot;webp&quot;.to_owned()), vec![])),</span>
     <span class='doccomment'>///                          QualityItem::new(Mime(TopLevel::Star, SubLevel::Star, vec![]),</span>
-    <span class='doccomment'>///                                           Quality(800))</span>
+    <span class='doccomment'>///                                           q(800))</span>
     <span class='doccomment'>///     ])</span>
     <span class='doccomment'>/// );</span>
     <span class='doccomment'>/// ```</span>
@@ -281,18 +281,18 @@
         <span class='comment'>//    test1,</span>
         <span class='comment'>//    vec![b&quot;audio/*; q=0.2, audio/basic&quot;],</span>
         <span class='comment'>//    Some(HeaderField(vec![</span>
-        <span class='comment'>//        QualityItem::new(Mime(TopLevel::Audio, SubLevel::Star, vec![]), Quality(200)),</span>
+        <span class='comment'>//        QualityItem::new(Mime(TopLevel::Audio, SubLevel::Star, vec![]), q(200)),</span>
         <span class='comment'>//        qitem(Mime(TopLevel::Audio, SubLevel::Ext(&quot;basic&quot;.to_owned()), vec![])),</span>
         <span class='comment'>//        ])));</span>
         <span class='macro'>test_header</span><span class='macro'>!</span>(
             <span class='ident'>test2</span>,
             <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c&quot;</span>],
             <span class='prelude-val'>Some</span>(<span class='ident'>HeaderField</span>(<span class='macro'>vec</span><span class='macro'>!</span>[
-                <span class='ident'>QualityItem</span>::<span class='ident'>new</span>(<span class='ident'>Mime</span>(<span class='ident'>TopLevel</span>::<span class='ident'>Text</span>, <span class='ident'>SubLevel</span>::<span class='ident'>Plain</span>, <span class='macro'>vec</span><span class='macro'>!</span>[]), <span class='ident'>Quality</span>(<span class='number'>500</span>)),
+                <span class='ident'>QualityItem</span>::<span class='ident'>new</span>(<span class='ident'>Mime</span>(<span class='ident'>TopLevel</span>::<span class='ident'>Text</span>, <span class='ident'>SubLevel</span>::<span class='ident'>Plain</span>, <span class='macro'>vec</span><span class='macro'>!</span>[]), <span class='ident'>q</span>(<span class='number'>500</span>)),
                 <span class='ident'>qitem</span>(<span class='ident'>Mime</span>(<span class='ident'>TopLevel</span>::<span class='ident'>Text</span>, <span class='ident'>SubLevel</span>::<span class='ident'>Html</span>, <span class='macro'>vec</span><span class='macro'>!</span>[])),
                 <span class='ident'>QualityItem</span>::<span class='ident'>new</span>(
                     <span class='ident'>Mime</span>(<span class='ident'>TopLevel</span>::<span class='ident'>Text</span>, <span class='ident'>SubLevel</span>::<span class='ident'>Ext</span>(<span class='string'>&quot;x-dvi&quot;</span>.<span class='ident'>to_owned</span>()), <span class='macro'>vec</span><span class='macro'>!</span>[]),
-                    <span class='ident'>Quality</span>(<span class='number'>800</span>)),
+                    <span class='ident'>q</span>(<span class='number'>800</span>)),
                 <span class='ident'>qitem</span>(<span class='ident'>Mime</span>(<span class='ident'>TopLevel</span>::<span class='ident'>Text</span>, <span class='ident'>SubLevel</span>::<span class='ident'>Ext</span>(<span class='string'>&quot;x-c&quot;</span>.<span class='ident'>to_owned</span>()), <span class='macro'>vec</span><span class='macro'>!</span>[])),
                 ])));
         <span class='comment'>// Custom tests</span>
@@ -308,7 +308,7 @@
             <span class='prelude-val'>Some</span>(<span class='ident'>Accept</span>(<span class='macro'>vec</span><span class='macro'>!</span>[
                 <span class='ident'>QualityItem</span>::<span class='ident'>new</span>(<span class='ident'>Mime</span>(<span class='ident'>TopLevel</span>::<span class='ident'>Text</span>,
                     <span class='ident'>SubLevel</span>::<span class='ident'>Plain</span>, <span class='macro'>vec</span><span class='macro'>!</span>[(<span class='ident'>Attr</span>::<span class='ident'>Charset</span>, <span class='ident'>Value</span>::<span class='ident'>Utf8</span>)]),
-                    <span class='ident'>Quality</span>(<span class='number'>500</span>)),
+                    <span class='ident'>q</span>(<span class='number'>500</span>)),
             ])));
 
         <span class='attribute'>#[<span class='ident'>test</span>]</span>

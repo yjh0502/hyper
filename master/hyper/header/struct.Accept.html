@@ -100,7 +100,7 @@ accept-ext = OWS &quot;;&quot; OWS token [ &quot;=&quot; ( token / quoted-string
 );</pre>
 
 <pre class='rust rust-example-rendered'>
-<span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>header</span>::{<span class='ident'>Headers</span>, <span class='ident'>Accept</span>, <span class='ident'>QualityItem</span>, <span class='ident'>Quality</span>, <span class='ident'>qitem</span>};
+<span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>header</span>::{<span class='ident'>Headers</span>, <span class='ident'>Accept</span>, <span class='ident'>QualityItem</span>, <span class='ident'>q</span>, <span class='ident'>qitem</span>};
 <span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>mime</span>::{<span class='ident'>Mime</span>, <span class='ident'>TopLevel</span>, <span class='ident'>SubLevel</span>};
 
 <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='ident'>Headers</span>::<span class='ident'>new</span>();
@@ -111,11 +111,11 @@ accept-ext = OWS &quot;;&quot; OWS token [ &quot;=&quot; ( token / quoted-string
         <span class='ident'>qitem</span>(<span class='ident'>Mime</span>(<span class='ident'>TopLevel</span>::<span class='ident'>Application</span>,
                    <span class='ident'>SubLevel</span>::<span class='ident'>Ext</span>(<span class='string'>&quot;xhtml+xml&quot;</span>.<span class='ident'>to_owned</span>()), <span class='macro'>vec</span><span class='macro'>!</span>[])),
         <span class='ident'>QualityItem</span>::<span class='ident'>new</span>(<span class='ident'>Mime</span>(<span class='ident'>TopLevel</span>::<span class='ident'>Application</span>, <span class='ident'>SubLevel</span>::<span class='ident'>Xml</span>, <span class='macro'>vec</span><span class='macro'>!</span>[]),
-                         <span class='ident'>Quality</span>(<span class='number'>900</span>)),
+                         <span class='ident'>q</span>(<span class='number'>900</span>)),
                          <span class='ident'>qitem</span>(<span class='ident'>Mime</span>(<span class='ident'>TopLevel</span>::<span class='ident'>Image</span>,
                                     <span class='ident'>SubLevel</span>::<span class='ident'>Ext</span>(<span class='string'>&quot;webp&quot;</span>.<span class='ident'>to_owned</span>()), <span class='macro'>vec</span><span class='macro'>!</span>[])),
                          <span class='ident'>QualityItem</span>::<span class='ident'>new</span>(<span class='ident'>Mime</span>(<span class='ident'>TopLevel</span>::<span class='ident'>Star</span>, <span class='ident'>SubLevel</span>::<span class='ident'>Star</span>, <span class='macro'>vec</span><span class='macro'>!</span>[]),
-                                          <span class='ident'>Quality</span>(<span class='number'>800</span>))
+                                          <span class='ident'>q</span>(<span class='number'>800</span>))
     ])
 );</pre>
 

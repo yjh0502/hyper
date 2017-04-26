@@ -131,13 +131,13 @@
     <span class='doccomment'>/// );</span>
     <span class='doccomment'>/// ```</span>
     <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use hyper::header::{Headers, AcceptCharset, Charset, Quality, QualityItem};</span>
+    <span class='doccomment'>/// use hyper::header::{Headers, AcceptCharset, Charset, q, QualityItem};</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// let mut headers = Headers::new();</span>
     <span class='doccomment'>/// headers.set(</span>
     <span class='doccomment'>///     AcceptCharset(vec![</span>
-    <span class='doccomment'>///         QualityItem::new(Charset::Us_Ascii, Quality(900)),</span>
-    <span class='doccomment'>///         QualityItem::new(Charset::Iso_8859_10, Quality(200)),</span>
+    <span class='doccomment'>///         QualityItem::new(Charset::Us_Ascii, q(900)),</span>
+    <span class='doccomment'>///         QualityItem::new(Charset::Iso_8859_10, q(200)),</span>
     <span class='doccomment'>///     ])</span>
     <span class='doccomment'>/// );</span>
     <span class='doccomment'>/// ```</span>
