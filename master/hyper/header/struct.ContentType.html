@@ -76,12 +76,11 @@ this is an issue, it&#39;s possible to implement <code>Header</code> on a custom
 <h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1>
 <pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>header</span>::{<span class='ident'>Headers</span>, <span class='ident'>ContentType</span>};
-<span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>mime</span>::{<span class='ident'>Mime</span>, <span class='ident'>TopLevel</span>, <span class='ident'>SubLevel</span>};
 
 <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='ident'>Headers</span>::<span class='ident'>new</span>();
 
 <span class='ident'>headers</span>.<span class='ident'>set</span>(
-    <span class='ident'>ContentType</span>(<span class='ident'>Mime</span>(<span class='ident'>TopLevel</span>::<span class='ident'>Text</span>, <span class='ident'>SubLevel</span>::<span class='ident'>Html</span>, <span class='macro'>vec</span><span class='macro'>!</span>[]))
+    <span class='ident'>ContentType</span>::<span class='ident'>json</span>()
 );</pre>
 
 <pre class='rust rust-example-rendered'>
@@ -91,10 +90,10 @@ this is an issue, it&#39;s possible to implement <code>Header</code> on a custom
 <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='ident'>Headers</span>::<span class='ident'>new</span>();
 
 <span class='ident'>headers</span>.<span class='ident'>set</span>(
-    <span class='ident'>ContentType</span>(<span class='ident'>Mime</span>(<span class='ident'>TopLevel</span>::<span class='ident'>Application</span>, <span class='ident'>SubLevel</span>::<span class='ident'>Json</span>,
+    <span class='ident'>ContentType</span>(<span class='ident'>Mime</span>(<span class='ident'>TopLevel</span>::<span class='ident'>Text</span>, <span class='ident'>SubLevel</span>::<span class='ident'>Html</span>,
                      <span class='macro'>vec</span><span class='macro'>!</span>[(<span class='ident'>Attr</span>::<span class='ident'>Charset</span>, <span class='ident'>Value</span>::<span class='ident'>Utf8</span>)]))
 );</pre>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../../hyper/header/struct.ContentType.html' title='hyper::header::ContentType'>ContentType</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/content_type.rs.html#64-99' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../../hyper/header/struct.ContentType.html' title='hyper::header::ContentType'>ContentType</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/content_type.rs.html#63-98' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.json' class='method'><span id='json.v' class='invisible'><code>fn <a href='#method.json' class='fnname'>json</a>() -&gt; <a class='struct' href='../../hyper/header/struct.ContentType.html' title='hyper::header::ContentType'>ContentType</a></code></span></h4>
 <div class='docblock'><p>A constructor  to easily create a <code>Content-Type: application/json</code> header.</p>
 </div><h4 id='method.plaintext' class='method'><span id='plaintext.v' class='invisible'><code>fn <a href='#method.plaintext' class='fnname'>plaintext</a>() -&gt; <a class='struct' href='../../hyper/header/struct.ContentType.html' title='hyper::header::ContentType'>ContentType</a></code></span></h4>
@@ -139,7 +138,7 @@ this is an issue, it&#39;s possible to implement <code>Header</code> on a custom
 </div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html' title='core::fmt::Display'>Display</a> for <a class='struct' href='../../hyper/header/struct.ContentType.html' title='hyper::header::ContentType'>ContentType</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/mod.rs.html#259-263' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.fmt-1' class='method'><span id='fmt.v-1' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> for <a class='struct' href='../../hyper/header/struct.ContentType.html' title='hyper::header::ContentType'>ContentType</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/content_type.rs.html#101' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> for <a class='struct' href='../../hyper/header/struct.ContentType.html' title='hyper::header::ContentType'>ContentType</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/content_type.rs.html#100' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'></div></section>
     <section id='search' class="content hidden"></section>
 

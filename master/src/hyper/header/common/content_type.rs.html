@@ -145,7 +145,6 @@
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
-<span id="103">103</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>mime</span>::<span class='ident'>Mime</span>;
 
@@ -176,12 +175,11 @@
     <span class='doccomment'>/// # Examples</span>
     <span class='doccomment'>/// ```</span>
     <span class='doccomment'>/// use hyper::header::{Headers, ContentType};</span>
-    <span class='doccomment'>/// use hyper::mime::{Mime, TopLevel, SubLevel};</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// let mut headers = Headers::new();</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// headers.set(</span>
-    <span class='doccomment'>///     ContentType(Mime(TopLevel::Text, SubLevel::Html, vec![]))</span>
+    <span class='doccomment'>///     ContentType::json()</span>
     <span class='doccomment'>/// );</span>
     <span class='doccomment'>/// ```</span>
     <span class='doccomment'>/// ```</span>
@@ -191,7 +189,7 @@
     <span class='doccomment'>/// let mut headers = Headers::new();</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// headers.set(</span>
-    <span class='doccomment'>///     ContentType(Mime(TopLevel::Application, SubLevel::Json,</span>
+    <span class='doccomment'>///     ContentType(Mime(TopLevel::Text, SubLevel::Html,</span>
     <span class='doccomment'>///                      vec![(Attr::Charset, Value::Utf8)]))</span>
     <span class='doccomment'>/// );</span>
     <span class='doccomment'>/// ```</span>
