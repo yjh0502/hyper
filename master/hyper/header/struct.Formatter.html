@@ -17,7 +17,7 @@
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc struct">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -43,15 +43,15 @@
         </form>
     </nav>
 
-    <section id='main' class="content struct">
-<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>hyper</a>::<wbr><a href='index.html'>header</a>::<wbr><a class='struct' href=''>Formatter</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>hyper</a>::<wbr><a href='index.html'>header</a>::<wbr><a class="struct" href=''>Formatter</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
                </span><a class='srclink' href='../../src/hyper/header/mod.rs.html#181' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Formatter&lt;'a, 'b: 'a&gt;(_);</pre><div class='docblock'><p>A formatter used to serialize headers to an output stream.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a, 'b&gt; <a class='struct' href='../../hyper/header/struct.Formatter.html' title='hyper::header::Formatter'>Formatter</a>&lt;'a, 'b&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/mod.rs.html#189-227' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.fmt_line' class='method'><span id='fmt_line.v' class='invisible'><code>fn <a href='#method.fmt_line' class='fnname'>fmt_line</a>(&amp;mut self, line: &amp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html' title='core::fmt::Display'>Display</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a, 'b&gt; <a class="struct" href="../../hyper/header/struct.Formatter.html" title="struct hyper::header::Formatter">Formatter</a>&lt;'a, 'b&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/mod.rs.html#189-227' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt_line' class="method"><span id='fmt_line.v' class='invisible'><code>fn <a href='#method.fmt_line' class='fnname'>fmt_line</a>(&amp;mut self, line: &amp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span></h4>
 <div class='docblock'><p>Format one &#39;line&#39; of a header.</p>
 
 <p>This writes the header name plus the <code>Display</code> value as a single line.</p>
