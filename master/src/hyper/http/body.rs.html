@@ -175,6 +175,13 @@
 <span id="130">130</span>
 <span id="131">131</span>
 <span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">Bytes</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Poll</span>, <span class="ident">Stream</span>};
@@ -282,6 +289,13 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">from</span> (<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Body</span> {
         <span class="ident">Body</span>(<span class="ident">TokioBody</span>::<span class="ident">from</span>(<span class="ident">Chunk</span>::<span class="ident">from</span>(<span class="ident">slice</span>.<span class="ident">as_bytes</span>())))
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Body</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">from</span> (<span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Body</span> {
+        <span class="ident">body</span>.<span class="ident">unwrap_or_default</span>()
     }
 }
 

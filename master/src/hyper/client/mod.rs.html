@@ -520,19 +520,19 @@
 
 <span class="kw">use</span> <span class="ident">header</span>::{<span class="ident">Headers</span>, <span class="ident">Host</span>};
 <span class="kw">use</span> <span class="ident">http</span>::{<span class="self">self</span>, <span class="ident">TokioBody</span>};
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">response</span>;
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">request</span>;
 <span class="kw">use</span> <span class="ident">method</span>::<span class="ident">Method</span>;
 <span class="kw">use</span> <span class="self">self</span>::<span class="ident">pool</span>::{<span class="ident">Pool</span>, <span class="ident">Pooled</span>};
 <span class="kw">use</span> <span class="ident">uri</span>::{<span class="self">self</span>, <span class="ident">Uri</span>};
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">http</span>::<span class="ident">response</span>::<span class="ident">Response</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">http</span>::<span class="ident">request</span>::<span class="ident">Request</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">connect</span>::{<span class="ident">HttpConnector</span>, <span class="ident">Connect</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">request</span>::<span class="ident">Request</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">response</span>::<span class="ident">Response</span>;
 
 <span class="kw">mod</span> <span class="ident">connect</span>;
 <span class="kw">mod</span> <span class="ident">dns</span>;
 <span class="kw">mod</span> <span class="ident">pool</span>;
-<span class="kw">mod</span> <span class="ident">request</span>;
-<span class="kw">mod</span> <span class="ident">response</span>;
 
 <span class="doccomment">/// A Client to make outgoing HTTP requests.</span>
 <span class="comment">// If the Connector is clone, then the Client can be clone easily.</span>
@@ -696,8 +696,8 @@
         });
         <span class="ident">FutureResponse</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">req</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">msg</span><span class="op">|</span> {
             <span class="kw">match</span> <span class="ident">msg</span> {
-                <span class="ident">Message</span>::<span class="ident">WithoutBody</span>(<span class="ident">head</span>) <span class="op">=&gt;</span> <span class="ident">response</span>::<span class="ident">new</span>(<span class="ident">head</span>, <span class="prelude-val">None</span>),
-                <span class="ident">Message</span>::<span class="ident">WithBody</span>(<span class="ident">head</span>, <span class="ident">body</span>) <span class="op">=&gt;</span> <span class="ident">response</span>::<span class="ident">new</span>(<span class="ident">head</span>, <span class="prelude-val">Some</span>(<span class="ident">body</span>.<span class="ident">into</span>())),
+                <span class="ident">Message</span>::<span class="ident">WithoutBody</span>(<span class="ident">head</span>) <span class="op">=&gt;</span> <span class="ident">response</span>::<span class="ident">from_wire</span>(<span class="ident">head</span>, <span class="prelude-val">None</span>),
+                <span class="ident">Message</span>::<span class="ident">WithBody</span>(<span class="ident">head</span>, <span class="ident">body</span>) <span class="op">=&gt;</span> <span class="ident">response</span>::<span class="ident">from_wire</span>(<span class="ident">head</span>, <span class="prelude-val">Some</span>(<span class="ident">body</span>.<span class="ident">into</span>())),
             }
         })))
     }

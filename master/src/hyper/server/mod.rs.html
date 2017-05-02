@@ -544,7 +544,6 @@
 <span id="499">499</span>
 <span id="500">500</span>
 <span id="501">501</span>
-<span id="502">502</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Server</span>
 <span class="doccomment">//!</span>
@@ -572,13 +571,12 @@
 <span class="kw">use</span> <span class="ident">tokio_proto</span>::<span class="ident">streaming</span>::<span class="ident">pipeline</span>::{<span class="ident">Transport</span>, <span class="ident">Frame</span>, <span class="ident">ServerProto</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_service</span>::{<span class="ident">NewService</span>, <span class="ident">Service</span>};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">request</span>::<span class="ident">Request</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">response</span>::<span class="ident">Response</span>;
-
 <span class="kw">use</span> <span class="ident">http</span>;
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">response</span>;
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">request</span>;
 
-<span class="kw">mod</span> <span class="ident">request</span>;
-<span class="kw">mod</span> <span class="ident">response</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">http</span>::<span class="ident">response</span>::<span class="ident">Response</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">http</span>::<span class="ident">request</span>::<span class="ident">Request</span>;
 
 <span class="doccomment">/// An instance of the HTTP protocol, and implementation of tokio-proto&#39;s</span>
 <span class="doccomment">/// `ServerProto` trait.</span>
@@ -832,7 +830,7 @@
             <span class="ident">Message</span>::<span class="ident">WithoutBody</span>(<span class="ident">head</span>) <span class="op">=&gt;</span> (<span class="ident">head</span>.<span class="number">0</span>, <span class="ident">http</span>::<span class="ident">Body</span>::<span class="ident">empty</span>()),
             <span class="ident">Message</span>::<span class="ident">WithBody</span>(<span class="ident">head</span>, <span class="ident">body</span>) <span class="op">=&gt;</span> (<span class="ident">head</span>.<span class="number">0</span>, <span class="ident">body</span>.<span class="ident">into</span>()),
         };
-        <span class="ident">request</span>::<span class="ident">new</span>(<span class="prelude-val">None</span>, <span class="ident">head</span>, <span class="ident">body</span>)
+        <span class="ident">request</span>::<span class="ident">from_wire</span>(<span class="prelude-val">None</span>, <span class="ident">head</span>, <span class="ident">body</span>)
     }
 }
 
@@ -869,7 +867,7 @@
             <span class="ident">Message</span>::<span class="ident">WithoutBody</span>(<span class="ident">head</span>) <span class="op">=&gt;</span> (<span class="ident">head</span>.<span class="number">0</span>, <span class="ident">http</span>::<span class="ident">Body</span>::<span class="ident">empty</span>()),
             <span class="ident">Message</span>::<span class="ident">WithBody</span>(<span class="ident">head</span>, <span class="ident">body</span>) <span class="op">=&gt;</span> (<span class="ident">head</span>.<span class="number">0</span>, <span class="ident">body</span>.<span class="ident">into</span>()),
         };
-        <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">request</span>::<span class="ident">new</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">remote_addr</span>), <span class="ident">head</span>, <span class="ident">body</span>);
+        <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">request</span>::<span class="ident">from_wire</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">remote_addr</span>), <span class="ident">head</span>, <span class="ident">body</span>);
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">call</span>(<span class="ident">req</span>).<span class="ident">map</span>(<span class="ident">Into</span>::<span class="ident">into</span>)
     }
 }
