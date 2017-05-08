@@ -316,10 +316,17 @@
 <span id="271">271</span>
 <span id="272">272</span>
 <span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
 <span class="comment">//use std::net::SocketAddr;</span>
 
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Future</span>, <span class="ident">Poll</span>, <span class="ident">Async</span>};
@@ -428,7 +435,7 @@
         };
 
         <span class="ident">HttpConnecting</span> {
-            <span class="ident">state</span>: <span class="ident">State</span>::<span class="ident">Resolving</span>(<span class="self">self</span>.<span class="ident">dns</span>.<span class="ident">resolve</span>(<span class="ident">host</span>.<span class="ident">into</span>(), <span class="ident">port</span>)),
+            <span class="ident">state</span>: <span class="ident">State</span>::<span class="ident">Lazy</span>(<span class="self">self</span>.<span class="ident">dns</span>.<span class="ident">clone</span>(), <span class="ident">host</span>.<span class="ident">into</span>(), <span class="ident">port</span>),
             <span class="ident">handle</span>: <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">clone</span>(),
         }
     }
@@ -472,6 +479,7 @@
 }
 
 <span class="kw">enum</span> <span class="ident">State</span> {
+    <span class="ident">Lazy</span>(<span class="ident">dns</span>::<span class="ident">Dns</span>, <span class="ident">String</span>, <span class="ident">u16</span>),
     <span class="ident">Resolving</span>(<span class="ident">dns</span>::<span class="ident">Query</span>),
     <span class="ident">Connecting</span>(<span class="ident">ConnectingTcp</span>),
     <span class="ident">Error</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span>),
@@ -485,6 +493,10 @@
         <span class="kw">loop</span> {
             <span class="kw">let</span> <span class="ident">state</span>;
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
+                <span class="ident">State</span>::<span class="ident">Lazy</span>(<span class="kw-2">ref</span> <span class="ident">dns</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">host</span>, <span class="ident">port</span>) <span class="op">=&gt;</span> {
+                    <span class="kw">let</span> <span class="ident">host</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">replace</span>(<span class="ident">host</span>, <span class="ident">String</span>::<span class="ident">new</span>());
+                    <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">Resolving</span>(<span class="ident">dns</span>.<span class="ident">resolve</span>(<span class="ident">host</span>, <span class="ident">port</span>));
+                },
                 <span class="ident">State</span>::<span class="ident">Resolving</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">query</span>) <span class="op">=&gt;</span> {
                     <span class="kw">match</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">query</span>.<span class="ident">poll</span>()) {
                         <span class="ident">Async</span>::<span class="ident">NotReady</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>),
