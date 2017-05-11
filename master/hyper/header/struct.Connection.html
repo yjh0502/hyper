@@ -79,12 +79,12 @@ connection-option = token
 <span class="comment">// extern crate unicase;</span>
 
 <span class="kw">use</span> <span class="ident">hyper</span>::<span class="ident">header</span>::{<span class="ident">Headers</span>, <span class="ident">Connection</span>, <span class="ident">ConnectionOption</span>};
-<span class="kw">use</span> <span class="ident">unicase</span>::<span class="ident">UniCase</span>;
+<span class="kw">use</span> <span class="ident">unicase</span>::<span class="ident">Ascii</span>;
 
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">Headers</span>::<span class="ident">new</span>();
 <span class="ident">headers</span>.<span class="ident">set</span>(
     <span class="ident">Connection</span>(<span class="macro">vec</span><span class="macro">!</span>[
-        <span class="ident">ConnectionOption</span>::<span class="ident">ConnectionHeader</span>(<span class="ident">UniCase</span>(<span class="string">&quot;upgrade&quot;</span>.<span class="ident">to_owned</span>())),
+        <span class="ident">ConnectionOption</span>::<span class="ident">ConnectionHeader</span>(<span class="ident">Ascii</span>::<span class="ident">new</span>(<span class="string">&quot;upgrade&quot;</span>.<span class="ident">to_owned</span>())),
     ])
 );</pre>
 </div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class="struct" href="../../hyper/header/struct.Connection.html" title="struct hyper::header::Connection">Connection</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/connection.rs.html#105-117' title='goto source code'>[src]</a></span></h3>
