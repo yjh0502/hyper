@@ -410,7 +410,7 @@
 <span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">Http1Transaction</span>, <span class="ident">h1</span>, <span class="ident">MessageHead</span>, <span class="ident">ParseResult</span>, <span class="ident">DebugTruncate</span>};
 <span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">BytesMut</span>, <span class="ident">Bytes</span>};
 
-<span class="kw">const</span> <span class="ident">INIT_BUFFER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4096</span>;
+<span class="kw">const</span> <span class="ident">INIT_BUFFER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8192</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_BUFFER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8192</span> <span class="op">+</span> <span class="number">4096</span> <span class="op">*</span> <span class="number">100</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Buffered</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
