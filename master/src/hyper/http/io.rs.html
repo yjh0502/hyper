@@ -405,16 +405,6 @@
 <span id="360">360</span>
 <span id="361">361</span>
 <span id="362">362</span>
-<span id="363">363</span>
-<span id="364">364</span>
-<span id="365">365</span>
-<span id="366">366</span>
-<span id="367">367</span>
-<span id="368">368</span>
-<span id="369">369</span>
-<span id="370">370</span>
-<span id="371">371</span>
-<span id="372">372</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
@@ -423,7 +413,7 @@
 
 <span class="kw">use</span> <span class="ident">tokio_io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
 
-<span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">Http1Transaction</span>, <span class="ident">h1</span>, <span class="ident">MessageHead</span>, <span class="ident">ParseResult</span>, <span class="ident">DebugTruncate</span>};
+<span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">Http1Transaction</span>, <span class="ident">MessageHead</span>, <span class="ident">DebugTruncate</span>};
 <span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">BytesMut</span>, <span class="ident">Bytes</span>};
 
 <span class="kw">const</span> <span class="ident">INIT_BUFFER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8192</span>;
@@ -474,7 +464,7 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Http1Transaction</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="ident">Incoming</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">S</span>, _<span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">read_buf</span>)) {
+            <span class="kw">match</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">S</span>::<span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">read_buf</span>)) {
                 <span class="prelude-val">Some</span>(<span class="ident">head</span>) <span class="op">=&gt;</span> {
                     <span class="comment">//trace!(&quot;parsed {} bytes out of {}&quot;, len, self.read_buf.len());</span>
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">head</span>.<span class="number">0</span>))
@@ -486,7 +476,6 @@
                     }
                 },
             }
-            <span class="self">self</span>.<span class="ident">reserve_read_buf</span>();
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">read_from_io</span>() {
                 <span class="prelude-val">Ok</span>(<span class="number">0</span>) <span class="op">=&gt;</span> {
                     <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;parse eof&quot;</span>);
@@ -506,8 +495,17 @@
 
     <span class="kw">fn</span> <span class="ident">read_from_io</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">BufMut</span>;
+        <span class="comment">// TODO: Investigate if we still need these unsafe blocks</span>
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">remaining_mut</span>() <span class="op">&lt;</span> <span class="ident">INIT_BUFFER_SIZE</span> {
+            <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">reserve</span>(<span class="ident">INIT_BUFFER_SIZE</span>);
+            <span class="kw">unsafe</span> { <span class="comment">// Zero out unused memory</span>
+                <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">bytes_mut</span>();
+                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>();
+                <span class="ident">ptr</span>::<span class="ident">write_bytes</span>(<span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>(), <span class="number">0</span>, <span class="ident">len</span>);
+            }
+        }
         <span class="self">self</span>.<span class="ident">read_blocked</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">unsafe</span> {
+        <span class="kw">unsafe</span> { <span class="comment">// Can we use AsyncRead::read_buf instead?</span>
             <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">read</span>(<span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">bytes_mut</span>()) {
                 <span class="prelude-val">Ok</span>(<span class="ident">n</span>) <span class="op">=&gt;</span> <span class="ident">n</span>,
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> {
@@ -519,19 +517,6 @@
             };
             <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">advance_mut</span>(<span class="ident">n</span>);
             <span class="prelude-val">Ok</span>(<span class="ident">n</span>)
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">reserve_read_buf</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">BufMut</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">remaining_mut</span>() <span class="op">&gt;=</span> <span class="ident">INIT_BUFFER_SIZE</span> {
-            <span class="kw">return</span>
-        }
-        <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">reserve</span>(<span class="ident">INIT_BUFFER_SIZE</span>);
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">bytes_mut</span>();
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>();
-            <span class="ident">ptr</span>::<span class="ident">write_bytes</span>(<span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>(), <span class="number">0</span>, <span class="ident">len</span>);
         }
     }
 
@@ -569,10 +554,6 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Http1Transaction</span><span class="op">&lt;</span><span class="ident">Incoming</span><span class="op">=</span><span class="ident">I</span><span class="op">&gt;</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">rdr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="ident">h1</span>::<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">rdr</span>)
-}
-
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">MemRead</span> {
     <span class="kw">fn</span> <span class="ident">read_mem</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>;
 }
@@ -585,7 +566,6 @@
             <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Buffered.read_mem read_buf is not empty, slicing {}&quot;</span>, <span class="ident">n</span>);
             <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">split_to</span>(<span class="ident">n</span>).<span class="ident">freeze</span>())
         } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">reserve_read_buf</span>();
             <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">read_from_io</span>());
             <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">split_to</span>(::<span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">min</span>(<span class="ident">len</span>, <span class="ident">n</span>)).<span class="ident">freeze</span>())
         }
