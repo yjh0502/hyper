@@ -136,8 +136,6 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
-<span id="94">94</span>
-<span id="95">95</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 
@@ -145,7 +143,7 @@
 
 <span class="doccomment">/// `Content-Length` header, defined in</span>
 <span class="doccomment">/// [RFC7230](http://tools.ietf.org/html/rfc7230#section-3.3.2)</span>
-<span class="doccomment">/// </span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// When a message does not have a `Transfer-Encoding` header field, a</span>
 <span class="doccomment">/// Content-Length header field can provide the anticipated size, as a</span>
 <span class="doccomment">/// decimal number of octets, for a potential payload body.  For messages</span>
@@ -154,26 +152,24 @@
 <span class="doccomment">/// body (and message) ends.  For messages that do not include a payload</span>
 <span class="doccomment">/// body, the Content-Length indicates the size of the selected</span>
 <span class="doccomment">/// representation.</span>
-<span class="doccomment">/// </span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// # ABNF</span>
 <span class="doccomment">/// ```plain</span>
 <span class="doccomment">/// Content-Length = 1*DIGIT</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// </span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// # Example values</span>
 <span class="doccomment">/// * `3495`</span>
-<span class="doccomment">/// </span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use hyper::header::{Headers, ContentLength};</span>
-<span class="doccomment">/// </span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// let mut headers = Headers::new();</span>
 <span class="doccomment">/// headers.set(ContentLength(1024u64));</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ContentLength</span>(<span class="kw">pub</span> <span class="ident">u64</span>);
-
-<span class="comment">//static NAME: &amp;&#39;static str = &quot;Content-Length&quot;;</span>
 
 <span class="kw">impl</span> <span class="ident">Header</span> <span class="kw">for</span> <span class="ident">ContentLength</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
