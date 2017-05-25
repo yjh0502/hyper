@@ -467,6 +467,29 @@
 <span id="422">422</span>
 <span id="423">423</span>
 <span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
@@ -556,7 +579,7 @@
     }
 
 
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="ident">head</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Outgoing</span><span class="op">&gt;</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Encoder</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">mut</span> <span class="ident">head</span>: <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Outgoing</span><span class="op">&gt;</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Encoder</span> {
         <span class="kw">use</span> ::<span class="ident">header</span>;
         <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;writing head: {:?}&quot;</span>, <span class="ident">head</span>);
 
@@ -683,7 +706,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="ident">head</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Outgoing</span><span class="op">&gt;</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Encoder</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">mut</span> <span class="ident">head</span>: <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Outgoing</span><span class="op">&gt;</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Encoder</span> {
         <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;writing head: {:?}&quot;</span>, <span class="ident">head</span>);
 
 
@@ -890,6 +913,29 @@
                 <span class="ident">b</span>.<span class="ident">set_len</span>(<span class="ident">len</span>);
             }
         }
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">bench_server_transaction_encode</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
+        <span class="kw">use</span> ::<span class="ident">http</span>::<span class="ident">MessageHead</span>;
+        <span class="kw">use</span> ::<span class="ident">header</span>::{<span class="ident">Headers</span>, <span class="ident">ContentLength</span>};
+        <span class="kw">use</span> ::{<span class="ident">StatusCode</span>, <span class="ident">HttpVersion</span>};
+        <span class="ident">b</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="number">75</span>;
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">MessageHead</span> {
+            <span class="ident">subject</span>: <span class="ident">StatusCode</span>::<span class="prelude-val">Ok</span>,
+            <span class="ident">headers</span>: <span class="ident">Headers</span>::<span class="ident">new</span>(),
+            <span class="ident">version</span>: <span class="ident">HttpVersion</span>::<span class="ident">Http11</span>,
+        };
+        <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">set</span>(<span class="ident">ContentLength</span>(<span class="number">0</span>));
+
+        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">||</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vec</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+            <span class="ident">ServerTransaction</span>::<span class="ident">encode</span>(<span class="ident">head</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">vec</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">vec</span>.<span class="ident">len</span>(), <span class="number">75</span>);
+            ::<span class="ident">test</span>::<span class="ident">black_box</span>(<span class="ident">vec</span>);
+        })
     }
 }
 </pre>
