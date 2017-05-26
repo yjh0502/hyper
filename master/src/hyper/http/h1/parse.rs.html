@@ -487,20 +487,16 @@
 <span id="442">442</span>
 <span id="443">443</span>
 <span id="444">444</span>
-<span id="445">445</span>
-<span id="446">446</span>
-<span id="447">447</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">SystemTime</span>;
 
 <span class="kw">use</span> <span class="ident">httparse</span>;
 <span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">BytesMut</span>, <span class="ident">Bytes</span>};
 
 <span class="kw">use</span> <span class="ident">header</span>::{<span class="self">self</span>, <span class="ident">Headers</span>, <span class="ident">ContentLength</span>, <span class="ident">TransferEncoding</span>};
 <span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">ByteStr</span>, <span class="ident">MessageHead</span>, <span class="ident">RawStatus</span>, <span class="ident">Http1Transaction</span>, <span class="ident">ParseResult</span>, <span class="ident">ServerTransaction</span>, <span class="ident">ClientTransaction</span>, <span class="ident">RequestLine</span>};
-<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">h1</span>::{<span class="ident">Encoder</span>, <span class="ident">Decoder</span>};
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">h1</span>::{<span class="ident">Encoder</span>, <span class="ident">Decoder</span>, <span class="ident">date</span>};
 <span class="kw">use</span> <span class="ident">method</span>::<span class="ident">Method</span>;
 <span class="kw">use</span> <span class="ident">status</span>::<span class="ident">StatusCode</span>;
 <span class="kw">use</span> <span class="ident">version</span>::<span class="ident">HttpVersion</span>::{<span class="ident">Http10</span>, <span class="ident">Http11</span>};
@@ -583,10 +579,6 @@
         <span class="kw">use</span> ::<span class="ident">header</span>;
         <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;writing head: {:?}&quot;</span>, <span class="ident">head</span>);
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">has</span>::<span class="op">&lt;</span><span class="ident">header</span>::<span class="ident">Date</span><span class="op">&gt;</span>() {
-            <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">set</span>(<span class="ident">header</span>::<span class="ident">Date</span>(<span class="ident">SystemTime</span>::<span class="ident">now</span>().<span class="ident">into</span>()));
-        }
-
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">header</span>::<span class="ident">ContentLength</span><span class="op">&gt;</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">n</span>);
 
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="op">=</span> <span class="ident">len</span> {
@@ -614,10 +606,19 @@
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;writing headers = {:?}&quot;</span>, <span class="ident">head</span>.<span class="ident">headers</span>);
         <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">version</span> <span class="op">==</span> ::<span class="ident">HttpVersion</span>::<span class="ident">Http11</span> <span class="op">&amp;&amp;</span> <span class="ident">head</span>.<span class="ident">subject</span> <span class="op">==</span> ::<span class="ident">StatusCode</span>::<span class="prelude-val">Ok</span> {
             <span class="ident">extend</span>(<span class="ident">dst</span>, <span class="string">b&quot;HTTP/1.1 200 OK\r\n&quot;</span>);
-            <span class="kw">let</span> _ <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">FastWrite</span>(<span class="ident">dst</span>), <span class="string">&quot;{}\r\n&quot;</span>, <span class="ident">head</span>.<span class="ident">headers</span>);
+            <span class="kw">let</span> _ <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">FastWrite</span>(<span class="ident">dst</span>), <span class="string">&quot;{}&quot;</span>, <span class="ident">head</span>.<span class="ident">headers</span>);
         } <span class="kw">else</span> {
-            <span class="kw">let</span> _ <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">FastWrite</span>(<span class="ident">dst</span>), <span class="string">&quot;{} {}\r\n{}\r\n&quot;</span>, <span class="ident">head</span>.<span class="ident">version</span>, <span class="ident">head</span>.<span class="ident">subject</span>, <span class="ident">head</span>.<span class="ident">headers</span>);
+            <span class="kw">let</span> _ <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">FastWrite</span>(<span class="ident">dst</span>), <span class="string">&quot;{} {}\r\n{}&quot;</span>, <span class="ident">head</span>.<span class="ident">version</span>, <span class="ident">head</span>.<span class="ident">subject</span>, <span class="ident">head</span>.<span class="ident">headers</span>);
         }
+        <span class="comment">// using http::h1::date is quite a lot faster than generating a unique Date header each time</span>
+        <span class="comment">// like req/s goes up about 10%</span>
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">has</span>::<span class="op">&lt;</span><span class="ident">header</span>::<span class="ident">Date</span><span class="op">&gt;</span>() {
+            <span class="ident">dst</span>.<span class="ident">reserve</span>(<span class="ident">date</span>::<span class="ident">DATE_VALUE_LENGTH</span> <span class="op">+</span> <span class="number">8</span>);
+            <span class="ident">extend</span>(<span class="ident">dst</span>, <span class="string">b&quot;Date: &quot;</span>);
+            <span class="ident">date</span>::<span class="ident">extend</span>(<span class="ident">dst</span>);
+            <span class="ident">extend</span>(<span class="ident">dst</span>, <span class="string">b&quot;\r\n&quot;</span>);
+        }
+        <span class="ident">extend</span>(<span class="ident">dst</span>, <span class="string">b&quot;\r\n&quot;</span>);
         <span class="ident">body</span>
     }
 
@@ -809,16 +810,9 @@
     }
 }
 
+<span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">fn</span> <span class="ident">extend</span>(<span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>;
-    <span class="ident">dst</span>.<span class="ident">reserve</span>(<span class="ident">data</span>.<span class="ident">len</span>());
-    <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="ident">dst</span>.<span class="ident">len</span>();
-    <span class="kw">unsafe</span> {
-        <span class="ident">ptr</span>::<span class="ident">copy_nonoverlapping</span>(<span class="ident">data</span>.<span class="ident">as_ptr</span>(),
-                                 <span class="ident">dst</span>.<span class="ident">as_mut_ptr</span>().<span class="ident">offset</span>(<span class="ident">prev</span> <span class="kw">as</span> <span class="ident">isize</span>),
-                                 <span class="ident">data</span>.<span class="ident">len</span>());
-        <span class="ident">dst</span>.<span class="ident">set_len</span>(<span class="ident">prev</span> <span class="op">+</span> <span class="ident">data</span>.<span class="ident">len</span>());
-    }
+    <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="ident">data</span>);
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
