@@ -817,7 +817,7 @@
 
     <span class="doccomment">/// Set the `Connect` type to be used.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connector</span><span class="op">&lt;</span><span class="ident">CC</span>: <span class="ident">Connect</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">val</span>: <span class="ident">CC</span>) <span class="op">-&gt;</span> <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">CC</span>, <span class="ident">B</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connector</span><span class="op">&lt;</span><span class="ident">CC</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">val</span>: <span class="ident">CC</span>) <span class="op">-&gt;</span> <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">CC</span>, <span class="ident">B</span><span class="op">&gt;</span> {
         <span class="ident">Config</span> {
             <span class="ident">_body_type</span>: <span class="self">self</span>.<span class="ident">_body_type</span>,
             <span class="comment">//connect_timeout: self.connect_timeout,</span>
