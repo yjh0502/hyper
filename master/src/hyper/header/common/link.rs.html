@@ -1150,8 +1150,6 @@
 <span id="1105">1105</span>
 <span id="1106">1106</span>
 <span id="1107">1107</span>
-<span id="1108">1108</span>
-<span id="1109">1109</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
@@ -2060,9 +2058,7 @@
     <span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">ServerTransaction</span>, <span class="ident">Http1Transaction</span>};
     <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">BytesMut</span>;
 
-    <span class="kw">use</span> <span class="ident">mime</span>::<span class="ident">Mime</span>;
-    <span class="kw">use</span> <span class="ident">mime</span>::<span class="ident">TopLevel</span>::<span class="ident">Text</span>;
-    <span class="kw">use</span> <span class="ident">mime</span>::<span class="ident">SubLevel</span>::<span class="ident">Plain</span>;
+    <span class="kw">use</span> <span class="ident">mime</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_link</span>() {
@@ -2111,7 +2107,7 @@
             .<span class="ident">push_media_desc</span>(<span class="ident">MediaDesc</span>::<span class="ident">Screen</span>)
             .<span class="ident">set_title</span>(<span class="string">&quot;previous chapter&quot;</span>)
             .<span class="ident">set_title_star</span>(<span class="string">&quot;title* unparsed&quot;</span>)
-            .<span class="ident">set_media_type</span>(<span class="ident">Mime</span>(<span class="ident">Text</span>, <span class="ident">Plain</span>, <span class="macro">vec</span><span class="macro">!</span>[]));
+            .<span class="ident">set_media_type</span>(<span class="ident">mime</span>::<span class="ident">TEXT_PLAIN</span>);
 
         <span class="kw">let</span> <span class="ident">link_header</span> <span class="op">=</span> <span class="string">b&quot;&lt;http://example.com/TheBook/chapter2&gt;; \
             rel=\&quot;previous\&quot;; anchor=\&quot;../anchor/example/\&quot;; \
@@ -2170,7 +2166,7 @@
             .<span class="ident">push_media_desc</span>(<span class="ident">MediaDesc</span>::<span class="ident">Screen</span>)
             .<span class="ident">set_title</span>(<span class="string">&quot;previous chapter&quot;</span>)
             .<span class="ident">set_title_star</span>(<span class="string">&quot;title* unparsed&quot;</span>)
-            .<span class="ident">set_media_type</span>(<span class="ident">Mime</span>(<span class="ident">Text</span>, <span class="ident">Plain</span>, <span class="macro">vec</span><span class="macro">!</span>[]));
+            .<span class="ident">set_media_type</span>(<span class="ident">mime</span>::<span class="ident">TEXT_PLAIN</span>);
 
         <span class="kw">let</span> <span class="ident">link</span> <span class="op">=</span> <span class="ident">Link</span>::<span class="ident">new</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">link_value</span>]);
 
