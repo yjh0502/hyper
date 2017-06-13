@@ -560,16 +560,16 @@
 
         <span class="comment">// left has more params</span>
         <span class="ident">cookie</span>.<span class="ident">append</span>(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cookie</span> <span class="op">!=</span> <span class="ident">cookie2</span>);
+        <span class="macro">assert_ne</span><span class="macro">!</span>(<span class="ident">cookie</span>, <span class="ident">cookie2</span>);
 
         <span class="comment">// same len, different params</span>
         <span class="ident">cookie2</span>.<span class="ident">append</span>(<span class="string">&quot;bar&quot;</span>, <span class="string">&quot;foo&quot;</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cookie</span> <span class="op">!=</span> <span class="ident">cookie2</span>);
+        <span class="macro">assert_ne</span><span class="macro">!</span>(<span class="ident">cookie</span>, <span class="ident">cookie2</span>);
 
 
         <span class="comment">// right has more params, and matching KV</span>
         <span class="ident">cookie2</span>.<span class="ident">append</span>(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cookie</span> <span class="op">!=</span> <span class="ident">cookie2</span>);
+        <span class="macro">assert_ne</span><span class="macro">!</span>(<span class="ident">cookie</span>, <span class="ident">cookie2</span>);
 
         <span class="comment">// same params, different order</span>
         <span class="ident">cookie</span>.<span class="ident">append</span>(<span class="string">&quot;bar&quot;</span>, <span class="string">&quot;foo&quot;</span>);

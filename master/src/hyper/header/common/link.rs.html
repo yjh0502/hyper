@@ -1142,14 +1142,6 @@
 <span id="1097">1097</span>
 <span id="1098">1098</span>
 <span id="1099">1099</span>
-<span id="1100">1100</span>
-<span id="1101">1101</span>
-<span id="1102">1102</span>
-<span id="1103">1103</span>
-<span id="1104">1104</span>
-<span id="1105">1105</span>
-<span id="1106">1106</span>
-<span id="1107">1107</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
@@ -1658,14 +1650,13 @@
                     <span class="comment">// https://tools.ietf.org/html/rfc5988#section-5.3</span>
                     <span class="kw">if</span> <span class="ident">link_header</span>.<span class="ident">rel</span>.<span class="ident">is_none</span>() {
                         <span class="ident">link_header</span>.<span class="ident">rel</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">link_param_split</span>.<span class="ident">next</span>() {
-                            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
-                            <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) <span class="op">=&gt;</span>  <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
+                            <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
                             <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=&gt;</span> {
                                 <span class="ident">s</span>.<span class="ident">trim_matches</span>(<span class="op">|</span><span class="ident">c</span>: <span class="ident">char</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;&quot;&#39;</span> <span class="op">||</span> <span class="ident">c</span>.<span class="ident">is_whitespace</span>())
                                     .<span class="ident">split</span>(<span class="string">&#39; &#39;</span>)
                                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">trim</span>().<span class="ident">parse</span>())
                                     .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationType</span><span class="op">&gt;</span>, _<span class="op">&gt;&gt;</span>()
-                                    .<span class="ident">or_else</span>(<span class="op">|</span>_<span class="op">|</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>))
+                                    .<span class="ident">or_else</span>(<span class="op">|</span>_<span class="op">|</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>))
                                     .<span class="ident">ok</span>()
                             },
                         };
@@ -1674,8 +1665,7 @@
                     <span class="comment">// Parse the `Context IRI`.</span>
                     <span class="comment">// https://tools.ietf.org/html/rfc5988#section-5.2</span>
                     <span class="ident">link_header</span>.<span class="ident">anchor</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">link_param_split</span>.<span class="ident">next</span>() {
-                        <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
-                        <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) <span class="op">=&gt;</span>  <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
+                        <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
                         <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">verify_and_trim</span>(<span class="ident">s</span>.<span class="ident">trim</span>(), (<span class="string">b&#39;&quot;&#39;</span>, <span class="string">b&#39;&quot;&#39;</span>)) {
                             <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
                             <span class="prelude-val">Ok</span>(<span class="ident">a</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">String</span>::<span class="ident">from</span>(<span class="ident">a</span>)),
@@ -1686,14 +1676,13 @@
                     <span class="comment">// https://tools.ietf.org/html/rfc5988#section-5.3</span>
                     <span class="kw">if</span> <span class="ident">link_header</span>.<span class="ident">rev</span>.<span class="ident">is_none</span>() {
                         <span class="ident">link_header</span>.<span class="ident">rev</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">link_param_split</span>.<span class="ident">next</span>() {
-                            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
-                            <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) <span class="op">=&gt;</span>  <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
+                            <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
                             <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=&gt;</span> {
                                 <span class="ident">s</span>.<span class="ident">trim_matches</span>(<span class="op">|</span><span class="ident">c</span>: <span class="ident">char</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;&quot;&#39;</span> <span class="op">||</span> <span class="ident">c</span>.<span class="ident">is_whitespace</span>())
                                     .<span class="ident">split</span>(<span class="string">&#39; &#39;</span>)
                                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">trim</span>().<span class="ident">parse</span>())
                                     .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationType</span><span class="op">&gt;</span>, _<span class="op">&gt;&gt;</span>()
-                                    .<span class="ident">or_else</span>(<span class="op">|</span>_<span class="op">|</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>))
+                                    .<span class="ident">or_else</span>(<span class="op">|</span>_<span class="op">|</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>))
                                     .<span class="ident">ok</span>()
                             },
                         }
@@ -1705,8 +1694,7 @@
 
                     <span class="ident">v</span>.<span class="ident">push</span>(
                         <span class="kw">match</span> <span class="ident">link_param_split</span>.<span class="ident">next</span>() {
-                            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
-                            <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) <span class="op">=&gt;</span>  <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
+                            <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
                             <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">trim</span>().<span class="ident">parse</span>() {
                                 <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
                                 <span class="prelude-val">Ok</span>(<span class="ident">t</span>) <span class="op">=&gt;</span> <span class="ident">t</span>,
@@ -1720,14 +1708,13 @@
                     <span class="comment">// https://tools.ietf.org/html/rfc5988#section-5.4</span>
                     <span class="kw">if</span> <span class="ident">link_header</span>.<span class="ident">media_desc</span>.<span class="ident">is_none</span>() {
                         <span class="ident">link_header</span>.<span class="ident">media_desc</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">link_param_split</span>.<span class="ident">next</span>() {
-                            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
-                            <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) <span class="op">=&gt;</span>  <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
+                            <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
                             <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=&gt;</span> {
                                 <span class="ident">s</span>.<span class="ident">trim_matches</span>(<span class="op">|</span><span class="ident">c</span>: <span class="ident">char</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;&quot;&#39;</span> <span class="op">||</span> <span class="ident">c</span>.<span class="ident">is_whitespace</span>())
                                     .<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>)
                                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">trim</span>().<span class="ident">parse</span>())
                                     .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MediaDesc</span><span class="op">&gt;</span>, _<span class="op">&gt;&gt;</span>()
-                                    .<span class="ident">or_else</span>(<span class="op">|</span>_<span class="op">|</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>))
+                                    .<span class="ident">or_else</span>(<span class="op">|</span>_<span class="op">|</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>))
                                     .<span class="ident">ok</span>()
                             },
                         };
@@ -1737,8 +1724,7 @@
                     <span class="comment">// https://tools.ietf.org/html/rfc5988#section-5.4</span>
                     <span class="kw">if</span> <span class="ident">link_header</span>.<span class="ident">title</span>.<span class="ident">is_none</span>() {
                         <span class="ident">link_header</span>.<span class="ident">title</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">link_param_split</span>.<span class="ident">next</span>() {
-                            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
-                            <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) <span class="op">=&gt;</span>  <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
+                            <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
                             <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">verify_and_trim</span>(<span class="ident">s</span>.<span class="ident">trim</span>(), (<span class="string">b&#39;&quot;&#39;</span>, <span class="string">b&#39;&quot;&#39;</span>)) {
                                 <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
                                 <span class="prelude-val">Ok</span>(<span class="ident">t</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">String</span>::<span class="ident">from</span>(<span class="ident">t</span>)),
@@ -1753,8 +1739,7 @@
                     <span class="comment">//       https://tools.ietf.org/html/rfc5987#section-3.2.1</span>
                     <span class="kw">if</span> <span class="ident">link_header</span>.<span class="ident">title_star</span>.<span class="ident">is_none</span>() {
                         <span class="ident">link_header</span>.<span class="ident">title_star</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">link_param_split</span>.<span class="ident">next</span>() {
-                            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
-                            <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) <span class="op">=&gt;</span>  <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
+                            <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
                             <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">String</span>::<span class="ident">from</span>(<span class="ident">s</span>.<span class="ident">trim</span>())),
                         };
                     }
@@ -1763,8 +1748,7 @@
                     <span class="comment">// https://tools.ietf.org/html/rfc5988#section-5.4</span>
                     <span class="kw">if</span> <span class="ident">link_header</span>.<span class="ident">media_type</span>.<span class="ident">is_none</span>() {
                         <span class="ident">link_header</span>.<span class="ident">media_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">link_param_split</span>.<span class="ident">next</span>() {
-                            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
-                            <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) <span class="op">=&gt;</span>  <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
+                            <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
                             <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">verify_and_trim</span>(<span class="ident">s</span>.<span class="ident">trim</span>(), (<span class="string">b&#39;&quot;&#39;</span>, <span class="string">b&#39;&quot;&#39;</span>)) {
                                 <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>),
                                 <span class="prelude-val">Ok</span>(<span class="ident">t</span>) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">t</span>.<span class="ident">parse</span>() {

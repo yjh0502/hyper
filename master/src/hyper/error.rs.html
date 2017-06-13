@@ -370,11 +370,11 @@
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">httparse</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">httparse</span>::<span class="ident">Error</span>) <span class="op">-&gt;</span> <span class="ident">Error</span> {
         <span class="kw">match</span> <span class="ident">err</span> {
-            <span class="ident">httparse</span>::<span class="ident">Error</span>::<span class="ident">HeaderName</span> <span class="op">=&gt;</span> <span class="ident">Header</span>,
-            <span class="ident">httparse</span>::<span class="ident">Error</span>::<span class="ident">HeaderValue</span> <span class="op">=&gt;</span> <span class="ident">Header</span>,
-            <span class="ident">httparse</span>::<span class="ident">Error</span>::<span class="ident">NewLine</span> <span class="op">=&gt;</span> <span class="ident">Header</span>,
-            <span class="ident">httparse</span>::<span class="ident">Error</span>::<span class="ident">Status</span> <span class="op">=&gt;</span> <span class="ident">Status</span>,
+            <span class="ident">httparse</span>::<span class="ident">Error</span>::<span class="ident">HeaderName</span> <span class="op">|</span>
+            <span class="ident">httparse</span>::<span class="ident">Error</span>::<span class="ident">HeaderValue</span> <span class="op">|</span>
+            <span class="ident">httparse</span>::<span class="ident">Error</span>::<span class="ident">NewLine</span> <span class="op">|</span>
             <span class="ident">httparse</span>::<span class="ident">Error</span>::<span class="ident">Token</span> <span class="op">=&gt;</span> <span class="ident">Header</span>,
+            <span class="ident">httparse</span>::<span class="ident">Error</span>::<span class="ident">Status</span> <span class="op">=&gt;</span> <span class="ident">Status</span>,
             <span class="ident">httparse</span>::<span class="ident">Error</span>::<span class="ident">TooManyHeaders</span> <span class="op">=&gt;</span> <span class="ident">TooLarge</span>,
             <span class="ident">httparse</span>::<span class="ident">Error</span>::<span class="ident">Version</span> <span class="op">=&gt;</span> <span class="ident">Version</span>,
         }

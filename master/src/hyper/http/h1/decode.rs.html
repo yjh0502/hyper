@@ -728,7 +728,7 @@
             <span class="comment">// LWS can follow the chunk size, but no more digits can come</span>
             <span class="string">b&#39;\t&#39;</span> <span class="op">|</span> <span class="string">b&#39; &#39;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ChunkedState</span>::<span class="ident">SizeLws</span>),
             <span class="string">b&#39;;&#39;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ChunkedState</span>::<span class="ident">Extension</span>),
-            <span class="string">b&#39;\r&#39;</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">ChunkedState</span>::<span class="ident">SizeLf</span>),
+            <span class="string">b&#39;\r&#39;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ChunkedState</span>::<span class="ident">SizeLf</span>),
             _ <span class="op">=&gt;</span> {
                 <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">InvalidInput</span>,
                                    <span class="string">&quot;Invalid chunk size linear white space&quot;</span>))
@@ -738,8 +738,8 @@
     <span class="kw">fn</span> <span class="ident">read_extension</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">MemRead</span><span class="op">&gt;</span>(<span class="ident">rdr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ChunkedState</span><span class="op">&gt;</span> {
         <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;read_extension&quot;</span>);
         <span class="kw">match</span> <span class="macro">byte</span><span class="macro">!</span>(<span class="ident">rdr</span>) {
-            <span class="string">b&#39;\r&#39;</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">ChunkedState</span>::<span class="ident">SizeLf</span>),
-            _ <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">ChunkedState</span>::<span class="ident">Extension</span>), <span class="comment">// no supported extensions</span>
+            <span class="string">b&#39;\r&#39;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ChunkedState</span>::<span class="ident">SizeLf</span>),
+            _ <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ChunkedState</span>::<span class="ident">Extension</span>), <span class="comment">// no supported extensions</span>
         }
     }
     <span class="kw">fn</span> <span class="ident">read_size_lf</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">MemRead</span><span class="op">&gt;</span>(<span class="ident">rdr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">size</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">u64</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ChunkedState</span><span class="op">&gt;</span> {

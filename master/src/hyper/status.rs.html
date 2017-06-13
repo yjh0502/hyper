@@ -1447,11 +1447,11 @@ impl StatusClass {
     pub fn default_code(&amp;self) -&gt; StatusCode {
         match *self {
             StatusClass::Informational =&gt; StatusCode::Continue,
-            StatusClass::Success =&gt; StatusCode::Ok,
+            StatusClass::Success |
+            StatusClass::NoClass =&gt; StatusCode::Ok,
             StatusClass::Redirection =&gt; StatusCode::MultipleChoices,
             StatusClass::ClientError =&gt; StatusCode::BadRequest,
             StatusClass::ServerError =&gt; StatusCode::InternalServerError,
-            StatusClass::NoClass =&gt; StatusCode::Ok,
         }
     }
 }

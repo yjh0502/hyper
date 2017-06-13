@@ -1963,7 +1963,7 @@
 
         <span class="ident">headers1</span>.<span class="ident">set</span>(<span class="ident">ContentLength</span>(<span class="number">11</span>));
         <span class="ident">headers2</span>.<span class="ident">set</span>(<span class="ident">Host</span>::<span class="ident">new</span>(<span class="string">&quot;foo.bar&quot;</span>, <span class="prelude-val">None</span>));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">headers1</span> <span class="op">!=</span> <span class="ident">headers2</span>);
+        <span class="macro">assert_ne</span><span class="macro">!</span>(<span class="ident">headers1</span>, <span class="ident">headers2</span>);
 
         <span class="ident">headers1</span> <span class="op">=</span> <span class="ident">Headers</span>::<span class="ident">new</span>();
         <span class="ident">headers2</span> <span class="op">=</span> <span class="ident">Headers</span>::<span class="ident">new</span>();
@@ -1973,7 +1973,7 @@
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">headers1</span>, <span class="ident">headers2</span>);
 
         <span class="ident">headers1</span>.<span class="ident">set</span>(<span class="ident">ContentLength</span>(<span class="number">10</span>));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">headers1</span> <span class="op">!=</span> <span class="ident">headers2</span>);
+        <span class="macro">assert_ne</span><span class="macro">!</span>(<span class="ident">headers1</span>, <span class="ident">headers2</span>);
 
         <span class="ident">headers1</span> <span class="op">=</span> <span class="ident">Headers</span>::<span class="ident">new</span>();
         <span class="ident">headers2</span> <span class="op">=</span> <span class="ident">Headers</span>::<span class="ident">new</span>();
@@ -1981,7 +1981,7 @@
         <span class="ident">headers1</span>.<span class="ident">set</span>(<span class="ident">Host</span>::<span class="ident">new</span>(<span class="string">&quot;foo.bar&quot;</span>, <span class="prelude-val">None</span>));
         <span class="ident">headers1</span>.<span class="ident">set</span>(<span class="ident">ContentLength</span>(<span class="number">11</span>));
         <span class="ident">headers2</span>.<span class="ident">set</span>(<span class="ident">ContentLength</span>(<span class="number">11</span>));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">headers1</span> <span class="op">!=</span> <span class="ident">headers2</span>);
+        <span class="macro">assert_ne</span><span class="macro">!</span>(<span class="ident">headers1</span>, <span class="ident">headers2</span>);
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
