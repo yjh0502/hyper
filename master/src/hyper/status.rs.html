@@ -796,6 +796,42 @@
 <span id="751">751</span>
 <span id="752">752</span>
 <span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP status codes</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
@@ -1012,11 +1048,35 @@
     <span class="ident">Unregistered</span>(<span class="ident">u16</span>),
 }
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InvalidStatusCode</span> {
+    <span class="ident">_inner</span>: (),
+}
+
 <span class="kw">impl</span> <span class="ident">StatusCode</span> {
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="comment">// Not part of public API or API contract. Could disappear.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_u16</span>(<span class="ident">n</span>: <span class="ident">u16</span>) <span class="op">-&gt;</span> <span class="ident">StatusCode</span> {
+    <span class="doccomment">/// Try to convert a `u16` into a `StatusCode`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This will return an error if the provided argument is not within the</span>
+    <span class="doccomment">/// range `100...599`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Note</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This function is temporary. When the `TryFrom` trait becomes stable,</span>
+    <span class="doccomment">/// this will be deprecated and replaced by `TryFrom&lt;u16&gt;`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">n</span>: <span class="ident">u16</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StatusCode</span>, <span class="ident">InvalidStatusCode</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="number">100</span> <span class="op">||</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="number">599</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">InvalidStatusCode</span> {
+                <span class="ident">_inner</span>: (),
+            })
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">StatusCode</span>::<span class="ident">from_u16</span>(<span class="ident">n</span>))
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">from_u16</span>(<span class="ident">n</span>: <span class="ident">u16</span>) <span class="op">-&gt;</span> <span class="ident">StatusCode</span> {
         <span class="kw">match</span> <span class="ident">n</span> {
             <span class="number">100</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">Continue</span>,
             <span class="number">101</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">SwitchingProtocols</span>,
@@ -1289,7 +1349,7 @@
 <span class="doccomment">/// Formats the status code, *including* the canonical reason.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use hyper::status::StatusCode::{ImATeapot, Unregistered};</span>
+<span class="doccomment">/// # use hyper::StatusCode::{ImATeapot, Unregistered};</span>
 <span class="doccomment">/// assert_eq!(format!(&quot;{}&quot;, ImATeapot), &quot;418 I&#39;m a teapot&quot;);</span>
 <span class="doccomment">/// assert_eq!(format!(&quot;{}&quot;, Unregistered(123)),</span>
 <span class="doccomment">///            &quot;123 &lt;unknown status code&gt;&quot;);</span>
@@ -1548,6 +1608,18 @@ impl StatusClass {
         <span class="ident">validate</span>(<span class="number">511</span>, <span class="ident">NetworkAuthenticationRequired</span>, <span class="ident">InternalServerError</span>,
             <span class="prelude-val">Some</span>(<span class="string">&quot;Network Authentication Required&quot;</span>));
 
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">try_from</span>() {
+        <span class="ident">StatusCode</span>::<span class="ident">try_from</span>(<span class="number">100</span>).<span class="ident">unwrap</span>();
+        <span class="ident">StatusCode</span>::<span class="ident">try_from</span>(<span class="number">599</span>).<span class="ident">unwrap</span>();
+        <span class="ident">StatusCode</span>::<span class="ident">try_from</span>(<span class="number">200</span>).<span class="ident">unwrap</span>();
+
+        <span class="ident">StatusCode</span>::<span class="ident">try_from</span>(<span class="number">99</span>).<span class="ident">unwrap_err</span>();
+        <span class="ident">StatusCode</span>::<span class="ident">try_from</span>(<span class="number">600</span>).<span class="ident">unwrap_err</span>();
+        <span class="ident">StatusCode</span>::<span class="ident">try_from</span>(<span class="number">0</span>).<span class="ident">unwrap_err</span>();
+        <span class="ident">StatusCode</span>::<span class="ident">try_from</span>(<span class="number">1000</span>).<span class="ident">unwrap_err</span>();
     }
 }
 </pre>
