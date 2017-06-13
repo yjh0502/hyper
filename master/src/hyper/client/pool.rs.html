@@ -662,16 +662,16 @@
     }
 }
 
-<span class="kw">struct</span> <span class="ident">Expiration</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>);
+<span class="kw">struct</span> <span class="ident">Expiration</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span> <span class="ident">Expiration</span> {
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">dur</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Expiration</span> {
-        <span class="ident">Expiration</span>(<span class="ident">dur</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dur</span><span class="op">|</span> <span class="ident">Instant</span>::<span class="ident">now</span>() <span class="op">-</span> <span class="ident">dur</span>))
+        <span class="ident">Expiration</span>(<span class="ident">dur</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">expires</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">instant</span>: <span class="ident">Instant</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">expire</span>) <span class="op">=&gt;</span> <span class="ident">expire</span> <span class="op">&gt;</span> <span class="ident">instant</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">timeout</span>) <span class="op">=&gt;</span> <span class="ident">instant</span>.<span class="ident">elapsed</span>() <span class="op">&gt;</span> <span class="ident">timeout</span>,
             <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>,
         }
     }
