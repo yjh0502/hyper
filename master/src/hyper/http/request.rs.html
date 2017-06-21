@@ -326,6 +326,10 @@
 <span id="281">281</span>
 <span id="282">282</span>
 <span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 
@@ -420,6 +424,10 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_version</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">version</span>: <span class="ident">HttpVersion</span>) { <span class="self">self</span>.<span class="ident">version</span> <span class="op">=</span> <span class="ident">version</span>; }
 
     <span class="doccomment">/// Set the body of the request.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// By default, the body will be sent using `Transfer-Encoding: chunked`. To</span>
+    <span class="doccomment">/// override this behavior, manually set a [`ContentLength`] header with the</span>
+    <span class="doccomment">/// length of `body`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_body</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="ident">T</span>) { <span class="self">self</span>.<span class="ident">body</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">body</span>.<span class="ident">into</span>()); }
 
