@@ -946,11 +946,6 @@
 <span id="901">901</span>
 <span id="902">902</span>
 <span id="903">903</span>
-<span id="904">904</span>
-<span id="905">905</span>
-<span id="906">906</span>
-<span id="907">907</span>
-<span id="908">908</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
@@ -1001,11 +996,6 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">http</span>::<span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Incoming</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()
-    }
-
-
     <span class="kw">fn</span> <span class="ident">is_read_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">is_read_closed</span>()
     }
@@ -1033,9 +1023,9 @@
         <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">can_read_head</span>());
         <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Conn::read_head&quot;</span>);
 
-        <span class="kw">let</span> (<span class="ident">version</span>, <span class="ident">head</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">parse</span>() {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">head</span>)) <span class="op">=&gt;</span> (<span class="ident">head</span>.<span class="ident">version</span>, <span class="ident">head</span>),
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>),
+        <span class="kw">let</span> (<span class="ident">version</span>, <span class="ident">head</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() {
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">head</span>)) <span class="op">=&gt;</span> (<span class="ident">head</span>.<span class="ident">version</span>, <span class="ident">head</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>),
             <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> {
                 <span class="kw">let</span> <span class="ident">must_respond_with_error</span> <span class="op">=</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">is_idle</span>();
                 <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">close_read</span>();
@@ -1090,7 +1080,7 @@
 
         <span class="kw">let</span> (<span class="ident">reading</span>, <span class="ident">ret</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> {
             <span class="ident">Reading</span>::<span class="ident">Body</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">decoder</span>) <span class="op">=&gt;</span> {
-                <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="macro">try_nb</span><span class="macro">!</span>(<span class="ident">decoder</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">io</span>));
+                <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="macro">try_ready</span><span class="macro">!</span>(<span class="ident">decoder</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">io</span>));
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">slice</span>.<span class="ident">is_empty</span>() {
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">http</span>::<span class="ident">Chunk</span>::<span class="ident">from</span>(<span class="ident">slice</span>))));
                 } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">decoder</span>.<span class="ident">is_eof</span>() {
