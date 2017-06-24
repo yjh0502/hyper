@@ -500,7 +500,7 @@
 <span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">BytesMut</span>, <span class="ident">Bytes</span>};
 
 <span class="kw">use</span> <span class="ident">header</span>::{<span class="self">self</span>, <span class="ident">Headers</span>, <span class="ident">ContentLength</span>, <span class="ident">TransferEncoding</span>};
-<span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">ByteStr</span>, <span class="ident">MessageHead</span>, <span class="ident">RawStatus</span>, <span class="ident">Http1Transaction</span>, <span class="ident">ParseResult</span>, <span class="ident">ServerTransaction</span>, <span class="ident">ClientTransaction</span>, <span class="ident">RequestLine</span>};
+<span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">MessageHead</span>, <span class="ident">RawStatus</span>, <span class="ident">Http1Transaction</span>, <span class="ident">ParseResult</span>, <span class="ident">ServerTransaction</span>, <span class="ident">ClientTransaction</span>, <span class="ident">RequestLine</span>};
 <span class="kw">use</span> <span class="ident">http</span>::<span class="ident">h1</span>::{<span class="ident">Encoder</span>, <span class="ident">Decoder</span>, <span class="ident">date</span>};
 <span class="kw">use</span> <span class="ident">method</span>::<span class="ident">Method</span>;
 <span class="kw">use</span> <span class="ident">status</span>::<span class="ident">StatusCode</span>;
@@ -549,10 +549,10 @@
         <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">split_to</span>(<span class="ident">len</span>).<span class="ident">freeze</span>();
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">slice</span>.<span class="ident">slice</span>(<span class="ident">path</span>.<span class="number">0</span>, <span class="ident">path</span>.<span class="number">1</span>);
         <span class="comment">// path was found to be utf8 by httparse</span>
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">ByteStr</span>::<span class="ident">from_utf8_unchecked</span>(<span class="ident">path</span>) };
+        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="kw">unsafe</span> { ::<span class="ident">uri</span>::<span class="ident">from_utf8_unchecked</span>(<span class="ident">path</span>) });
         <span class="kw">let</span> <span class="ident">subject</span> <span class="op">=</span> <span class="ident">RequestLine</span>(
             <span class="ident">method</span>,
-            <span class="macro">try</span><span class="macro">!</span>(::<span class="ident">uri</span>::<span class="ident">from_byte_str</span>(<span class="ident">path</span>)),
+            <span class="ident">path</span>,
         );
 
         <span class="ident">headers</span>.<span class="ident">extend</span>(<span class="ident">HeadersAsBytesIter</span> {
