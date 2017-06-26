@@ -213,6 +213,33 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Pieces pertaining to the HTTP message protocol.</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
@@ -220,7 +247,7 @@
 
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">BytesMut</span>;
 
-<span class="kw">use</span> <span class="ident">header</span>::{<span class="ident">Connection</span>, <span class="ident">ConnectionOption</span>};
+<span class="kw">use</span> <span class="ident">header</span>::{<span class="ident">Connection</span>, <span class="ident">ConnectionOption</span>, <span class="ident">Expect</span>};
 <span class="kw">use</span> <span class="ident">header</span>::<span class="ident">Headers</span>;
 <span class="kw">use</span> <span class="ident">method</span>::<span class="ident">Method</span>;
 <span class="kw">use</span> <span class="ident">status</span>::<span class="ident">StatusCode</span>;
@@ -271,6 +298,10 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_keep_alive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="ident">should_keep_alive</span>(<span class="self">self</span>.<span class="ident">version</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">headers</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expecting_continue</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="ident">expecting_continue</span>(<span class="self">self</span>.<span class="ident">version</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">headers</span>)
     }
 }
 
@@ -335,6 +366,17 @@
     <span class="ident">ret</span>
 }
 
+<span class="doccomment">/// Checks if a connection is expecting a `100 Continue` before sending its body.</span>
+<span class="attribute">#[<span class="ident">inline</span>]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expecting_continue</span>(<span class="ident">version</span>: <span class="ident">HttpVersion</span>, <span class="ident">headers</span>: <span class="kw-2">&amp;</span><span class="ident">Headers</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">version</span>, <span class="ident">headers</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">Expect</span><span class="op">&gt;</span>()) {
+        (<span class="ident">Http11</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Expect</span>::<span class="ident">Continue</span>)) <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+        _ <span class="op">=&gt;</span> <span class="bool-val">false</span>
+    };
+    <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;expecting_continue(version={:?}, header={:?}) = {:?}&quot;</span>, <span class="ident">version</span>, <span class="ident">headers</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">Expect</span><span class="op">&gt;</span>(), <span class="ident">ret</span>);
+    <span class="ident">ret</span>
+}
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ServerTransaction</span> {}
 
@@ -383,6 +425,18 @@
     <span class="ident">headers</span>.<span class="ident">set</span>(<span class="ident">Connection</span>::<span class="ident">keep_alive</span>());
     <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">should_keep_alive</span>(<span class="ident">Http10</span>, <span class="kw-2">&amp;</span><span class="ident">headers</span>));
     <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">should_keep_alive</span>(<span class="ident">Http11</span>, <span class="kw-2">&amp;</span><span class="ident">headers</span>));
+}
+
+<span class="attribute">#[<span class="ident">test</span>]</span>
+<span class="kw">fn</span> <span class="ident">test_expecting_continue</span>() {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">Headers</span>::<span class="ident">new</span>();
+
+    <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">expecting_continue</span>(<span class="ident">Http10</span>, <span class="kw-2">&amp;</span><span class="ident">headers</span>));
+    <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">expecting_continue</span>(<span class="ident">Http11</span>, <span class="kw-2">&amp;</span><span class="ident">headers</span>));
+
+    <span class="ident">headers</span>.<span class="ident">set</span>(<span class="ident">Expect</span>::<span class="ident">Continue</span>);
+    <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">expecting_continue</span>(<span class="ident">Http10</span>, <span class="kw-2">&amp;</span><span class="ident">headers</span>));
+    <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">expecting_continue</span>(<span class="ident">Http11</span>, <span class="kw-2">&amp;</span><span class="ident">headers</span>));
 }
 </pre>
 </section>
