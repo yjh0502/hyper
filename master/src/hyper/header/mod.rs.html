@@ -1100,6 +1100,32 @@
 <span id="1055">1055</span>
 <span id="1056">1056</span>
 <span id="1057">1057</span>
+<span id="1058">1058</span>
+<span id="1059">1059</span>
+<span id="1060">1060</span>
+<span id="1061">1061</span>
+<span id="1062">1062</span>
+<span id="1063">1063</span>
+<span id="1064">1064</span>
+<span id="1065">1065</span>
+<span id="1066">1066</span>
+<span id="1067">1067</span>
+<span id="1068">1068</span>
+<span id="1069">1069</span>
+<span id="1070">1070</span>
+<span id="1071">1071</span>
+<span id="1072">1072</span>
+<span id="1073">1073</span>
+<span id="1074">1074</span>
+<span id="1075">1075</span>
+<span id="1076">1076</span>
+<span id="1077">1077</span>
+<span id="1078">1078</span>
+<span id="1079">1079</span>
+<span id="1080">1080</span>
+<span id="1081">1081</span>
+<span id="1082">1082</span>
+<span id="1083">1083</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Headers container, and common header fields.</span>
 <span class="doccomment">//!</span>
@@ -1322,6 +1348,32 @@
             <span class="ident">Multi</span>::<span class="ident">Raw</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">raw</span>) <span class="op">=&gt;</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">new</span>();
                 <span class="macro">try</span><span class="macro">!</span>(<span class="macro">write</span><span class="macro">!</span>(<span class="ident">NewlineReplacer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">s</span>), <span class="string">&quot;{}&quot;</span>, <span class="ident">line</span>));
+                <span class="ident">raw</span>.<span class="ident">push</span>(<span class="ident">s</span>);
+                <span class="prelude-val">Ok</span>(())
+            }
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">danger_fmt_line_without_newline_replacer</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt</span>::<span class="ident">Display</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">line</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Write</span>;
+        <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
+            <span class="ident">Multi</span>::<span class="ident">Line</span>(<span class="ident">name</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">f</span>) <span class="op">=&gt;</span> {
+                <span class="macro">try</span><span class="macro">!</span>(<span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">name</span>));
+                <span class="macro">try</span><span class="macro">!</span>(<span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;: &quot;</span>));
+                <span class="macro">try</span><span class="macro">!</span>(<span class="ident">fmt</span>::<span class="ident">Display</span>::<span class="ident">fmt</span>(<span class="ident">line</span>, <span class="ident">f</span>));
+                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;\r\n&quot;</span>)
+            },
+            <span class="ident">Multi</span>::<span class="ident">Join</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">first</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">f</span>) <span class="op">=&gt;</span> {
+                <span class="kw">if</span> <span class="op">!</span><span class="kw-2">*</span><span class="ident">first</span> {
+                    <span class="macro">try</span><span class="macro">!</span>(<span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;, &quot;</span>));
+                } <span class="kw">else</span> {
+                    <span class="kw-2">*</span><span class="ident">first</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                }
+                <span class="ident">fmt</span>::<span class="ident">Display</span>::<span class="ident">fmt</span>(<span class="ident">line</span>, <span class="ident">f</span>)
+            }
+            <span class="ident">Multi</span>::<span class="ident">Raw</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">raw</span>) <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">new</span>();
+                <span class="macro">try</span><span class="macro">!</span>(<span class="macro">write</span><span class="macro">!</span>(<span class="ident">s</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">line</span>));
                 <span class="ident">raw</span>.<span class="ident">push</span>(<span class="ident">s</span>);
                 <span class="prelude-val">Ok</span>(())
             }

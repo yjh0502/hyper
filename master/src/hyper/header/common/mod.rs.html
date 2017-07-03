@@ -502,6 +502,42 @@
 <span id="457">457</span>
 <span id="458">458</span>
 <span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! A Collection of Header implementations for common HTTP Headers.</span>
 <span class="doccomment">//!</span>
@@ -780,6 +816,34 @@
             }
         }
     };
+    <span class="comment">// Single value header (internal)</span>
+    ($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">meta</span>]</span>)<span class="kw-2">*</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">expr</span>) <span class="op">=&gt;</span> <span class="ident">danger</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ty</span>]) <span class="op">=&gt;</span> {
+        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>]</span>)<span class="op">*</span>
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
+        <span class="kw">pub</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>(<span class="kw">pub</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>);
+        <span class="macro">__hyper__deref</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span> <span class="op">=&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>);
+        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">header</span>::<span class="ident">Header</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span> {
+            <span class="attribute">#[<span class="ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class="ident">header_name</span>() <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+                <span class="kw">static</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>;
+                <span class="ident">NAME</span>
+            }
+            <span class="attribute">#[<span class="ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class="ident">parse_header</span>(<span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">header</span>::<span class="ident">Raw</span>) <span class="op">-&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+                <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">header</span>::<span class="ident">parsing</span>::<span class="ident">from_one_raw_str</span>(<span class="ident">raw</span>).<span class="ident">map</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>)
+            }
+            <span class="attribute">#[<span class="ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class="ident">fmt_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">header</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> ::<span class="ident">std</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+                <span class="ident">f</span>.<span class="ident">danger_fmt_line_without_newline_replacer</span>(<span class="self">self</span>)
+            }
+        }
+        <span class="kw">impl</span> ::<span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span> {
+            <span class="attribute">#[<span class="ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> ::<span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> ::<span class="ident">std</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+                ::<span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Display</span>::<span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">f</span>)
+            }
+        }
+    };
     <span class="comment">// Single value cow header</span>
     ($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">meta</span>]</span>)<span class="kw-2">*</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">expr</span>) <span class="op">=&gt;</span> <span class="ident">Cow</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ty</span>]) <span class="op">=&gt;</span> {
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>]</span>)<span class="op">*</span>
@@ -884,6 +948,14 @@
         <span class="macro">header</span><span class="macro">!</span> {
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>]</span>)<span class="op">*</span>
             (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>) <span class="op">=&gt;</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">item</span>]
+        }
+
+        <span class="macro">__hyper__tm</span><span class="macro">!</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tm</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>)<span class="op">*</span> }}
+    };
+    ($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">meta</span>]</span>)<span class="kw-2">*</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">expr</span>) <span class="op">=&gt;</span> <span class="ident">danger</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">item</span>:<span class="ident">ty</span>] <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tm</span>:<span class="ident">ident</span>{$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>:<span class="ident">item</span>)<span class="kw-2">*</span>}) <span class="op">=&gt;</span> {
+        <span class="macro">header</span><span class="macro">!</span> {
+            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>]</span>)<span class="op">*</span>
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>) <span class="op">=&gt;</span> <span class="ident">danger</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">item</span>]
         }
 
         <span class="macro">__hyper__tm</span><span class="macro">!</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tm</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>)<span class="op">*</span> }}
