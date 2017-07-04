@@ -556,7 +556,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// If a message body does not include a Transfer-Encoding, it *should*</span>
 <span class="doccomment">/// include a Content-Length header.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Decoder</span> {
     <span class="ident">kind</span>: <span class="ident">Kind</span>,
 }
@@ -575,7 +575,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">enum</span> <span class="ident">Kind</span> {
     <span class="doccomment">/// A Reader used when a Content-Length header is passed with a positive integer.</span>
     <span class="ident">Length</span>(<span class="ident">u64</span>),
