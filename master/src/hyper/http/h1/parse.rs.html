@@ -536,6 +536,62 @@
 <span id="491">491</span>
 <span id="492">492</span>
 <span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
@@ -613,11 +669,31 @@
 
     <span class="kw">fn</span> <span class="ident">decoder</span>(<span class="ident">head</span>: <span class="kw-2">&amp;</span><span class="ident">MessageHead</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Incoming</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decoder</span><span class="op">&gt;</span> {
         <span class="kw">use</span> ::<span class="ident">header</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>::<span class="ident">ContentLength</span>(<span class="ident">len</span>)) <span class="op">=</span> <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">get</span>() {
+        <span class="comment">// According to https://tools.ietf.org/html/rfc7230#section-3.3.3</span>
+        <span class="comment">// 1. (irrelevant to Request)</span>
+        <span class="comment">// 2. (irrelevant to Request)</span>
+        <span class="comment">// 3. Transfer-Encoding: chunked has a chunked body.</span>
+        <span class="comment">// 4. If multiple differing Content-Length headers or invalid, close connection.</span>
+        <span class="comment">// 5. Content-Length header has a sized body.</span>
+        <span class="comment">// 6. Length 0.</span>
+        <span class="comment">// 7. (irrelevant to Request)</span>
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>::<span class="ident">TransferEncoding</span>(<span class="kw-2">ref</span> <span class="ident">encodings</span>)) <span class="op">=</span> <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">get</span>() {
+            <span class="comment">// https://tools.ietf.org/html/rfc7230#section-3.3.3</span>
+            <span class="comment">// If Transfer-Encoding header is present, and &#39;chunked&#39; is</span>
+            <span class="comment">// not the final encoding, and this is a Request, then it is</span>
+            <span class="comment">// mal-formed. A server should responsed with 400 Bad Request.</span>
+            <span class="kw">if</span> <span class="ident">encodings</span>.<span class="ident">last</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>::<span class="ident">Encoding</span>::<span class="ident">Chunked</span>) {
+                <span class="prelude-val">Ok</span>(<span class="ident">Decoder</span>::<span class="ident">chunked</span>())
+            } <span class="kw">else</span> {
+                <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;request with transfer-encoding header, but not chunked, bad request&quot;</span>);
+                <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>)
+            }
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>::<span class="ident">ContentLength</span>(<span class="ident">len</span>)) <span class="op">=</span> <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">get</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">Decoder</span>::<span class="ident">length</span>(<span class="ident">len</span>))
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">has</span>::<span class="op">&lt;</span><span class="ident">header</span>::<span class="ident">TransferEncoding</span><span class="op">&gt;</span>() {
-            <span class="comment">//TODO: check for Transfer-Encoding: chunked</span>
-            <span class="prelude-val">Ok</span>(<span class="ident">Decoder</span>::<span class="ident">chunked</span>())
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">has</span>::<span class="op">&lt;</span><span class="ident">header</span>::<span class="ident">ContentLength</span><span class="op">&gt;</span>() {
+            <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;illegal Content-Length: {:?}&quot;</span>, <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">get_raw</span>(<span class="string">&quot;Content-Length&quot;</span>));
+            <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">Decoder</span>::<span class="ident">length</span>(<span class="number">0</span>))
         }
@@ -740,7 +816,7 @@
         <span class="comment">// 3. Transfer-Encoding: chunked has a chunked body.</span>
         <span class="comment">// 4. If multiple differing Content-Length headers or invalid, close connection.</span>
         <span class="comment">// 5. Content-Length header has a sized body.</span>
-        <span class="comment">// 6. Not Client.</span>
+        <span class="comment">// 6. (irrelevant to Response)</span>
         <span class="comment">// 7. Read till EOF.</span>
 
         <span class="comment">//TODO: need a way to pass the Method that caused this Response</span>
@@ -762,7 +838,7 @@
         } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>::<span class="ident">ContentLength</span>(<span class="ident">len</span>)) <span class="op">=</span> <span class="ident">inc</span>.<span class="ident">headers</span>.<span class="ident">get</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">Decoder</span>::<span class="ident">length</span>(<span class="ident">len</span>))
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">inc</span>.<span class="ident">headers</span>.<span class="ident">has</span>::<span class="op">&lt;</span><span class="ident">header</span>::<span class="ident">ContentLength</span><span class="op">&gt;</span>() {
-            <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;illegal Content-Length: {:?}&quot;</span>, <span class="ident">inc</span>.<span class="ident">headers</span>.<span class="ident">get_raw</span>(<span class="string">&quot;Content-Length&quot;</span>));
+            <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;illegal Content-Length: {:?}&quot;</span>, <span class="ident">inc</span>.<span class="ident">headers</span>.<span class="ident">get_raw</span>(<span class="string">&quot;Content-Length&quot;</span>));
             <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>)
         } <span class="kw">else</span> {
             <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;neither Transfer-Encoding nor Content-Length&quot;</span>);
@@ -935,6 +1011,39 @@
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res</span>.<span class="ident">subject</span>.<span class="number">1</span>, <span class="string">&quot;Howdy&quot;</span>);
     }
 
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_decoder_request</span>() {
+        <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Decoder</span>;
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">MessageHead</span>::<span class="op">&lt;</span>::<span class="ident">http</span>::<span class="ident">RequestLine</span><span class="op">&gt;</span>::<span class="ident">default</span>();
+
+        <span class="ident">head</span>.<span class="ident">subject</span>.<span class="number">0</span> <span class="op">=</span> ::<span class="ident">Method</span>::<span class="ident">Get</span>;
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Decoder</span>::<span class="ident">length</span>(<span class="number">0</span>), <span class="ident">ServerTransaction</span>::<span class="ident">decoder</span>(<span class="kw-2">&amp;</span><span class="ident">head</span>).<span class="ident">unwrap</span>());
+        <span class="ident">head</span>.<span class="ident">subject</span>.<span class="number">0</span> <span class="op">=</span> ::<span class="ident">Method</span>::<span class="ident">Post</span>;
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Decoder</span>::<span class="ident">length</span>(<span class="number">0</span>), <span class="ident">ServerTransaction</span>::<span class="ident">decoder</span>(<span class="kw-2">&amp;</span><span class="ident">head</span>).<span class="ident">unwrap</span>());
+
+        <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">set</span>(<span class="ident">TransferEncoding</span>::<span class="ident">chunked</span>());
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Decoder</span>::<span class="ident">chunked</span>(), <span class="ident">ServerTransaction</span>::<span class="ident">decoder</span>(<span class="kw-2">&amp;</span><span class="ident">head</span>).<span class="ident">unwrap</span>());
+        <span class="comment">// transfer-encoding and content-length = chunked</span>
+        <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">set</span>(<span class="ident">ContentLength</span>(<span class="number">10</span>));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Decoder</span>::<span class="ident">chunked</span>(), <span class="ident">ServerTransaction</span>::<span class="ident">decoder</span>(<span class="kw-2">&amp;</span><span class="ident">head</span>).<span class="ident">unwrap</span>());
+
+        <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">remove</span>::<span class="op">&lt;</span><span class="ident">TransferEncoding</span><span class="op">&gt;</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Decoder</span>::<span class="ident">length</span>(<span class="number">10</span>), <span class="ident">ServerTransaction</span>::<span class="ident">decoder</span>(<span class="kw-2">&amp;</span><span class="ident">head</span>).<span class="ident">unwrap</span>());
+
+        <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">set_raw</span>(<span class="string">&quot;Content-Length&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;5&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;5&quot;</span>.<span class="ident">to_vec</span>()]);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Decoder</span>::<span class="ident">length</span>(<span class="number">5</span>), <span class="ident">ServerTransaction</span>::<span class="ident">decoder</span>(<span class="kw-2">&amp;</span><span class="ident">head</span>).<span class="ident">unwrap</span>());
+
+        <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">set_raw</span>(<span class="string">&quot;Content-Length&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;10&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;11&quot;</span>.<span class="ident">to_vec</span>()]);
+        <span class="ident">ServerTransaction</span>::<span class="ident">decoder</span>(<span class="kw-2">&amp;</span><span class="ident">head</span>).<span class="ident">unwrap_err</span>();
+
+        <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">remove</span>::<span class="op">&lt;</span><span class="ident">ContentLength</span><span class="op">&gt;</span>();
+
+        <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">set_raw</span>(<span class="string">&quot;Transfer-Encoding&quot;</span>, <span class="string">&quot;gzip&quot;</span>);
+        <span class="ident">ServerTransaction</span>::<span class="ident">decoder</span>(<span class="kw-2">&amp;</span><span class="ident">head</span>).<span class="ident">unwrap_err</span>();
+    }
+
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_decoder_response</span>() {
         <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Decoder</span>;
@@ -952,8 +1061,11 @@
         <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">set</span>(<span class="ident">TransferEncoding</span>::<span class="ident">chunked</span>());
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Decoder</span>::<span class="ident">chunked</span>(), <span class="ident">ClientTransaction</span>::<span class="ident">decoder</span>(<span class="kw-2">&amp;</span><span class="ident">head</span>).<span class="ident">unwrap</span>());
 
-        <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">remove</span>::<span class="op">&lt;</span><span class="ident">TransferEncoding</span><span class="op">&gt;</span>();
+        <span class="comment">// transfer-encoding and content-length = chunked</span>
         <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">set</span>(<span class="ident">ContentLength</span>(<span class="number">10</span>));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Decoder</span>::<span class="ident">chunked</span>(), <span class="ident">ClientTransaction</span>::<span class="ident">decoder</span>(<span class="kw-2">&amp;</span><span class="ident">head</span>).<span class="ident">unwrap</span>());
+
+        <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">remove</span>::<span class="op">&lt;</span><span class="ident">TransferEncoding</span><span class="op">&gt;</span>();
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Decoder</span>::<span class="ident">length</span>(<span class="number">10</span>), <span class="ident">ClientTransaction</span>::<span class="ident">decoder</span>(<span class="kw-2">&amp;</span><span class="ident">head</span>).<span class="ident">unwrap</span>());
 
         <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">set_raw</span>(<span class="string">&quot;Content-Length&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;5&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;5&quot;</span>.<span class="ident">to_vec</span>()]);
