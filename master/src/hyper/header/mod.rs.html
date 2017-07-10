@@ -1098,34 +1098,6 @@
 <span id="1053">1053</span>
 <span id="1054">1054</span>
 <span id="1055">1055</span>
-<span id="1056">1056</span>
-<span id="1057">1057</span>
-<span id="1058">1058</span>
-<span id="1059">1059</span>
-<span id="1060">1060</span>
-<span id="1061">1061</span>
-<span id="1062">1062</span>
-<span id="1063">1063</span>
-<span id="1064">1064</span>
-<span id="1065">1065</span>
-<span id="1066">1066</span>
-<span id="1067">1067</span>
-<span id="1068">1068</span>
-<span id="1069">1069</span>
-<span id="1070">1070</span>
-<span id="1071">1071</span>
-<span id="1072">1072</span>
-<span id="1073">1073</span>
-<span id="1074">1074</span>
-<span id="1075">1075</span>
-<span id="1076">1076</span>
-<span id="1077">1077</span>
-<span id="1078">1078</span>
-<span id="1079">1079</span>
-<span id="1080">1080</span>
-<span id="1081">1081</span>
-<span id="1082">1082</span>
-<span id="1083">1083</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Headers container, and common header fields.</span>
 <span class="doccomment">//!</span>
@@ -1212,7 +1184,7 @@
 <span class="kw">use</span> <span class="ident">unicase</span>::<span class="ident">Ascii</span>;
 
 <span class="kw">use</span> <span class="self">self</span>::<span class="ident">internals</span>::{<span class="ident">Item</span>, <span class="ident">VecMap</span>, <span class="ident">Entry</span>};
-<span class="kw">use</span> <span class="self">self</span>::<span class="ident">sealed</span>::{<span class="ident">GetType</span>, <span class="ident">HeaderClone</span>};
+<span class="kw">use</span> <span class="self">self</span>::<span class="ident">sealed</span>::<span class="ident">HeaderClone</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">shared</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">common</span>::<span class="kw-2">*</span>;
@@ -1230,7 +1202,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// This trait represents the construction and identification of headers,</span>
 <span class="doccomment">/// and contains trait-object unsafe methods.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Header</span>: <span class="ident">HeaderClone</span> <span class="op">+</span> <span class="ident">GetType</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Header</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">HeaderClone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
     <span class="doccomment">/// Returns the name of the header field this belongs to.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will become an associated constant once available.</span>
@@ -1261,18 +1233,7 @@
 }
 
 <span class="kw">mod</span> <span class="ident">sealed</span> {
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">any</span>::{<span class="ident">Any</span>, <span class="ident">TypeId</span>};
     <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Header</span>;
-
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GetType</span>: <span class="ident">Any</span> {
-        <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">get_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">TypeId</span> {
-            <span class="ident">TypeId</span>::<span class="ident">of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>()
-        }
-    }
-
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Any</span><span class="op">&gt;</span> <span class="ident">GetType</span> <span class="kw">for</span> <span class="ident">T</span> {}
 
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">HeaderClone</span> {
@@ -1284,23 +1245,6 @@
         <span class="kw">fn</span> <span class="ident">clone_box</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Header</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> {
             <span class="ident">Box</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">clone</span>())
         }
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_get_type</span>() {
-        <span class="kw">use</span> ::<span class="ident">header</span>::{<span class="ident">ContentLength</span>, <span class="ident">UserAgent</span>};
-
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">ContentLength</span>(<span class="number">5</span>);
-        <span class="kw">let</span> <span class="ident">agent</span> <span class="op">=</span> <span class="ident">UserAgent</span>::<span class="ident">new</span>(<span class="string">&quot;hyper&quot;</span>);
-
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">TypeId</span>::<span class="ident">of</span>::<span class="op">&lt;</span><span class="ident">ContentLength</span><span class="op">&gt;</span>(), <span class="ident">len</span>.<span class="ident">get_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">TypeId</span>::<span class="ident">of</span>::<span class="op">&lt;</span><span class="ident">UserAgent</span><span class="op">&gt;</span>(), <span class="ident">agent</span>.<span class="ident">get_type</span>());
-
-        <span class="kw">let</span> <span class="ident">len</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Header</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">len</span>);
-        <span class="kw">let</span> <span class="ident">agent</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Header</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">agent</span>);
-
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">TypeId</span>::<span class="ident">of</span>::<span class="op">&lt;</span><span class="ident">ContentLength</span><span class="op">&gt;</span>(), (<span class="kw-2">*</span><span class="ident">len</span>).<span class="ident">get_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">TypeId</span>::<span class="ident">of</span>::<span class="op">&lt;</span><span class="ident">UserAgent</span><span class="op">&gt;</span>(), (<span class="kw-2">*</span><span class="ident">agent</span>).<span class="ident">get_type</span>());
     }
 }
 
