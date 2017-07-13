@@ -226,6 +226,10 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 
@@ -322,6 +326,10 @@
         <span class="self">self</span>.<span class="ident">set_body</span>(<span class="ident">body</span>);
         <span class="self">self</span>
     }
+
+    <span class="doccomment">/// Read the body.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">body_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">B</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">body</span>.<span class="ident">as_ref</span>() }
 }
 
 <span class="kw">impl</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> {
