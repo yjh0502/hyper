@@ -538,6 +538,10 @@
 <span id="493">493</span>
 <span id="494">494</span>
 <span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! A Collection of Header implementations for common HTTP Headers.</span>
 <span class="doccomment">//!</span>
@@ -547,6 +551,10 @@
 <span class="doccomment">//! strongly-typed theme, the [mime](https://docs.rs/mime) crate</span>
 <span class="doccomment">//! is used, such as `ContentType(pub Mime)`.</span>
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">accept_charset</span>::<span class="ident">AcceptCharset</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">accept_encoding</span>::<span class="ident">AcceptEncoding</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">accept_language</span>::<span class="ident">AcceptLanguage</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">accept_ranges</span>::{<span class="ident">AcceptRanges</span>, <span class="ident">RangeUnit</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">accept</span>::<span class="ident">Accept</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">access_control_allow_credentials</span>::<span class="ident">AccessControlAllowCredentials</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">access_control_allow_headers</span>::<span class="ident">AccessControlAllowHeaders</span>;
@@ -556,18 +564,14 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">access_control_max_age</span>::<span class="ident">AccessControlMaxAge</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">access_control_request_headers</span>::<span class="ident">AccessControlRequestHeaders</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">access_control_request_method</span>::<span class="ident">AccessControlRequestMethod</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">accept_charset</span>::<span class="ident">AcceptCharset</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">accept_encoding</span>::<span class="ident">AcceptEncoding</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">accept_language</span>::<span class="ident">AcceptLanguage</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">accept_ranges</span>::{<span class="ident">AcceptRanges</span>, <span class="ident">RangeUnit</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">allow</span>::<span class="ident">Allow</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">authorization</span>::{<span class="ident">Authorization</span>, <span class="ident">Scheme</span>, <span class="ident">Basic</span>, <span class="ident">Bearer</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">cache_control</span>::{<span class="ident">CacheControl</span>, <span class="ident">CacheDirective</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">connection</span>::{<span class="ident">Connection</span>, <span class="ident">ConnectionOption</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">content_disposition</span>::{<span class="ident">ContentDisposition</span>, <span class="ident">DispositionType</span>, <span class="ident">DispositionParam</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">content_length</span>::<span class="ident">ContentLength</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">content_encoding</span>::<span class="ident">ContentEncoding</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">content_language</span>::<span class="ident">ContentLanguage</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">content_length</span>::<span class="ident">ContentLength</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">content_location</span>::<span class="ident">ContentLocation</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">content_range</span>::{<span class="ident">ContentRange</span>, <span class="ident">ContentRangeSpec</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">content_type</span>::<span class="ident">ContentType</span>;
@@ -581,9 +585,11 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">if_match</span>::<span class="ident">IfMatch</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">if_modified_since</span>::<span class="ident">IfModifiedSince</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">if_none_match</span>::<span class="ident">IfNoneMatch</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">if_unmodified_since</span>::<span class="ident">IfUnmodifiedSince</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">if_range</span>::<span class="ident">IfRange</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">if_unmodified_since</span>::<span class="ident">IfUnmodifiedSince</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">last_event_id</span>::<span class="ident">LastEventId</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">last_modified</span>::<span class="ident">LastModified</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">link</span>::{<span class="ident">Link</span>, <span class="ident">LinkValue</span>, <span class="ident">RelationType</span>, <span class="ident">MediaDesc</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">location</span>::<span class="ident">Location</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">origin</span>::<span class="ident">Origin</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">pragma</span>::<span class="ident">Pragma</span>;
@@ -596,12 +602,12 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">server</span>::<span class="ident">Server</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">set_cookie</span>::<span class="ident">SetCookie</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">strict_transport_security</span>::<span class="ident">StrictTransportSecurity</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">te</span>::<span class="ident">Te</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">transfer_encoding</span>::<span class="ident">TransferEncoding</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">upgrade</span>::{<span class="ident">Upgrade</span>, <span class="ident">Protocol</span>, <span class="ident">ProtocolName</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">user_agent</span>::<span class="ident">UserAgent</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">vary</span>::<span class="ident">Vary</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">warning</span>::<span class="ident">Warning</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">link</span>::{<span class="ident">Link</span>, <span class="ident">LinkValue</span>, <span class="ident">RelationType</span>, <span class="ident">MediaDesc</span>};
 
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
@@ -979,6 +985,10 @@
 }
 
 
+<span class="kw">mod</span> <span class="ident">accept_charset</span>;
+<span class="kw">mod</span> <span class="ident">accept_encoding</span>;
+<span class="kw">mod</span> <span class="ident">accept_language</span>;
+<span class="kw">mod</span> <span class="ident">accept_ranges</span>;
 <span class="kw">mod</span> <span class="ident">accept</span>;
 <span class="kw">mod</span> <span class="ident">access_control_allow_credentials</span>;
 <span class="kw">mod</span> <span class="ident">access_control_allow_headers</span>;
@@ -988,14 +998,9 @@
 <span class="kw">mod</span> <span class="ident">access_control_max_age</span>;
 <span class="kw">mod</span> <span class="ident">access_control_request_headers</span>;
 <span class="kw">mod</span> <span class="ident">access_control_request_method</span>;
-<span class="kw">mod</span> <span class="ident">accept_charset</span>;
-<span class="kw">mod</span> <span class="ident">accept_encoding</span>;
-<span class="kw">mod</span> <span class="ident">accept_language</span>;
-<span class="kw">mod</span> <span class="ident">accept_ranges</span>;
 <span class="kw">mod</span> <span class="ident">allow</span>;
 <span class="kw">mod</span> <span class="ident">authorization</span>;
 <span class="kw">mod</span> <span class="ident">cache_control</span>;
-<span class="kw">mod</span> <span class="ident">cookie</span>;
 <span class="kw">mod</span> <span class="ident">connection</span>;
 <span class="kw">mod</span> <span class="ident">content_disposition</span>;
 <span class="kw">mod</span> <span class="ident">content_encoding</span>;
@@ -1004,6 +1009,7 @@
 <span class="kw">mod</span> <span class="ident">content_location</span>;
 <span class="kw">mod</span> <span class="ident">content_range</span>;
 <span class="kw">mod</span> <span class="ident">content_type</span>;
+<span class="kw">mod</span> <span class="ident">cookie</span>;
 <span class="kw">mod</span> <span class="ident">date</span>;
 <span class="kw">mod</span> <span class="ident">etag</span>;
 <span class="kw">mod</span> <span class="ident">expect</span>;
@@ -1015,7 +1021,9 @@
 <span class="kw">mod</span> <span class="ident">if_none_match</span>;
 <span class="kw">mod</span> <span class="ident">if_range</span>;
 <span class="kw">mod</span> <span class="ident">if_unmodified_since</span>;
+<span class="kw">mod</span> <span class="ident">last_event_id</span>;
 <span class="kw">mod</span> <span class="ident">last_modified</span>;
+<span class="kw">mod</span> <span class="ident">link</span>;
 <span class="kw">mod</span> <span class="ident">location</span>;
 <span class="kw">mod</span> <span class="ident">origin</span>;
 <span class="kw">mod</span> <span class="ident">pragma</span>;
@@ -1028,12 +1036,12 @@
 <span class="kw">mod</span> <span class="ident">server</span>;
 <span class="kw">mod</span> <span class="ident">set_cookie</span>;
 <span class="kw">mod</span> <span class="ident">strict_transport_security</span>;
+<span class="kw">mod</span> <span class="ident">te</span>;
 <span class="kw">mod</span> <span class="ident">transfer_encoding</span>;
 <span class="kw">mod</span> <span class="ident">upgrade</span>;
 <span class="kw">mod</span> <span class="ident">user_agent</span>;
 <span class="kw">mod</span> <span class="ident">vary</span>;
 <span class="kw">mod</span> <span class="ident">warning</span>;
-<span class="kw">mod</span> <span class="ident">link</span>;
 </pre>
 </section>
     <section id='search' class="content hidden"></section>
