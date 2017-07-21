@@ -415,7 +415,7 @@ touch its capacity.</p>
 <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="number">0</span>, <span class="ident">s</span>.<span class="ident">len</span>());
 <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="number">3</span>, <span class="ident">s</span>.<span class="ident">capacity</span>());</pre>
 </div><h4 id='method.drain' class="method"><span id='drain.v' class='invisible'><code>fn <a href='#method.drain' class='fnname'>drain</a>&lt;R&gt;(&amp;mut self, range: R) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/collections/string/struct.Drain.html" title="struct collections::string::Drain">Drain</a> <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href="https://doc.rust-lang.org/nightly/collections/range/trait.RangeArgument.html" title="trait collections::range::RangeArgument">RangeArgument</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>&gt;,&nbsp;</span></code><div class='since' title='Stable since Rust version 1.6.0'>1.6.0</div></span></h4>
-<div class='docblock'><p>Create a draining iterator that removes the specified range in the string
+<div class='docblock'><p>Creates a draining iterator that removes the specified range in the string
 and yields the removed chars.</p>
 
 <p>Note: The element range is removed even if the iterator is not
@@ -440,12 +440,37 @@ boundary, or if they&#39;re out of bounds.</p>
 <span class="comment">// A full range clears the string</span>
 <span class="ident">s</span>.<span class="ident">drain</span>(..);
 <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">s</span>, <span class="string">&quot;&quot;</span>);</pre>
+</div><h4 id='method.splice' class="method"><span id='splice.v' class='invisible'><code>fn <a href='#method.splice' class='fnname'>splice</a>&lt;R&gt;(&amp;'a mut self, range: R, replace_with: &amp;'b <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/collections/string/struct.Splice.html" title="struct collections::string::Splice">Splice</a>&lt;'a, 'b&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href="https://doc.rust-lang.org/nightly/collections/range/trait.RangeArgument.html" title="trait collections::range::RangeArgument">RangeArgument</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>&gt;,&nbsp;</span></code></span></h4>
+<div class='stability'><div class='stab unstable'><details><summary><span class=microscope>🔬</span> This is a nightly-only experimental API.  (<code>splice</code>)</summary><p>recently added</p>
+</details></div></div><div class='docblock'><p>Creates a splicing iterator that removes the specified range in the string,
+replaces with the given string, and yields the removed chars.
+The given string doesn’t need to be the same length as the range.</p>
+
+<p>Note: The element range is removed when the <code>Splice</code> is dropped,
+even if the iterator is not consumed until the end.</p>
+
+<h1 id='panics-8' class='section-header'><a href='#panics-8'>Panics</a></h1>
+<p>Panics if the starting point or end point do not lie on a <a href="../../std/primitive.char.html"><code>char</code></a>
+boundary, or if they&#39;re out of bounds.</p>
+
+<h1 id='examples-20' class='section-header'><a href='#examples-20'>Examples</a></h1>
+<p>Basic usage:</p>
+
+<pre class="rust rust-example-rendered">
+<span class="attribute">#<span class="op">!</span>[<span class="ident">feature</span>(<span class="ident">splice</span>)]</span>
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;α is alpha, β is beta&quot;</span>);
+<span class="kw">let</span> <span class="ident">beta_offset</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">find</span>(<span class="string">&#39;β&#39;</span>).<span class="ident">unwrap_or</span>(<span class="ident">s</span>.<span class="ident">len</span>());
+
+<span class="comment">// Replace the range up until the β from the string</span>
+<span class="kw">let</span> <span class="ident">t</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">splice</span>(..<span class="ident">beta_offset</span>, <span class="string">&quot;Α is capital alpha; &quot;</span>).<span class="ident">collect</span>();
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">t</span>, <span class="string">&quot;α is alpha, &quot;</span>);
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">s</span>, <span class="string">&quot;Α is capital alpha; β is beta&quot;</span>);</pre>
 </div><h4 id='method.into_boxed_str' class="method"><span id='into_boxed_str.v' class='invisible'><code>fn <a href='#method.into_boxed_str' class='fnname'>into_boxed_str</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;</code><div class='since' title='Stable since Rust version 1.4.0'>1.4.0</div></span></h4>
 <div class='docblock'><p>Converts this <code>String</code> into a <code>Box&lt;str&gt;</code>.</p>
 
 <p>This will drop any excess capacity.</p>
 
-<h1 id='examples-20' class='section-header'><a href='#examples-20'>Examples</a></h1>
+<h1 id='examples-21' class='section-header'><a href='#examples-21'>Examples</a></h1>
 <p>Basic usage:</p>
 
 <pre class="rust rust-example-rendered">
@@ -540,7 +565,6 @@ boundary, or if they&#39;re out of bounds.</p>
         window.rootPath = "../../";
         window.currentCrate = "hyper";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>
