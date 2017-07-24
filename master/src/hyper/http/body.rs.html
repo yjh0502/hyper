@@ -182,6 +182,7 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
+<span id="140">140</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">Bytes</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Poll</span>, <span class="ident">Stream</span>};
@@ -193,6 +194,7 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">TokioBody</span> <span class="op">=</span> <span class="ident">tokio_proto</span>::<span class="ident">streaming</span>::<span class="ident">Body</span><span class="op">&lt;</span><span class="ident">Chunk</span>, ::<span class="ident">Error</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// A `Stream` for `Chunk`s used in requests and responses.</span>
+<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;streams do nothing unless polled&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Body</span>(<span class="ident">TokioBody</span>);
 

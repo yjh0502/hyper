@@ -1098,6 +1098,12 @@
 <span id="1053">1053</span>
 <span id="1054">1054</span>
 <span id="1055">1055</span>
+<span id="1056">1056</span>
+<span id="1057">1057</span>
+<span id="1058">1058</span>
+<span id="1059">1059</span>
+<span id="1060">1060</span>
+<span id="1061">1061</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Headers container, and common header fields.</span>
 <span class="doccomment">//!</span>
@@ -1964,6 +1970,12 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">Headers</span>::<span class="ident">new</span>();
         <span class="ident">headers</span>.<span class="ident">set</span>(<span class="ident">ContentLength</span>(<span class="number">10</span>));
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">headers</span>.<span class="ident">remove</span>(), <span class="prelude-val">Some</span>(<span class="ident">ContentLength</span>(<span class="number">10</span>)));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">headers</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+
+        <span class="ident">headers</span>.<span class="ident">set</span>(<span class="ident">ContentLength</span>(<span class="number">9</span>));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">headers</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">headers</span>.<span class="ident">remove</span>::<span class="op">&lt;</span><span class="ident">CrazyLength</span><span class="op">&gt;</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">headers</span>.<span class="ident">len</span>(), <span class="number">0</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
