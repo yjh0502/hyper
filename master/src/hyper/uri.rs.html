@@ -636,6 +636,76 @@
 <span id="591">591</span>
 <span id="592">592</span>
 <span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="self">self</span>};
@@ -707,6 +777,15 @@
             <span class="kw">if</span> <span class="ident">scheme_end</span> <span class="op">+</span> <span class="number">3</span> <span class="op">==</span> <span class="ident">auth_end</span> {
                 <span class="comment">// authority was empty</span>
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">UriError</span>(<span class="ident">ErrorKind</span>::<span class="ident">MissingAuthority</span>));
+            }
+            {
+                <span class="kw">let</span> <span class="ident">authority</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">as_bytes</span>()[<span class="ident">scheme_end</span> <span class="op">+</span> <span class="number">3</span>..<span class="ident">auth_end</span>];
+                <span class="kw">let</span> <span class="ident">has_start_bracket</span> <span class="op">=</span> <span class="ident">authority</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;[&#39;</span>);
+                <span class="kw">let</span> <span class="ident">has_end_bracket</span> <span class="op">=</span> <span class="ident">authority</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;]&#39;</span>);
+                <span class="kw">if</span> <span class="ident">has_start_bracket</span> <span class="op">^</span> <span class="ident">has_end_bracket</span> {
+                    <span class="comment">// has only 1 of [ and ]</span>
+                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">UriError</span>(<span class="ident">ErrorKind</span>::<span class="ident">Malformed</span>));
+                }
             }
             <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">parse_query</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>);
             <span class="kw">let</span> <span class="ident">fragment</span> <span class="op">=</span> <span class="ident">parse_fragment</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>);
@@ -799,18 +878,27 @@
     <span class="doccomment">/// Get the host of this `Uri`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">auth</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">authority</span>() {
-            <span class="ident">auth</span>.<span class="ident">split</span>(<span class="string">&quot;:&quot;</span>).<span class="ident">next</span>()
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+        <span class="self">self</span>.<span class="ident">authority</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">auth</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">host_port</span> <span class="op">=</span> <span class="ident">auth</span>.<span class="ident">rsplit</span>(<span class="string">&#39;@&#39;</span>)
+                .<span class="ident">next</span>()
+                .<span class="ident">expect</span>(<span class="string">&quot;split always has at least 1 item&quot;</span>);
+            <span class="kw">if</span> <span class="ident">host_port</span>.<span class="ident">as_bytes</span>()[<span class="number">0</span>] <span class="op">==</span> <span class="string">b&#39;[&#39;</span> {
+                <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">host_port</span>.<span class="ident">find</span>(<span class="string">&#39;]&#39;</span>)
+                    .<span class="ident">expect</span>(<span class="string">&quot;parsing should validate matching brackets&quot;</span>);
+                <span class="kw-2">&amp;</span><span class="ident">host_port</span>[<span class="number">1</span>..<span class="ident">i</span>]
+            } <span class="kw">else</span> {
+                <span class="ident">host_port</span>.<span class="ident">split</span>(<span class="string">&#39;:&#39;</span>)
+                    .<span class="ident">next</span>()
+                    .<span class="ident">expect</span>(<span class="string">&quot;split always has at least 1 item&quot;</span>)
+            }
+        })
     }
 
     <span class="doccomment">/// Get the port of this `Uri`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">authority</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">auth</span>) <span class="op">=&gt;</span> <span class="ident">auth</span>.<span class="ident">find</span>(<span class="string">&quot;:&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">u16</span>::<span class="ident">from_str</span>(<span class="kw-2">&amp;</span><span class="ident">auth</span>[<span class="ident">i</span><span class="op">+</span><span class="number">1</span>..]).<span class="ident">ok</span>()),
+            <span class="prelude-val">Some</span>(<span class="ident">auth</span>) <span class="op">=&gt;</span> <span class="ident">auth</span>.<span class="ident">rfind</span>(<span class="string">&#39;:&#39;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">auth</span>[<span class="ident">i</span><span class="op">+</span><span class="number">1</span>..].<span class="ident">parse</span>().<span class="ident">ok</span>()),
             <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
        }
     }
@@ -1039,7 +1127,7 @@
             <span class="kw">let</span> <span class="ident">uri</span> <span class="op">=</span> <span class="ident">Uri</span>::<span class="ident">from_str</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">str</span>).<span class="ident">unwrap</span>();
             <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{:?} = {:#?}&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">str</span>, <span class="ident">uri</span>);
             $(
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">uri</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">uri</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>, <span class="macro">stringify</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>));
             )<span class="op">+</span>
         }
     );
@@ -1062,6 +1150,7 @@
 
     <span class="ident">scheme</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;http&quot;</span>),
     <span class="ident">authority</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;127.0.0.1:61761&quot;</span>),
+    <span class="ident">host</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;127.0.0.1&quot;</span>),
     <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;/chunks&quot;</span>,
     <span class="ident">query</span> <span class="op">=</span> <span class="prelude-val">None</span>,
     <span class="ident">fragment</span> <span class="op">=</span> <span class="prelude-val">None</span>,
@@ -1074,6 +1163,7 @@
 
     <span class="ident">scheme</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;https&quot;</span>),
     <span class="ident">authority</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;127.0.0.1:61761&quot;</span>),
+    <span class="ident">host</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;127.0.0.1&quot;</span>),
     <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;/&quot;</span>,
     <span class="ident">query</span> <span class="op">=</span> <span class="prelude-val">None</span>,
     <span class="ident">fragment</span> <span class="op">=</span> <span class="prelude-val">None</span>,
@@ -1097,6 +1187,7 @@
 
     <span class="ident">scheme</span> <span class="op">=</span> <span class="prelude-val">None</span>,
     <span class="ident">authority</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;localhost&quot;</span>),
+    <span class="ident">host</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;localhost&quot;</span>),
     <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>,
     <span class="ident">query</span> <span class="op">=</span> <span class="prelude-val">None</span>,
     <span class="ident">fragment</span> <span class="op">=</span> <span class="prelude-val">None</span>,
@@ -1109,6 +1200,7 @@
 
     <span class="ident">scheme</span> <span class="op">=</span> <span class="prelude-val">None</span>,
     <span class="ident">authority</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;localhost:3000&quot;</span>),
+    <span class="ident">host</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;localhost&quot;</span>),
     <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>,
     <span class="ident">query</span> <span class="op">=</span> <span class="prelude-val">None</span>,
     <span class="ident">fragment</span> <span class="op">=</span> <span class="prelude-val">None</span>,
@@ -1117,11 +1209,12 @@
 
 <span class="macro">test_parse</span><span class="macro">!</span> {
     <span class="ident">test_uri_parse_absolute_with_default_port_http</span>,
-    <span class="string">&quot;http://127.0.0.1:80&quot;</span>,
+    <span class="string">&quot;http://127.0.0.1:80/foo&quot;</span>,
 
     <span class="ident">scheme</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;http&quot;</span>),
     <span class="ident">authority</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;127.0.0.1:80&quot;</span>),
-    <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;/&quot;</span>,
+    <span class="ident">host</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;127.0.0.1&quot;</span>),
+    <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;/foo&quot;</span>,
     <span class="ident">query</span> <span class="op">=</span> <span class="prelude-val">None</span>,
     <span class="ident">fragment</span> <span class="op">=</span> <span class="prelude-val">None</span>,
     <span class="ident">port</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">80</span>),
@@ -1133,10 +1226,50 @@
 
     <span class="ident">scheme</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;https&quot;</span>),
     <span class="ident">authority</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;127.0.0.1:443&quot;</span>),
+    <span class="ident">host</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;127.0.0.1&quot;</span>),
     <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;/&quot;</span>,
     <span class="ident">query</span> <span class="op">=</span> <span class="prelude-val">None</span>,
     <span class="ident">fragment</span> <span class="op">=</span> <span class="prelude-val">None</span>,
     <span class="ident">port</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">443</span>),
+}
+
+<span class="macro">test_parse</span><span class="macro">!</span> {
+    <span class="ident">test_uri_parse_absolute_with_ipv6</span>,
+    <span class="string">&quot;https://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:8008&quot;</span>,
+
+    <span class="ident">scheme</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;https&quot;</span>),
+    <span class="ident">authority</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:8008&quot;</span>),
+    <span class="ident">host</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;2001:0db8:85a3:0000:0000:8a2e:0370:7334&quot;</span>),
+    <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;/&quot;</span>,
+    <span class="ident">query</span> <span class="op">=</span> <span class="prelude-val">None</span>,
+    <span class="ident">fragment</span> <span class="op">=</span> <span class="prelude-val">None</span>,
+    <span class="ident">port</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">8008</span>),
+}
+
+<span class="macro">test_parse</span><span class="macro">!</span> {
+    <span class="ident">test_uri_parse_absolute_with_ipv6_and_no_port</span>,
+    <span class="string">&quot;https://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]&quot;</span>,
+
+    <span class="ident">scheme</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;https&quot;</span>),
+    <span class="ident">authority</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;[2001:0db8:85a3:0000:0000:8a2e:0370:7334]&quot;</span>),
+    <span class="ident">host</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;2001:0db8:85a3:0000:0000:8a2e:0370:7334&quot;</span>),
+    <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;/&quot;</span>,
+    <span class="ident">query</span> <span class="op">=</span> <span class="prelude-val">None</span>,
+    <span class="ident">fragment</span> <span class="op">=</span> <span class="prelude-val">None</span>,
+    <span class="ident">port</span> <span class="op">=</span> <span class="prelude-val">None</span>,
+}
+
+<span class="macro">test_parse</span><span class="macro">!</span> {
+    <span class="ident">test_uri_parse_absolute_with_userinfo</span>,
+    <span class="string">&quot;https://seanmonstar:password@hyper.rs&quot;</span>,
+
+    <span class="ident">scheme</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;https&quot;</span>),
+    <span class="ident">authority</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;seanmonstar:password@hyper.rs&quot;</span>),
+    <span class="ident">host</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;hyper.rs&quot;</span>),
+    <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;/&quot;</span>,
+    <span class="ident">query</span> <span class="op">=</span> <span class="prelude-val">None</span>,
+    <span class="ident">fragment</span> <span class="op">=</span> <span class="prelude-val">None</span>,
+    <span class="ident">port</span> <span class="op">=</span> <span class="prelude-val">None</span>,
 }
 
 <span class="macro">test_parse</span><span class="macro">!</span> {
@@ -1145,6 +1278,7 @@
 
     <span class="ident">scheme</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;http&quot;</span>),
     <span class="ident">authority</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;127.0.0.1&quot;</span>),
+    <span class="ident">host</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;127.0.0.1&quot;</span>),
     <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;/&quot;</span>,
     <span class="ident">query</span> <span class="op">=</span> <span class="prelude-val">None</span>,
     <span class="ident">fragment</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;?&quot;</span>),
@@ -1157,6 +1291,7 @@
 
     <span class="ident">scheme</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;http&quot;</span>),
     <span class="ident">authority</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;127.0.0.1&quot;</span>),
+    <span class="ident">host</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;127.0.0.1&quot;</span>),
     <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;/path&quot;</span>,
     <span class="ident">query</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>),
     <span class="ident">fragment</span> <span class="op">=</span> <span class="prelude-val">None</span>,
@@ -1169,6 +1304,7 @@
 
     <span class="ident">scheme</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;http&quot;</span>),
     <span class="ident">authority</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;127.0.0.1&quot;</span>),
+    <span class="ident">host</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;127.0.0.1&quot;</span>),
     <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;/&quot;</span>,
     <span class="ident">query</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;foo=bar&quot;</span>),
     <span class="ident">fragment</span> <span class="op">=</span> <span class="prelude-val">None</span>,
@@ -1180,6 +1316,7 @@
     <span class="string">&quot;http://127.0.0.1#foo/bar&quot;</span>,
     <span class="ident">scheme</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;http&quot;</span>),
     <span class="ident">authority</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;127.0.0.1&quot;</span>),
+    <span class="ident">host</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;127.0.0.1&quot;</span>),
     <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;/&quot;</span>,
     <span class="ident">query</span> <span class="op">=</span> <span class="prelude-val">None</span>,
     <span class="ident">fragment</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;foo/bar&quot;</span>),
@@ -1191,6 +1328,7 @@
     <span class="string">&quot;http://127.0.0.1#foo?bar&quot;</span>,
     <span class="ident">scheme</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;http&quot;</span>),
     <span class="ident">authority</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;127.0.0.1&quot;</span>),
+    <span class="ident">host</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;127.0.0.1&quot;</span>),
     <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;/&quot;</span>,
     <span class="ident">query</span> <span class="op">=</span> <span class="prelude-val">None</span>,
     <span class="ident">fragment</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;foo?bar&quot;</span>),
@@ -1210,6 +1348,8 @@
     <span class="ident">err</span>(<span class="string">&quot;?key=val&quot;</span>);
     <span class="ident">err</span>(<span class="string">&quot;localhost/&quot;</span>);
     <span class="ident">err</span>(<span class="string">&quot;localhost?key=val&quot;</span>);
+    <span class="ident">err</span>(<span class="string">&quot;http://::1]&quot;</span>);
+    <span class="ident">err</span>(<span class="string">&quot;http://[::1&quot;</span>);
 }
 
 <span class="attribute">#[<span class="ident">test</span>]</span>
