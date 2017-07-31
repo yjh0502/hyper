@@ -337,6 +337,7 @@
 <span id="292">292</span>
 <span id="293">293</span>
 <span id="294">294</span>
+<span id="295">295</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">any</span>::<span class="ident">Any</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>};
@@ -480,7 +481,8 @@
     <span class="doccomment">/// The username as a possibly empty string</span>
     <span class="kw">pub</span> <span class="ident">username</span>: <span class="ident">String</span>,
     <span class="doccomment">/// The password. `None` if the `:` delimiter character was not</span>
-    <span class="doccomment">/// part of the parsed input.</span>
+    <span class="doccomment">/// part of the parsed input. Note: A compliant client MUST</span>
+    <span class="doccomment">/// always send a password (which may be the empty string).</span>
     <span class="kw">pub</span> <span class="ident">password</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>
 }
 
