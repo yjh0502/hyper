@@ -1233,7 +1233,7 @@
 
         <span class="kw">let</span> <span class="ident">wants_keep_alive</span> <span class="op">=</span> <span class="ident">head</span>.<span class="ident">should_keep_alive</span>();
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">keep_alive</span> <span class="op">&amp;=</span> <span class="ident">wants_keep_alive</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">write_buf_mut</span>();
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">write_buf_mut</span>();
         <span class="comment">// if a 100-continue has started but not finished sending, tack the</span>
         <span class="comment">// remainder on to the start of the buffer.</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Writing</span>::<span class="ident">Continue</span>(<span class="kw-2">ref</span> <span class="ident">pending</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> {

@@ -696,7 +696,7 @@ impl&lt;T: Write + ::vecio::Writev&gt; AtomicWrite for T {
         <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;WriteBuf::buffer() len = {:?}&quot;</span>, <span class="ident">data</span>.<span class="ident">len</span>());
         <span class="self">self</span>.<span class="ident">maybe_reset</span>();
         <span class="self">self</span>.<span class="ident">maybe_reserve</span>(<span class="ident">data</span>.<span class="ident">len</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vec</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">bytes</span>;
+        <span class="kw">let</span> <span class="ident">vec</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">bytes</span>;
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">cmp</span>::<span class="ident">min</span>(<span class="ident">vec</span>.<span class="ident">capacity</span>() <span class="op">-</span> <span class="ident">vec</span>.<span class="ident">len</span>(), <span class="ident">data</span>.<span class="ident">len</span>());
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">vec</span>.<span class="ident">capacity</span>() <span class="op">-</span> <span class="ident">vec</span>.<span class="ident">len</span>() <span class="op">&gt;=</span> <span class="ident">len</span>);
         <span class="kw">unsafe</span> {
@@ -718,7 +718,7 @@ impl&lt;T: Write + ::vecio::Writev&gt; AtomicWrite for T {
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">maybe_reserve</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">needed</span>: <span class="ident">usize</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vec</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">bytes</span>;
+        <span class="kw">let</span> <span class="ident">vec</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">bytes</span>;
         <span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> <span class="ident">vec</span>.<span class="ident">capacity</span>();
         <span class="kw">if</span> <span class="ident">cap</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">let</span> <span class="ident">init</span> <span class="op">=</span> <span class="ident">cmp</span>::<span class="ident">min</span>(<span class="ident">MAX_BUFFER_SIZE</span>, <span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">INIT_BUFFER_SIZE</span>, <span class="ident">needed</span>));
