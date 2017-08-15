@@ -628,13 +628,6 @@
 <span id="583">583</span>
 <span id="584">584</span>
 <span id="585">585</span>
-<span id="586">586</span>
-<span id="587">587</span>
-<span id="588">588</span>
-<span id="589">589</span>
-<span id="590">590</span>
-<span id="591">591</span>
-<span id="592">592</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
@@ -661,7 +654,6 @@
         <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
-        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;parse({:?})&quot;</span>, <span class="ident">buf</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers_indices</span> <span class="op">=</span> [<span class="ident">HeaderIndices</span> {
             <span class="ident">name</span>: (<span class="number">0</span>, <span class="number">0</span>),
             <span class="ident">value</span>: (<span class="number">0</span>, <span class="number">0</span>)
@@ -672,7 +664,7 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">httparse</span>::<span class="ident">Request</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">headers</span>);
             <span class="kw">match</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">req</span>.<span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>)) {
                 <span class="ident">httparse</span>::<span class="ident">Status</span>::<span class="ident">Complete</span>(<span class="ident">len</span>) <span class="op">=&gt;</span> {
-                    <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;httparse Complete({})&quot;</span>, <span class="ident">len</span>);
+                    <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Request.parse Complete({})&quot;</span>, <span class="ident">len</span>);
                     <span class="kw">let</span> <span class="ident">method</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">req</span>.<span class="ident">method</span>.<span class="ident">unwrap</span>().<span class="ident">parse</span>());
                     <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">path</span>.<span class="ident">unwrap</span>();
                     <span class="kw">let</span> <span class="ident">bytes_ptr</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">as_ref</span>().<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>;
@@ -748,11 +740,9 @@
 
 
     <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">mut</span> <span class="ident">head</span>: <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Outgoing</span><span class="op">&gt;</span>, <span class="ident">has_body</span>: <span class="ident">bool</span>, <span class="ident">method</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Method</span><span class="op">&gt;</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Encoder</span> {
-        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;ServerTransaction::encode head={:?}, has_body={}, method={:?}&quot;</span>,
-               <span class="ident">head</span>, <span class="ident">has_body</span>, <span class="ident">method</span>);
+        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;ServerTransaction::encode has_body={}, method={:?}&quot;</span>, <span class="ident">has_body</span>, <span class="ident">method</span>);
 
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">ServerTransaction</span>::<span class="ident">set_length</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">head</span>, <span class="ident">has_body</span>, <span class="ident">method</span>.<span class="ident">as_ref</span>());
-        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;encode headers = {:?}&quot;</span>, <span class="ident">head</span>.<span class="ident">headers</span>);
 
         <span class="kw">let</span> <span class="ident">init_cap</span> <span class="op">=</span> <span class="number">30</span> <span class="op">+</span> <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="ident">AVERAGE_HEADER_SIZE</span>;
         <span class="ident">dst</span>.<span class="ident">reserve</span>(<span class="ident">init_cap</span>);
@@ -818,7 +808,6 @@
         <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
-        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;parse({:?})&quot;</span>, <span class="ident">buf</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers_indices</span> <span class="op">=</span> [<span class="ident">HeaderIndices</span> {
             <span class="ident">name</span>: (<span class="number">0</span>, <span class="number">0</span>),
             <span class="ident">value</span>: (<span class="number">0</span>, <span class="number">0</span>)
@@ -830,7 +819,7 @@
             <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">as_ref</span>();
             <span class="kw">match</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">res</span>.<span class="ident">parse</span>(<span class="ident">bytes</span>)) {
                 <span class="ident">httparse</span>::<span class="ident">Status</span>::<span class="ident">Complete</span>(<span class="ident">len</span>) <span class="op">=&gt;</span> {
-                    <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Response.try_parse Complete({})&quot;</span>, <span class="ident">len</span>);
+                    <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Response.parse Complete({})&quot;</span>, <span class="ident">len</span>);
                     <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">code</span>.<span class="ident">unwrap</span>();
                     <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">StatusCode</span>::<span class="ident">try_from</span>(<span class="ident">code</span>).<span class="ident">map_err</span>(<span class="op">|</span>_<span class="op">|</span> ::<span class="ident">Error</span>::<span class="ident">Status</span>));
                     <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">status</span>.<span class="ident">canonical_reason</span>() {
@@ -911,14 +900,11 @@
     }
 
     <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">mut</span> <span class="ident">head</span>: <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Outgoing</span><span class="op">&gt;</span>, <span class="ident">has_body</span>: <span class="ident">bool</span>, <span class="ident">method</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Method</span><span class="op">&gt;</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Encoder</span> {
-        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;ClientTransaction::encode head={:?}, has_body={}, method={:?}&quot;</span>,
-               <span class="ident">head</span>, <span class="ident">has_body</span>, <span class="ident">method</span>);
-
+        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;ClientTransaction::encode has_body={}, method={:?}&quot;</span>, <span class="ident">has_body</span>, <span class="ident">method</span>);
 
         <span class="kw-2">*</span><span class="ident">method</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">head</span>.<span class="ident">subject</span>.<span class="number">0</span>.<span class="ident">clone</span>());
 
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">ClientTransaction</span>::<span class="ident">set_length</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">head</span>, <span class="ident">has_body</span>);
-        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;encode headers = {:?}&quot;</span>, <span class="ident">head</span>.<span class="ident">headers</span>);
 
         <span class="kw">let</span> <span class="ident">init_cap</span> <span class="op">=</span> <span class="number">30</span> <span class="op">+</span> <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="ident">AVERAGE_HEADER_SIZE</span>;
         <span class="ident">dst</span>.<span class="ident">reserve</span>(<span class="ident">init_cap</span>);
