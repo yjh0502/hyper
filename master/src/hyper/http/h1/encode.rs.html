@@ -557,7 +557,7 @@
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="ident">Chunked</span>::<span class="ident">Init</span> <span class="op">|</span>
             <span class="ident">Chunked</span>::<span class="ident">End</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">msg</span>.<span class="ident">len</span>()),
-            _ <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">WouldBlock</span>, <span class="string">&quot;chunked incomplete&quot;</span>))
+            _ <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">WouldBlock</span>.<span class="ident">into</span>())
         }
     }
 }
