@@ -146,6 +146,12 @@
 <span id="101">101</span>
 <span id="102">102</span>
 <span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">mime</span>::{<span class="self">self</span>, <span class="ident">Mime</span>};
 
@@ -217,10 +223,16 @@
         <span class="ident">ContentType</span>(<span class="ident">mime</span>::<span class="ident">TEXT_PLAIN_UTF_8</span>)
     }
 
-    <span class="doccomment">/// A constructor  to easily create a `Content-Type: text/html; charset=utf-8` header.</span>
+    <span class="doccomment">/// A constructor  to easily create a `Content-Type: text/html` header.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">html</span>() <span class="op">-&gt;</span> <span class="ident">ContentType</span> {
         <span class="ident">ContentType</span>(<span class="ident">mime</span>::<span class="ident">TEXT_HTML</span>)
+    }
+
+    <span class="doccomment">/// A constructor  to easily create a `Content-Type: text/xml` header.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">xml</span>() <span class="op">-&gt;</span> <span class="ident">ContentType</span> {
+        <span class="ident">ContentType</span>(<span class="ident">mime</span>::<span class="ident">TEXT_XML</span>)
     }
 
     <span class="doccomment">/// A constructor  to easily create a `Content-Type: application/www-form-url-encoded` header.</span>
