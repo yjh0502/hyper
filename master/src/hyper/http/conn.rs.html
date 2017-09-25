@@ -1001,6 +1001,22 @@
 <span id="956">956</span>
 <span id="957">957</span>
 <span id="958">958</span>
+<span id="959">959</span>
+<span id="960">960</span>
+<span id="961">961</span>
+<span id="962">962</span>
+<span id="963">963</span>
+<span id="964">964</span>
+<span id="965">965</span>
+<span id="966">966</span>
+<span id="967">967</span>
+<span id="968">968</span>
+<span id="969">969</span>
+<span id="970">970</span>
+<span id="971">971</span>
+<span id="972">972</span>
+<span id="973">973</span>
+<span id="974">974</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
@@ -1051,6 +1067,9 @@
         }
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_flush_pipeline</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) {
+        <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">set_flush_pipeline</span>(<span class="ident">enabled</span>);
+    }
 
     <span class="kw">fn</span> <span class="ident">poll2</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">http</span>::<span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Incoming</span><span class="op">&gt;</span>, <span class="ident">http</span>::<span class="ident">Chunk</span>, ::<span class="ident">Error</span><span class="op">&gt;&gt;</span>, <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Conn::poll()&quot;</span>);
@@ -1212,12 +1231,12 @@
         <span class="comment">//</span>
         <span class="comment">// When writing finishes, we need to wake the task up in case there</span>
         <span class="comment">// is more reading that can be done, to start a new message.</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> {
+        <span class="kw">let</span> <span class="ident">wants_read</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> {
             <span class="ident">Reading</span>::<span class="ident">Body</span>(..) <span class="op">|</span>
             <span class="ident">Reading</span>::<span class="ident">KeepAlive</span> <span class="op">=&gt;</span> <span class="kw">return</span>,
-            <span class="ident">Reading</span>::<span class="ident">Init</span> <span class="op">|</span>
-            <span class="ident">Reading</span>::<span class="ident">Closed</span> <span class="op">=&gt;</span> (),
-        }
+            <span class="ident">Reading</span>::<span class="ident">Init</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">Reading</span>::<span class="ident">Closed</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>,
+        };
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> {
             <span class="ident">Writing</span>::<span class="ident">Continue</span>(..) <span class="op">|</span>
@@ -1229,6 +1248,19 @@
         }
 
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">io</span>.<span class="ident">is_read_blocked</span>() {
+            <span class="kw">if</span> <span class="ident">wants_read</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">read_buf</span>().<span class="ident">is_empty</span>() {
+                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">read_from_io</span>() {
+                    <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(_)) <span class="op">=&gt;</span> (),
+                    <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> {
+                        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;maybe_notify; read_from_io blocked&quot;</span>);
+                        <span class="kw">return</span>
+                    },
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> {
+                        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;maybe_notify read_from_io error: {}&quot;</span>, <span class="ident">e</span>);
+                        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">close</span>();
+                    }
+                }
+            }
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">task</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">read_task</span> {
                 <span class="ident">task</span>.<span class="ident">notify</span>();
             }
