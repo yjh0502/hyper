@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `src/http/body.rs`.">
+    <meta name="description" content="Source to the Rust file `src/proto/body.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>body.rs.html -- source</title>
@@ -213,7 +213,7 @@
 <span class="kw">use</span> <span class="ident">tokio_proto</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
 
-<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">Chunk</span>;
+<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Chunk</span>;
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">TokioBody</span> <span class="op">=</span> <span class="ident">tokio_proto</span>::<span class="ident">streaming</span>::<span class="ident">Body</span><span class="op">&lt;</span><span class="ident">Chunk</span>, ::<span class="ident">Error</span><span class="op">&gt;</span>;
 

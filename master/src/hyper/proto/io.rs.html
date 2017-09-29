@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `src/http/io.rs`.">
+    <meta name="description" content="Source to the Rust file `src/proto/io.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>io.rs.html -- source</title>
@@ -438,7 +438,7 @@
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Poll</span>};
 <span class="kw">use</span> <span class="ident">tokio_io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
 
-<span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">Http1Transaction</span>, <span class="ident">MessageHead</span>};
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Http1Transaction</span>, <span class="ident">MessageHead</span>};
 <span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">BytesMut</span>, <span class="ident">Bytes</span>};
 
 <span class="kw">const</span> <span class="ident">INIT_BUFFER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8192</span>;
