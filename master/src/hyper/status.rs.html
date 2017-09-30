@@ -831,7 +831,7 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">Ordering</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">http_types</span>;
+<span class="kw">use</span> <span class="ident">http</span>;
 
 <span class="doccomment">/// An HTTP status code (`status-code` in RFC 7230 et al.).</span>
 <span class="doccomment">///</span>
@@ -1428,17 +1428,17 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">http_types</span>::<span class="ident">StatusCode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StatusCode</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">status</span>: <span class="ident">http_types</span>::<span class="ident">StatusCode</span>) <span class="op">-&gt;</span> <span class="ident">StatusCode</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">http</span>::<span class="ident">StatusCode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StatusCode</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">status</span>: <span class="ident">http</span>::<span class="ident">StatusCode</span>) <span class="op">-&gt;</span> <span class="ident">StatusCode</span> {
         <span class="ident">StatusCode</span>::<span class="ident">try_from</span>(<span class="ident">status</span>.<span class="ident">as_u16</span>())
             .<span class="ident">expect</span>(<span class="string">&quot;attempted to convert invalid status code&quot;</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">http_types</span>::<span class="ident">StatusCode</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">status</span>: <span class="ident">StatusCode</span>) <span class="op">-&gt;</span> <span class="ident">http_types</span>::<span class="ident">StatusCode</span> {
-        <span class="ident">http_types</span>::<span class="ident">StatusCode</span>::<span class="ident">from_u16</span>(<span class="ident">status</span>.<span class="ident">as_u16</span>())
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">http</span>::<span class="ident">StatusCode</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">status</span>: <span class="ident">StatusCode</span>) <span class="op">-&gt;</span> <span class="ident">http</span>::<span class="ident">StatusCode</span> {
+        <span class="ident">http</span>::<span class="ident">StatusCode</span>::<span class="ident">from_u16</span>(<span class="ident">status</span>.<span class="ident">as_u16</span>())
             .<span class="ident">expect</span>(<span class="string">&quot;attempted to convert invalid status code&quot;</span>)
     }
 }
@@ -1597,12 +1597,12 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">test_compat</span>() {
-        <span class="kw">use</span> <span class="ident">http_types</span>::{<span class="self">self</span>, <span class="ident">HttpTryFrom</span>};
+        <span class="kw">use</span> <span class="ident">http</span>::{<span class="self">self</span>, <span class="ident">HttpTryFrom</span>};
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">100</span>..<span class="number">600</span> {
             <span class="kw">let</span> <span class="ident">orig_hyper_status</span> <span class="op">=</span> <span class="ident">StatusCode</span>::<span class="ident">try_from</span>(<span class="ident">i</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">orig_http_status</span> <span class="op">=</span> <span class="ident">http_types</span>::<span class="ident">StatusCode</span>::<span class="ident">try_from</span>(<span class="ident">i</span>).<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">orig_http_status</span> <span class="op">=</span> <span class="ident">http</span>::<span class="ident">StatusCode</span>::<span class="ident">try_from</span>(<span class="ident">i</span>).<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="ident">conv_hyper_status</span>: <span class="ident">StatusCode</span> <span class="op">=</span> <span class="ident">orig_http_status</span>.<span class="ident">into</span>();
-            <span class="kw">let</span> <span class="ident">conv_http_status</span>: <span class="ident">http_types</span>::<span class="ident">StatusCode</span> <span class="op">=</span> <span class="ident">orig_hyper_status</span>.<span class="ident">into</span>();
+            <span class="kw">let</span> <span class="ident">conv_http_status</span>: <span class="ident">http</span>::<span class="ident">StatusCode</span> <span class="op">=</span> <span class="ident">orig_hyper_status</span>.<span class="ident">into</span>();
             <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">orig_hyper_status</span>, <span class="ident">conv_hyper_status</span>);
             <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">orig_http_status</span>, <span class="ident">conv_http_status</span>);
         }

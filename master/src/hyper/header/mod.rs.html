@@ -1250,7 +1250,7 @@
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">mem</span>, <span class="ident">fmt</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">http_types</span>;
+<span class="kw">use</span> <span class="ident">http</span>;
 
 <span class="kw">use</span> <span class="ident">unicase</span>::<span class="ident">Ascii</span>;
 
@@ -1719,8 +1719,8 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">http_types</span>::<span class="ident">HeaderMap</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Headers</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw-2">mut</span> <span class="ident">header_map</span>: <span class="ident">http_types</span>::<span class="ident">HeaderMap</span>) <span class="op">-&gt;</span> <span class="ident">Headers</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">http</span>::<span class="ident">HeaderMap</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Headers</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw-2">mut</span> <span class="ident">header_map</span>: <span class="ident">http</span>::<span class="ident">HeaderMap</span>) <span class="op">-&gt;</span> <span class="ident">Headers</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">Headers</span>::<span class="ident">new</span>();
         <span class="kw">for</span> (<span class="ident">name</span>, <span class="kw-2">mut</span> <span class="ident">value_drain</span>) <span class="kw">in</span> <span class="ident">header_map</span>.<span class="ident">drain</span>() {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">first_value</span>) <span class="op">=</span> <span class="ident">value_drain</span>.<span class="ident">next</span>() {
@@ -1736,23 +1736,23 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">http_types</span>::<span class="ident">HeaderMap</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">headers</span>: <span class="ident">Headers</span>) <span class="op">-&gt;</span> <span class="ident">http_types</span>::<span class="ident">HeaderMap</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">header_map</span> <span class="op">=</span> <span class="ident">http_types</span>::<span class="ident">HeaderMap</span>::<span class="ident">new</span>();
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">http</span>::<span class="ident">HeaderMap</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">headers</span>: <span class="ident">Headers</span>) <span class="op">-&gt;</span> <span class="ident">http</span>::<span class="ident">HeaderMap</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">header_map</span> <span class="op">=</span> <span class="ident">http</span>::<span class="ident">HeaderMap</span>::<span class="ident">new</span>();
         <span class="kw">for</span> <span class="ident">header</span> <span class="kw">in</span> <span class="ident">headers</span>.<span class="ident">iter</span>() {
             <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">header_map</span>.<span class="ident">entry</span>(<span class="ident">header</span>.<span class="ident">name</span>())
                 .<span class="ident">expect</span>(<span class="string">&quot;attempted to convert invalid header name&quot;</span>);
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value_iter</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">raw</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">line</span><span class="op">|</span> {
-                <span class="ident">http_types</span>::<span class="ident">header</span>::<span class="ident">HeaderValue</span>::<span class="ident">from_bytes</span>(<span class="ident">line</span>)
+                <span class="ident">http</span>::<span class="ident">header</span>::<span class="ident">HeaderValue</span>::<span class="ident">from_bytes</span>(<span class="ident">line</span>)
                     .<span class="ident">expect</span>(<span class="string">&quot;attempted to convert invalid header value&quot;</span>)
             });
             <span class="kw">match</span> <span class="ident">entry</span> {
-                <span class="ident">http_types</span>::<span class="ident">header</span>::<span class="ident">Entry</span>::<span class="ident">Occupied</span>(<span class="kw-2">mut</span>  <span class="ident">occupied</span>) <span class="op">=&gt;</span> {
+                <span class="ident">http</span>::<span class="ident">header</span>::<span class="ident">Entry</span>::<span class="ident">Occupied</span>(<span class="kw-2">mut</span>  <span class="ident">occupied</span>) <span class="op">=&gt;</span> {
                     <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">value_iter</span> {
                         <span class="ident">occupied</span>.<span class="ident">append</span>(<span class="ident">value</span>);
                     }
                 },
-                <span class="ident">http_types</span>::<span class="ident">header</span>::<span class="ident">Entry</span>::<span class="ident">Vacant</span>(<span class="ident">vacant</span>) <span class="op">=&gt;</span> {
+                <span class="ident">http</span>::<span class="ident">header</span>::<span class="ident">Entry</span>::<span class="ident">Vacant</span>(<span class="ident">vacant</span>) <span class="op">=&gt;</span> {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">first_value</span>) <span class="op">=</span> <span class="ident">value_iter</span>.<span class="ident">next</span>() {
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">occupied</span> <span class="op">=</span> <span class="ident">vacant</span>.<span class="ident">insert_entry</span>(<span class="ident">first_value</span>);
                         <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">value_iter</span> {
@@ -2163,7 +2163,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">test_compat</span>() {
-        <span class="kw">use</span> <span class="ident">http_types</span>;
+        <span class="kw">use</span> <span class="ident">http</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">orig_hyper_headers</span> <span class="op">=</span> <span class="ident">Headers</span>::<span class="ident">new</span>();
         <span class="ident">orig_hyper_headers</span>.<span class="ident">set</span>(<span class="ident">ContentLength</span>(<span class="number">11</span>));
@@ -2171,14 +2171,14 @@
         <span class="ident">orig_hyper_headers</span>.<span class="ident">append_raw</span>(<span class="string">&quot;x-foo&quot;</span>, <span class="string">b&quot;bar&quot;</span>.<span class="ident">to_vec</span>());
         <span class="ident">orig_hyper_headers</span>.<span class="ident">append_raw</span>(<span class="string">&quot;x-foo&quot;</span>, <span class="string">b&quot;quux&quot;</span>.<span class="ident">to_vec</span>());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">orig_http_headers</span> <span class="op">=</span> <span class="ident">http_types</span>::<span class="ident">HeaderMap</span>::<span class="ident">new</span>();
-        <span class="ident">orig_http_headers</span>.<span class="ident">insert</span>(<span class="ident">http_types</span>::<span class="ident">header</span>::<span class="ident">CONTENT_LENGTH</span>, <span class="string">&quot;11&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>());
-        <span class="ident">orig_http_headers</span>.<span class="ident">insert</span>(<span class="ident">http_types</span>::<span class="ident">header</span>::<span class="ident">HOST</span>, <span class="string">&quot;foo.bar&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">orig_http_headers</span> <span class="op">=</span> <span class="ident">http</span>::<span class="ident">HeaderMap</span>::<span class="ident">new</span>();
+        <span class="ident">orig_http_headers</span>.<span class="ident">insert</span>(<span class="ident">http</span>::<span class="ident">header</span>::<span class="ident">CONTENT_LENGTH</span>, <span class="string">&quot;11&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>());
+        <span class="ident">orig_http_headers</span>.<span class="ident">insert</span>(<span class="ident">http</span>::<span class="ident">header</span>::<span class="ident">HOST</span>, <span class="string">&quot;foo.bar&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>());
         <span class="ident">orig_http_headers</span>.<span class="ident">append</span>(<span class="string">&quot;x-foo&quot;</span>, <span class="string">&quot;bar&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>());
         <span class="ident">orig_http_headers</span>.<span class="ident">append</span>(<span class="string">&quot;x-foo&quot;</span>, <span class="string">&quot;quux&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>());
 
         <span class="kw">let</span> <span class="ident">conv_hyper_headers</span>: <span class="ident">Headers</span> <span class="op">=</span> <span class="ident">orig_http_headers</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">conv_http_headers</span>: <span class="ident">http_types</span>::<span class="ident">HeaderMap</span> <span class="op">=</span> <span class="ident">orig_hyper_headers</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
+        <span class="kw">let</span> <span class="ident">conv_http_headers</span>: <span class="ident">http</span>::<span class="ident">HeaderMap</span> <span class="op">=</span> <span class="ident">orig_hyper_headers</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">orig_hyper_headers</span>, <span class="ident">conv_hyper_headers</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">orig_http_headers</span>, <span class="ident">conv_http_headers</span>);
     }

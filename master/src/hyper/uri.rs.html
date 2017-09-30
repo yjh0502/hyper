@@ -732,7 +732,7 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::{<span class="self">self</span>, <span class="ident">FromStr</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">http_types</span>;
+<span class="kw">use</span> <span class="ident">http</span>;
 
 <span class="kw">use</span> ::<span class="ident">common</span>::<span class="ident">ByteStr</span>;
 <span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">BufMut</span>, <span class="ident">Bytes</span>, <span class="ident">BytesMut</span>};
@@ -1048,18 +1048,18 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">http_types</span>::<span class="ident">Uri</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Uri</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">uri</span>: <span class="ident">http_types</span>::<span class="ident">Uri</span>) <span class="op">-&gt;</span> <span class="ident">Uri</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">http</span>::<span class="ident">Uri</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Uri</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">uri</span>: <span class="ident">http</span>::<span class="ident">Uri</span>) <span class="op">-&gt;</span> <span class="ident">Uri</span> {
         <span class="ident">uri</span>.<span class="ident">to_string</span>().<span class="ident">parse</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;attempted to convert invalid uri&quot;</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Uri</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">http_types</span>::<span class="ident">Uri</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">uri</span>: <span class="ident">Uri</span>) <span class="op">-&gt;</span> <span class="ident">http_types</span>::<span class="ident">Uri</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Uri</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">http</span>::<span class="ident">Uri</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">uri</span>: <span class="ident">Uri</span>) <span class="op">-&gt;</span> <span class="ident">http</span>::<span class="ident">Uri</span> {
         <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">uri</span>.<span class="ident">source</span>.<span class="ident">into_bytes</span>();
-        <span class="ident">http_types</span>::<span class="ident">Uri</span>::<span class="ident">from_shared</span>(<span class="ident">bytes</span>)
+        <span class="ident">http</span>::<span class="ident">Uri</span>::<span class="ident">from_shared</span>(<span class="ident">bytes</span>)
             .<span class="ident">expect</span>(<span class="string">&quot;attempted to convert invalid uri&quot;</span>)
     }
 }

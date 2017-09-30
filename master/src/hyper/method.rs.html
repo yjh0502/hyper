@@ -349,7 +349,7 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">convert</span>::<span class="ident">AsRef</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">http_types</span>;
+<span class="kw">use</span> <span class="ident">http</span>;
 
 <span class="kw">use</span> <span class="ident">error</span>::<span class="ident">Error</span>;
 <span class="kw">use</span> <span class="self">self</span>::<span class="ident">Method</span>::{<span class="ident">Options</span>, <span class="ident">Get</span>, <span class="ident">Post</span>, <span class="ident">Put</span>, <span class="ident">Delete</span>, <span class="ident">Head</span>, <span class="ident">Trace</span>, <span class="ident">Connect</span>, <span class="ident">Patch</span>,
@@ -505,26 +505,26 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">http_types</span>::<span class="ident">Method</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Method</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">method</span>: <span class="ident">http_types</span>::<span class="ident">Method</span>) <span class="op">-&gt;</span> <span class="ident">Method</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">http</span>::<span class="ident">Method</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Method</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">method</span>: <span class="ident">http</span>::<span class="ident">Method</span>) <span class="op">-&gt;</span> <span class="ident">Method</span> {
         <span class="kw">match</span> <span class="ident">method</span> {
-            <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">GET</span> <span class="op">=&gt;</span>
+            <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">GET</span> <span class="op">=&gt;</span>
                 <span class="ident">Method</span>::<span class="ident">Get</span>,
-            <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">POST</span> <span class="op">=&gt;</span>
+            <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">POST</span> <span class="op">=&gt;</span>
                 <span class="ident">Method</span>::<span class="ident">Post</span>,
-            <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">PUT</span> <span class="op">=&gt;</span>
+            <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">PUT</span> <span class="op">=&gt;</span>
                 <span class="ident">Method</span>::<span class="ident">Put</span>,
-            <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">DELETE</span> <span class="op">=&gt;</span>
+            <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">DELETE</span> <span class="op">=&gt;</span>
                 <span class="ident">Method</span>::<span class="ident">Delete</span>,
-            <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">HEAD</span> <span class="op">=&gt;</span>
+            <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">HEAD</span> <span class="op">=&gt;</span>
                 <span class="ident">Method</span>::<span class="ident">Head</span>,
-            <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">OPTIONS</span> <span class="op">=&gt;</span>
+            <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">OPTIONS</span> <span class="op">=&gt;</span>
                 <span class="ident">Method</span>::<span class="ident">Options</span>,
-            <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">CONNECT</span> <span class="op">=&gt;</span>
+            <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">CONNECT</span> <span class="op">=&gt;</span>
                 <span class="ident">Method</span>::<span class="ident">Connect</span>,
-            <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">PATCH</span> <span class="op">=&gt;</span>
+            <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">PATCH</span> <span class="op">=&gt;</span>
                 <span class="ident">Method</span>::<span class="ident">Patch</span>,
-            <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">TRACE</span> <span class="op">=&gt;</span>
+            <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">TRACE</span> <span class="op">=&gt;</span>
                 <span class="ident">Method</span>::<span class="ident">Trace</span>,
             _ <span class="op">=&gt;</span> {
                 <span class="ident">method</span>.<span class="ident">as_ref</span>().<span class="ident">parse</span>()
@@ -535,29 +535,29 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Method</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">http_types</span>::<span class="ident">Method</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">method</span>: <span class="ident">Method</span>) <span class="op">-&gt;</span> <span class="ident">http_types</span>::<span class="ident">Method</span> {
-        <span class="kw">use</span> <span class="ident">http_types</span>::<span class="ident">HttpTryFrom</span>;
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Method</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">http</span>::<span class="ident">Method</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">method</span>: <span class="ident">Method</span>) <span class="op">-&gt;</span> <span class="ident">http</span>::<span class="ident">Method</span> {
+        <span class="kw">use</span> <span class="ident">http</span>::<span class="ident">HttpTryFrom</span>;
 
         <span class="kw">match</span> <span class="ident">method</span> {
             <span class="ident">Method</span>::<span class="ident">Get</span> <span class="op">=&gt;</span>
-                <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">GET</span>,
+                <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">GET</span>,
             <span class="ident">Method</span>::<span class="ident">Post</span> <span class="op">=&gt;</span>
-                <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">POST</span>,
+                <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">POST</span>,
             <span class="ident">Method</span>::<span class="ident">Put</span> <span class="op">=&gt;</span>
-                <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">PUT</span>,
+                <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">PUT</span>,
             <span class="ident">Method</span>::<span class="ident">Delete</span> <span class="op">=&gt;</span>
-                <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">DELETE</span>,
+                <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">DELETE</span>,
             <span class="ident">Method</span>::<span class="ident">Head</span> <span class="op">=&gt;</span>
-                <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">HEAD</span>,
+                <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">HEAD</span>,
             <span class="ident">Method</span>::<span class="ident">Options</span> <span class="op">=&gt;</span>
-                <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">OPTIONS</span>,
+                <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">OPTIONS</span>,
             <span class="ident">Method</span>::<span class="ident">Connect</span> <span class="op">=&gt;</span>
-                <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">CONNECT</span>,
+                <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">CONNECT</span>,
             <span class="ident">Method</span>::<span class="ident">Patch</span> <span class="op">=&gt;</span>
-                <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">PATCH</span>,
+                <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">PATCH</span>,
             <span class="ident">Method</span>::<span class="ident">Trace</span> <span class="op">=&gt;</span>
-                <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">TRACE</span>,
+                <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">TRACE</span>,
             <span class="ident">Method</span>::<span class="ident">Extension</span>(<span class="ident">s</span>) <span class="op">=&gt;</span> {
                 <span class="ident">HttpTryFrom</span>::<span class="ident">try_from</span>(<span class="ident">s</span>.<span class="ident">as_str</span>())
                     .<span class="ident">expect</span>(<span class="string">&quot;attempted to convert invalid method&quot;</span>)
@@ -624,7 +624,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">test_compat</span>() {
-        <span class="kw">use</span> <span class="ident">http_types</span>::{<span class="self">self</span>, <span class="ident">HttpTryFrom</span>};
+        <span class="kw">use</span> <span class="ident">http</span>::{<span class="self">self</span>, <span class="ident">HttpTryFrom</span>};
 
         <span class="kw">let</span> <span class="ident">methods</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
             <span class="string">&quot;GET&quot;</span>,
@@ -634,9 +634,9 @@
         ];
         <span class="kw">for</span> <span class="ident">method</span> <span class="kw">in</span> <span class="ident">methods</span> {
             <span class="kw">let</span> <span class="ident">orig_hyper_method</span> <span class="op">=</span> <span class="ident">Method</span>::<span class="ident">from_str</span>(<span class="ident">method</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">orig_http_method</span> <span class="op">=</span> <span class="ident">http_types</span>::<span class="ident">Method</span>::<span class="ident">try_from</span>(<span class="ident">method</span>).<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">orig_http_method</span> <span class="op">=</span> <span class="ident">http</span>::<span class="ident">Method</span>::<span class="ident">try_from</span>(<span class="ident">method</span>).<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="ident">conv_hyper_method</span>: <span class="ident">Method</span> <span class="op">=</span> <span class="ident">orig_http_method</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
-            <span class="kw">let</span> <span class="ident">conv_http_method</span>: <span class="ident">http_types</span>::<span class="ident">Method</span> <span class="op">=</span> <span class="ident">orig_hyper_method</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
+            <span class="kw">let</span> <span class="ident">conv_http_method</span>: <span class="ident">http</span>::<span class="ident">Method</span> <span class="op">=</span> <span class="ident">orig_hyper_method</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
             <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">orig_hyper_method</span>, <span class="ident">conv_hyper_method</span>);
             <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">orig_http_method</span>, <span class="ident">conv_http_method</span>);
         }
