@@ -579,7 +579,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">flush_pipeline</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">is_empty</span>() {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">flush_pipeline</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">is_empty</span>() {
             <span class="prelude-val">Ok</span>(())
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">remaining</span>() <span class="op">==</span> <span class="number">0</span> {
             <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">flush</span>()
