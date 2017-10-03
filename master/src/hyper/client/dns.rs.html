@@ -96,13 +96,16 @@
 <span id="51">51</span>
 <span id="52">52</span>
 <span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">net</span>::{<span class="ident">SocketAddr</span>, <span class="ident">ToSocketAddrs</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">vec</span>;
 
 <span class="kw">use</span> ::<span class="ident">futures</span>::{<span class="ident">Future</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> ::<span class="ident">futures_cpupool</span>::{<span class="ident">CpuPool</span>, <span class="ident">CpuFuture</span>};
+<span class="kw">use</span> ::<span class="ident">futures_cpupool</span>::{<span class="ident">CpuPool</span>, <span class="ident">CpuFuture</span>, <span class="ident">Builder</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Dns</span> {
@@ -112,7 +115,10 @@
 <span class="kw">impl</span> <span class="ident">Dns</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">threads</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">Dns</span> {
         <span class="ident">Dns</span> {
-            <span class="ident">pool</span>: <span class="ident">CpuPool</span>::<span class="ident">new</span>(<span class="ident">threads</span>)
+            <span class="ident">pool</span>: <span class="ident">Builder</span>::<span class="ident">new</span>()
+                .<span class="ident">name_prefix</span>(<span class="string">&quot;hyper-dns&quot;</span>)
+                .<span class="ident">pool_size</span>(<span class="ident">threads</span>)
+                .<span class="ident">create</span>()
         }
     }
 
