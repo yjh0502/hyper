@@ -819,7 +819,7 @@
                 <span class="ident">query_start</span>: <span class="ident">query</span>,
                 <span class="ident">fragment_start</span>: <span class="ident">fragment</span>,
             })
-        } <span class="kw">else</span> <span class="kw">if</span> (<span class="ident">s</span>.<span class="ident">contains</span>(<span class="string">&quot;/&quot;</span>) <span class="op">||</span> <span class="ident">s</span>.<span class="ident">contains</span>(<span class="string">&quot;?&quot;</span>)) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">s</span>.<span class="ident">contains</span>(<span class="string">&quot;://&quot;</span>) {
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">contains</span>(<span class="string">&quot;/&quot;</span>) <span class="op">||</span> <span class="ident">s</span>.<span class="ident">contains</span>(<span class="string">&quot;?&quot;</span>) {
             <span class="comment">// last possibility is authority-form, above are illegal characters</span>
             <span class="prelude-val">Err</span>(<span class="ident">UriError</span>(<span class="ident">ErrorKind</span>::<span class="ident">Malformed</span>))
         } <span class="kw">else</span> {
