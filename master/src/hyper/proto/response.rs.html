@@ -458,7 +458,7 @@
     }
 }
 
-<span class="doccomment">/// Splits this response into a MessageHead&lt;StatusCode&gt; and its body</span>
+<span class="doccomment">/// Splits this response into a `MessageHead&lt;StatusCode&gt;` and its body</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">res</span>: <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> (<span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">MessageHead</span>::<span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span> {
