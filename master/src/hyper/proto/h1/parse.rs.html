@@ -721,7 +721,7 @@
             <span class="comment">// https://tools.ietf.org/html/rfc7230#section-3.3.3</span>
             <span class="comment">// If Transfer-Encoding header is present, and &#39;chunked&#39; is</span>
             <span class="comment">// not the final encoding, and this is a Request, then it is</span>
-            <span class="comment">// mal-formed. A server should responsed with 400 Bad Request.</span>
+            <span class="comment">// mal-formed. A server should respond with 400 Bad Request.</span>
             <span class="kw">if</span> <span class="ident">encodings</span>.<span class="ident">last</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>::<span class="ident">Encoding</span>::<span class="ident">Chunked</span>) {
                 <span class="prelude-val">Ok</span>(<span class="ident">Decoder</span>::<span class="ident">chunked</span>())
             } <span class="kw">else</span> {
@@ -768,7 +768,7 @@
 <span class="kw">impl</span> <span class="ident">ServerTransaction</span> {
     <span class="kw">fn</span> <span class="ident">set_length</span>(<span class="ident">head</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span>, <span class="ident">has_body</span>: <span class="ident">bool</span>, <span class="ident">method</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Method</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Encoder</span> {
         <span class="comment">// these are here thanks to borrowck</span>
-        <span class="comment">// `if method == Some(&amp;Method::Get)` says the RHS doesnt live long enough</span>
+        <span class="comment">// `if method == Some(&amp;Method::Get)` says the RHS doesn&#39;t live long enough</span>
         <span class="kw">const</span> <span class="ident">HEAD</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Method</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Method</span>::<span class="ident">Head</span>);
         <span class="kw">const</span> <span class="ident">CONNECT</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Method</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Method</span>::<span class="ident">Connect</span>);
 
