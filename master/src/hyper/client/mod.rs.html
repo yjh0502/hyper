@@ -557,44 +557,6 @@
 <span id="512">512</span>
 <span id="513">513</span>
 <span id="514">514</span>
-<span id="515">515</span>
-<span id="516">516</span>
-<span id="517">517</span>
-<span id="518">518</span>
-<span id="519">519</span>
-<span id="520">520</span>
-<span id="521">521</span>
-<span id="522">522</span>
-<span id="523">523</span>
-<span id="524">524</span>
-<span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
-<span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
-<span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-<span id="545">545</span>
-<span id="546">546</span>
-<span id="547">547</span>
-<span id="548">548</span>
-<span id="549">549</span>
-<span id="550">550</span>
-<span id="551">551</span>
-<span id="552">552</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Client</span>
 
@@ -1109,44 +1071,6 @@
             .. <span class="kw-2">*</span><span class="self">self</span>
         }
     }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="comment">/*
-    use std::io::Read;
-    use header::Server;
-    use super::{Client};
-    use super::pool::Pool;
-    use Url;
-
-    mock_connector!(Issue640Connector {
-        b&quot;HTTP/1.1 200 OK\r\nContent-Length: 3\r\n\r\n&quot;,
-        b&quot;GET&quot;,
-        b&quot;HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\n&quot;,
-        b&quot;HEAD&quot;,
-        b&quot;HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\n&quot;,
-        b&quot;POST&quot;
-    });
-
-    // see issue #640
-    #[test]
-    fn test_head_response_body_keep_alive() {
-        let client = Client::with_connector(Pool::with_connector(Default::default(), Issue640Connector));
-
-        let mut s = String::new();
-        client.get(&quot;http://127.0.0.1&quot;).send().unwrap().read_to_string(&amp;mut s).unwrap();
-        assert_eq!(s, &quot;GET&quot;);
-
-        let mut s = String::new();
-        client.head(&quot;http://127.0.0.1&quot;).send().unwrap().read_to_string(&amp;mut s).unwrap();
-        assert_eq!(s, &quot;&quot;);
-
-        let mut s = String::new();
-        client.post(&quot;http://127.0.0.1&quot;).send().unwrap().read_to_string(&amp;mut s).unwrap();
-        assert_eq!(s, &quot;POST&quot;);
-    }
-    */</span>
 }
 </pre>
 </section>
