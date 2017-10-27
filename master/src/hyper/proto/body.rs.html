@@ -204,6 +204,7 @@
 <span id="159">159</span>
 <span id="160">160</span>
 <span id="161">161</span>
+<span id="162">162</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">Bytes</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Poll</span>, <span class="ident">Stream</span>};
@@ -214,6 +215,7 @@
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Chunk</span>;
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">TokioBody</span> <span class="op">=</span> <span class="ident">tokio_proto</span>::<span class="ident">streaming</span>::<span class="ident">Body</span><span class="op">&lt;</span><span class="ident">Chunk</span>, ::<span class="ident">Error</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">BodySender</span> <span class="op">=</span> <span class="ident">mpsc</span>::<span class="ident">Sender</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Chunk</span>, ::<span class="ident">Error</span><span class="op">&gt;&gt;</span>;
 
 <span class="doccomment">/// A `Stream` for `Chunk`s used in requests and responses.</span>
 <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;streams do nothing unless polled&quot;</span>]</span>

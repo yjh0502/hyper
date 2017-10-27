@@ -628,6 +628,22 @@
 <span id="583">583</span>
 <span id="584">584</span>
 <span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
@@ -762,6 +778,14 @@
         }
         <span class="ident">extend</span>(<span class="ident">dst</span>, <span class="string">b&quot;\r\n&quot;</span>);
         <span class="ident">body</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">should_error_on_parse_eof</span>() <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="bool-val">false</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">should_read_first</span>() <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="bool-val">true</span>
     }
 }
 
@@ -911,6 +935,14 @@
         <span class="kw">let</span> _ <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">FastWrite</span>(<span class="ident">dst</span>), <span class="string">&quot;{} {}\r\n{}\r\n&quot;</span>, <span class="ident">head</span>.<span class="ident">subject</span>, <span class="ident">head</span>.<span class="ident">version</span>, <span class="ident">head</span>.<span class="ident">headers</span>);
 
         <span class="ident">body</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">should_error_on_parse_eof</span>() <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="bool-val">true</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">should_read_first</span>() <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="bool-val">false</span>
     }
 }
 
