@@ -794,6 +794,9 @@
 <span id="749">749</span>
 <span id="750">750</span>
 <span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Server</span>
 <span class="doccomment">//!</span>
@@ -804,6 +807,7 @@
 <span class="kw">mod</span> <span class="ident">compat_impl</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">compat</span>;
+<span class="kw">mod</span> <span class="ident">service</span>;
 
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cell</span>::<span class="ident">RefCell</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
@@ -842,6 +846,8 @@
         <span class="ident">__ProtoBindTransport</span>,
     };
 }
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">service</span>::{<span class="ident">const_service</span>, <span class="ident">service_fn</span>};
 
 <span class="doccomment">/// An instance of the HTTP protocol, and implementation of tokio-proto&#39;s</span>
 <span class="doccomment">/// `ServerProto` trait.</span>
