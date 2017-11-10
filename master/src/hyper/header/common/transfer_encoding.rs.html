@@ -110,6 +110,9 @@
 <span id="65">65</span>
 <span id="66">66</span>
 <span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">header</span>::<span class="ident">Encoding</span>;
 
@@ -130,14 +133,17 @@
     <span class="doccomment">/// &gt; that contains a Transfer-Encoding header field.</span>
     <span class="doccomment">/// </span>
     <span class="doccomment">/// # ABNF</span>
-    <span class="doccomment">/// ```plain</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```text</span>
     <span class="doccomment">/// Transfer-Encoding = 1#transfer-coding</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// </span>
     <span class="doccomment">/// # Example values</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// * `gzip, chunked`</span>
     <span class="doccomment">/// </span>
     <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use hyper::header::{Headers, TransferEncoding, Encoding};</span>
     <span class="doccomment">/// </span>

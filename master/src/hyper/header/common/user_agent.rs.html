@@ -85,6 +85,10 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
 </pre><pre class="rust ">
 <span class="macro">header</span><span class="macro">!</span> {
     <span class="doccomment">/// `User-Agent` header, defined in</span>
@@ -99,20 +103,24 @@
     <span class="doccomment">/// unless specifically configured not to do so.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # ABNF</span>
-    <span class="doccomment">/// ```plain</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```text</span>
     <span class="doccomment">/// User-Agent = product *( RWS ( product / comment ) )</span>
     <span class="doccomment">/// product         = token [&quot;/&quot; product-version]</span>
     <span class="doccomment">/// product-version = token</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example values</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// * `CERN-LineMode/2.15 libwww/2.17b3`</span>
     <span class="doccomment">/// * `Bunnies`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Notes</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// * The parser does not split the value</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use hyper::header::{Headers, UserAgent};</span>
     <span class="doccomment">///</span>

@@ -161,6 +161,9 @@
 <span id="116">116</span>
 <span id="117">117</span>
 <span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
@@ -178,7 +181,8 @@
 <span class="doccomment">/// protected resource.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # ABNF</span>
-<span class="doccomment">/// ```plain</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```text</span>
 <span class="doccomment">/// Referrer-Policy: 1#policy-token</span>
 <span class="doccomment">/// policy-token   = &quot;no-referrer&quot; / &quot;no-referrer-when-downgrade&quot;</span>
 <span class="doccomment">///                  / &quot;same-origin&quot; / &quot;origin&quot;</span>
@@ -186,9 +190,11 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example values</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// * `no-referrer`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use hyper::header::{Headers, ReferrerPolicy};</span>
 <span class="doccomment">///</span>

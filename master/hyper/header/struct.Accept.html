@@ -58,7 +58,7 @@ small set of desired types, as in the case of a request for an
 in-line image</p>
 
 <h1 id='abnf' class='section-header'><a href='#abnf'>ABNF</a></h1>
-<pre><code class="language-plain">Accept = #( media-range [ accept-params ] )
+<pre><code class="language-text">Accept = #( media-range [ accept-params ] )
 
 media-range    = ( &quot;*/*&quot;
                  / ( type &quot;/&quot; &quot;*&quot; )
@@ -123,14 +123,14 @@ accept-ext = OWS &quot;;&quot; OWS token [ &quot;=&quot; ( token / quoted-string
                     <h2 id='methods' class='small-section-header'>
                       Methods<a href='#methods' class='anchor'></a>
                     </h2>
-                <h3 id='impl' class='impl'><span class='in-band'><code>impl <a class="struct" href="../../hyper/header/struct.Accept.html" title="struct hyper::header::Accept">Accept</a></code><a href='#impl' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/accept.rs.html#122-142' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.star' class="method"><span id='star.v' class='invisible'><code>fn <a href='#method.star' class='fnname'>star</a>() -&gt; <a class="struct" href="../../hyper/header/struct.Accept.html" title="struct hyper::header::Accept">Accept</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/accept.rs.html#124-126' title='goto source code'>[src]</a></span></h4>
+                <h3 id='impl' class='impl'><span class='in-band'><code>impl <a class="struct" href="../../hyper/header/struct.Accept.html" title="struct hyper::header::Accept">Accept</a></code><a href='#impl' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/accept.rs.html#124-144' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.star' class="method"><span id='star.v' class='invisible'><code>fn <a href='#method.star' class='fnname'>star</a>() -&gt; <a class="struct" href="../../hyper/header/struct.Accept.html" title="struct hyper::header::Accept">Accept</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/accept.rs.html#126-128' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>A constructor to easily create <code>Accept: */*</code>.</p>
-</div><h4 id='method.json' class="method"><span id='json.v' class='invisible'><code>fn <a href='#method.json' class='fnname'>json</a>() -&gt; <a class="struct" href="../../hyper/header/struct.Accept.html" title="struct hyper::header::Accept">Accept</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/accept.rs.html#129-131' title='goto source code'>[src]</a></span></h4>
+</div><h4 id='method.json' class="method"><span id='json.v' class='invisible'><code>fn <a href='#method.json' class='fnname'>json</a>() -&gt; <a class="struct" href="../../hyper/header/struct.Accept.html" title="struct hyper::header::Accept">Accept</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/accept.rs.html#131-133' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>A constructor to easily create <code>Accept: application/json</code>.</p>
-</div><h4 id='method.text' class="method"><span id='text.v' class='invisible'><code>fn <a href='#method.text' class='fnname'>text</a>() -&gt; <a class="struct" href="../../hyper/header/struct.Accept.html" title="struct hyper::header::Accept">Accept</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/accept.rs.html#134-136' title='goto source code'>[src]</a></span></h4>
+</div><h4 id='method.text' class="method"><span id='text.v' class='invisible'><code>fn <a href='#method.text' class='fnname'>text</a>() -&gt; <a class="struct" href="../../hyper/header/struct.Accept.html" title="struct hyper::header::Accept">Accept</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/accept.rs.html#136-138' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>A constructor to easily create <code>Accept: text/*</code>.</p>
-</div><h4 id='method.image' class="method"><span id='image.v' class='invisible'><code>fn <a href='#method.image' class='fnname'>image</a>() -&gt; <a class="struct" href="../../hyper/header/struct.Accept.html" title="struct hyper::header::Accept">Accept</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/accept.rs.html#139-141' title='goto source code'>[src]</a></span></h4>
+</div><h4 id='method.image' class="method"><span id='image.v' class='invisible'><code>fn <a href='#method.image' class='fnname'>image</a>() -&gt; <a class="struct" href="../../hyper/header/struct.Accept.html" title="struct hyper::header::Accept">Accept</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/accept.rs.html#141-143' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>A constructor to easily create <code>Accept: image/*</code>.</p>
 </div></div>
                     <h2 id='deref-methods' class='small-section-header'>

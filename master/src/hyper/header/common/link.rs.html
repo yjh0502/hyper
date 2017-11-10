@@ -1143,6 +1143,10 @@
 <span id="1098">1098</span>
 <span id="1099">1099</span>
 <span id="1100">1100</span>
+<span id="1101">1101</span>
+<span id="1102">1102</span>
+<span id="1103">1103</span>
+<span id="1104">1104</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
@@ -1160,7 +1164,8 @@
 <span class="doccomment">/// [RFC5988](http://tools.ietf.org/html/rfc5988#section-5)</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # ABNF</span>
-<span class="doccomment">/// ```plain</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```text</span>
 <span class="doccomment">/// Link           = &quot;Link&quot; &quot;:&quot; #link-value</span>
 <span class="doccomment">/// link-value     = &quot;&lt;&quot; URI-Reference &quot;&gt;&quot; *( &quot;;&quot; link-param )</span>
 <span class="doccomment">/// link-param     = ( ( &quot;rel&quot; &quot;=&quot; relation-types )</span>
@@ -1201,6 +1206,7 @@
 <span class="doccomment">///        &lt;/TheBook/chapter4&gt;; rel=&quot;next&quot;; title*=UTF-8&#39;de&#39;n%c3%a4chstes%20Kapitel`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use hyper::header::{Headers, Link, LinkValue, RelationType};</span>
 <span class="doccomment">///</span>
@@ -1254,7 +1260,9 @@
 }
 
 <span class="doccomment">/// A Media Descriptors Enum based on:</span>
-<span class="doccomment">/// https://www.w3.org/TR/html401/types.html#h-6.13</span>
+<span class="doccomment">/// [https://www.w3.org/TR/html401/types.html#h-6.13][url]</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [url]: https://www.w3.org/TR/html401/types.html#h-6.13</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MediaDesc</span> {
     <span class="doccomment">/// screen.</span>

@@ -124,6 +124,10 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
@@ -142,15 +146,19 @@
 <span class="doccomment">/// &gt; implementation-specified directives for recipients.  This</span>
 <span class="doccomment">/// &gt; specification deprecates such extensions to improve interoperability.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Spec: https://tools.ietf.org/html/rfc7234#section-5.4</span>
+<span class="doccomment">/// Spec: [https://tools.ietf.org/html/rfc7234#section-5.4][url]</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [url]: https://tools.ietf.org/html/rfc7234#section-5.4</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use hyper::header::{Headers, Pragma};</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let mut headers = Headers::new();</span>
 <span class="doccomment">/// headers.set(Pragma::NoCache);</span>
 <span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use hyper::header::{Headers, Pragma};</span>
 <span class="doccomment">///</span>

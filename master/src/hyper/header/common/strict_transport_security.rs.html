@@ -243,6 +243,8 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::{<span class="self">self</span>, <span class="ident">FromStr</span>};
@@ -263,7 +265,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// # ABNF</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ```plain</span>
+<span class="doccomment">/// ```text</span>
 <span class="doccomment">///      [ directive ]  *( &quot;;&quot; [ directive ] )</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///      directive                 = directive-name [ &quot;=&quot; directive-value ]</span>
@@ -273,10 +275,12 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example values</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// * `max-age=31536000`</span>
 <span class="doccomment">/// * `max-age=15768000 ; includeSubDomains`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// # extern crate hyper;</span>
 <span class="doccomment">/// # fn main() {</span>

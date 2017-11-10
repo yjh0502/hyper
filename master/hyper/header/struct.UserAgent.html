@@ -61,7 +61,7 @@ use.  A user agent SHOULD send a User-Agent field in each request
 unless specifically configured not to do so.</p>
 
 <h1 id='abnf' class='section-header'><a href='#abnf'>ABNF</a></h1>
-<pre><code class="language-plain">User-Agent = product *( RWS ( product / comment ) )
+<pre><code class="language-text">User-Agent = product *( RWS ( product / comment ) )
 product         = token [&quot;/&quot; product-version]
 product-version = token
 </code></pre>

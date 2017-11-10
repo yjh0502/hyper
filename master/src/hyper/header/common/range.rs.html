@@ -428,6 +428,10 @@
 <span id="383">383</span>
 <span id="384">384</span>
 <span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
@@ -443,7 +447,8 @@
 <span class="doccomment">/// representation data.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # ABNF</span>
-<span class="doccomment">/// ```plain</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```text</span>
 <span class="doccomment">/// Range =	byte-ranges-specifier / other-ranges-specifier</span>
 <span class="doccomment">/// other-ranges-specifier = other-range-unit &quot;=&quot; other-range-set</span>
 <span class="doccomment">/// other-range-set = 1*VCHAR</span>
@@ -458,6 +463,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example values</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// * `bytes=1000-`</span>
 <span class="doccomment">/// * `bytes=-2000`</span>
 <span class="doccomment">/// * `bytes=0-1,30-40`</span>
@@ -466,6 +472,7 @@
 <span class="doccomment">/// * `custom_unit=xxx-yyy`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use hyper::header::{Headers, Range, ByteRangeSpec};</span>
 <span class="doccomment">///</span>
@@ -477,6 +484,7 @@
 <span class="doccomment">/// headers.clear();</span>
 <span class="doccomment">/// headers.set(Range::Unregistered(&quot;letters&quot;.to_owned(), &quot;a-f&quot;.to_owned()));</span>
 <span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use hyper::header::{Headers, Range};</span>
 <span class="doccomment">///</span>
