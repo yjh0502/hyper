@@ -389,7 +389,7 @@
     <span class="kw">type</span> <span class="ident">PollBody</span>;
     <span class="kw">type</span> <span class="ident">RecvItem</span>;
     <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">PollBody</span><span class="op">&gt;</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">RecvItem</span>, <span class="ident">Body</span>)<span class="op">&gt;</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">RecvItem</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>)<span class="op">&gt;</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
     <span class="kw">fn</span> <span class="ident">should_poll</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span>;
 }
 
@@ -431,9 +431,9 @@
                         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">has_body</span> {
                             <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="kw">super</span>::<span class="ident">Body</span>::<span class="ident">pair</span>();
                             <span class="self">self</span>.<span class="ident">body_tx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tx</span>);
-                            <span class="ident">rx</span>
+                            <span class="prelude-val">Some</span>(<span class="ident">rx</span>)
                         } <span class="kw">else</span> {
-                            <span class="ident">Body</span>::<span class="ident">empty</span>()
+                            <span class="prelude-val">None</span>
                         };
                         <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">recv_msg</span>(<span class="prelude-val">Ok</span>((<span class="ident">head</span>, <span class="ident">body</span>))).<span class="ident">expect</span>(<span class="string">&quot;recv_msg with Ok shouldn&#39;t error&quot;</span>);
                     },
@@ -624,7 +624,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">RecvItem</span>, <span class="ident">Body</span>)<span class="op">&gt;</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">RecvItem</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>)<span class="op">&gt;</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">msg</span>, <span class="ident">body</span>) <span class="op">=</span> <span class="ident">msg</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="kw">super</span>::<span class="ident">request</span>::<span class="ident">from_wire</span>(<span class="prelude-val">None</span>, <span class="ident">msg</span>, <span class="ident">body</span>);
         <span class="self">self</span>.<span class="ident">in_flight</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">service</span>.<span class="ident">call</span>(<span class="ident">req</span>));
@@ -671,10 +671,10 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">RecvItem</span>, <span class="ident">Body</span>)<span class="op">&gt;</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">RecvItem</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>)<span class="op">&gt;</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">msg</span> {
             <span class="prelude-val">Ok</span>((<span class="ident">msg</span>, <span class="ident">body</span>)) <span class="op">=&gt;</span> {
-                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">super</span>::<span class="ident">response</span>::<span class="ident">from_wire</span>(<span class="ident">msg</span>, <span class="prelude-val">Some</span>(<span class="ident">body</span>));
+                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">super</span>::<span class="ident">response</span>::<span class="ident">from_wire</span>(<span class="ident">msg</span>, <span class="ident">body</span>);
                 <span class="kw">let</span> <span class="ident">cb</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">callback</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;recv_msg without callback&quot;</span>);
                 <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">cb</span>.<span class="ident">send</span>(<span class="prelude-val">Ok</span>(<span class="ident">res</span>));
                 <span class="prelude-val">Ok</span>(())
