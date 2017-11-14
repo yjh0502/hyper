@@ -368,6 +368,8 @@
 <span id="323">323</span>
 <span id="324">324</span>
 <span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">AsyncSink</span>, <span class="ident">Future</span>, <span class="ident">Poll</span>, <span class="ident">Sink</span>, <span class="ident">Stream</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">sync</span>::{<span class="ident">mpsc</span>, <span class="ident">oneshot</span>};
@@ -519,6 +521,8 @@
                     <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">close_write</span>();
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
                 }
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">has_queued_body</span>() {
+                <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">poll_flush</span>());
             } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">body</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">body_rx</span>.<span class="ident">take</span>() {
                 <span class="kw">let</span> <span class="ident">chunk</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">body</span>.<span class="ident">poll</span>()<span class="question-mark">?</span> {
                     <span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">chunk</span>)) <span class="op">=&gt;</span> {
@@ -536,7 +540,7 @@
                         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>);
                     }
                 };
-                <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">write_body</span>(<span class="prelude-val">Some</span>(<span class="ident">chunk</span>))<span class="question-mark">?</span>;
+                <span class="macro">assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">write_body</span>(<span class="prelude-val">Some</span>(<span class="ident">chunk</span>))<span class="question-mark">?</span>.<span class="ident">is_ready</span>());
             } <span class="kw">else</span> {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>);
             }
