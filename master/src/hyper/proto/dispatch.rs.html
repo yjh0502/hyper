@@ -370,6 +370,7 @@
 <span id="325">325</span>
 <span id="326">326</span>
 <span id="327">327</span>
+<span id="328">328</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">AsyncSink</span>, <span class="ident">Future</span>, <span class="ident">Poll</span>, <span class="ident">Sink</span>, <span class="ident">Stream</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">sync</span>::{<span class="ident">mpsc</span>, <span class="ident">oneshot</span>};
@@ -583,6 +584,7 @@
         <span class="self">self</span>.<span class="ident">poll_flush</span>()<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_done</span>() {
+            <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">shutdown</span>());
             <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Dispatch::poll done&quot;</span>);
             <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()))
         } <span class="kw">else</span> {
