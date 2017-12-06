@@ -1094,6 +1094,16 @@
 <span id="1049">1049</span>
 <span id="1050">1050</span>
 <span id="1051">1051</span>
+<span id="1052">1052</span>
+<span id="1053">1053</span>
+<span id="1054">1054</span>
+<span id="1055">1055</span>
+<span id="1056">1056</span>
+<span id="1057">1057</span>
+<span id="1058">1058</span>
+<span id="1059">1059</span>
+<span id="1060">1060</span>
+<span id="1061">1061</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
@@ -1293,8 +1303,9 @@
                 }
 
             },
-            <span class="ident">Reading</span>::<span class="ident">Init</span> <span class="op">|</span> <span class="ident">Reading</span>::<span class="ident">KeepAlive</span> <span class="op">|</span> <span class="ident">Reading</span>::<span class="ident">Closed</span> <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>()
+            _ <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;read_body invalid state: {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span>),
         };
+
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> <span class="op">=</span> <span class="ident">reading</span>;
         <span class="ident">ret</span>
     }
@@ -1421,6 +1432,14 @@
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_queued_body</span>() {
             <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">flush</span>());
+
+            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">can_write_body</span>() {
+                <span class="kw">if</span> <span class="ident">chunk</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">as_ref</span>().<span class="ident">len</span>()).<span class="ident">unwrap_or</span>(<span class="number">0</span>) <span class="op">==</span> <span class="number">0</span> {
+                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">AsyncSink</span>::<span class="ident">NotReady</span>(<span class="ident">chunk</span>));
+                } <span class="kw">else</span> {
+                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">AsyncSink</span>::<span class="ident">Ready</span>);
+                }
+            }
         }
 
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> {
@@ -1466,8 +1485,9 @@
                     }
                 }
             },
-            _ <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
+            _ <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;write_body invalid state: {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span>),
         };
+
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> <span class="op">=</span> <span class="ident">state</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">AsyncSink</span>::<span class="ident">Ready</span>)
     }
