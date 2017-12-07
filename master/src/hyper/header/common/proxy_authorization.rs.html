@@ -234,6 +234,13 @@
 <span id="189">189</span>
 <span id="190">190</span>
 <span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">any</span>::<span class="ident">Any</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
@@ -423,9 +430,16 @@
     }
 }
 
-<span class="macro">bench_header</span><span class="macro">!</span>(<span class="ident">raw</span>, <span class="ident">ProxyAuthorization</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, { <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;foo bar baz&quot;</span>.<span class="ident">to_vec</span>()] });
-<span class="macro">bench_header</span><span class="macro">!</span>(<span class="ident">basic</span>, <span class="ident">ProxyAuthorization</span><span class="op">&lt;</span><span class="ident">Basic</span><span class="op">&gt;</span>, { <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;Basic QWxhZGRpbjpuIHNlc2FtZQ==&quot;</span>.<span class="ident">to_vec</span>()] });
-<span class="macro">bench_header</span><span class="macro">!</span>(<span class="ident">bearer</span>, <span class="ident">ProxyAuthorization</span><span class="op">&lt;</span><span class="ident">Bearer</span><span class="op">&gt;</span>, { <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;Bearer fpKL54jvWmEGVoRdCNjG&quot;</span>.<span class="ident">to_vec</span>()] });
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
+<span class="kw">mod</span> <span class="ident">benches</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">ProxyAuthorization</span>;
+    <span class="kw">use</span> ::<span class="ident">header</span>::{<span class="ident">Basic</span>, <span class="ident">Bearer</span>};
+
+    <span class="macro">bench_header</span><span class="macro">!</span>(<span class="ident">raw</span>, <span class="ident">ProxyAuthorization</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, { <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;foo bar baz&quot;</span>.<span class="ident">to_vec</span>()] });
+    <span class="macro">bench_header</span><span class="macro">!</span>(<span class="ident">basic</span>, <span class="ident">ProxyAuthorization</span><span class="op">&lt;</span><span class="ident">Basic</span><span class="op">&gt;</span>, { <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;Basic QWxhZGRpbjpuIHNlc2FtZQ==&quot;</span>.<span class="ident">to_vec</span>()] });
+    <span class="macro">bench_header</span><span class="macro">!</span>(<span class="ident">bearer</span>, <span class="ident">ProxyAuthorization</span><span class="op">&lt;</span><span class="ident">Bearer</span><span class="op">&gt;</span>, { <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;Bearer fpKL54jvWmEGVoRdCNjG&quot;</span>.<span class="ident">to_vec</span>()] });
+}
 </pre>
 </section>
     <section id='search' class="content hidden"></section>
