@@ -389,6 +389,36 @@
 <span id="344">344</span>
 <span id="345">345</span>
 <span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
 
@@ -405,6 +435,7 @@
     <span class="ident">dispatch</span>: <span class="ident">D</span>,
     <span class="ident">body_tx</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span>::<span class="ident">body</span>::<span class="ident">BodySender</span><span class="op">&gt;</span>,
     <span class="ident">body_rx</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Bs</span><span class="op">&gt;</span>,
+    <span class="ident">is_closing</span>: <span class="ident">bool</span>,
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Dispatch</span> {
@@ -426,7 +457,12 @@
     <span class="ident">rx</span>: <span class="ident">ClientRx</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">type</span> <span class="ident">ClientRx</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">mpsc</span>::<span class="ident">Receiver</span><span class="op">&lt;</span>(<span class="ident">RequestHead</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">oneshot</span>::<span class="ident">Sender</span><span class="op">&lt;</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>::<span class="ident">Response</span><span class="op">&gt;&gt;</span>)<span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ClientMsg</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
+    <span class="ident">Request</span>(<span class="ident">RequestHead</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">oneshot</span>::<span class="ident">Sender</span><span class="op">&lt;</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>::<span class="ident">Response</span><span class="op">&gt;&gt;</span>),
+    <span class="ident">Close</span>,
+}
+
+<span class="kw">type</span> <span class="ident">ClientRx</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">mpsc</span>::<span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">ClientMsg</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;&gt;</span>;
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">Bs</span>, <span class="ident">I</span>, <span class="ident">B</span>, <span class="ident">T</span>, <span class="ident">K</span><span class="op">&gt;</span> <span class="ident">Dispatcher</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">Bs</span>, <span class="ident">I</span>, <span class="ident">B</span>, <span class="ident">T</span>, <span class="ident">K</span><span class="op">&gt;</span>
 <span class="kw">where</span>
@@ -443,6 +479,7 @@
             <span class="ident">dispatch</span>: <span class="ident">dispatch</span>,
             <span class="ident">body_tx</span>: <span class="prelude-val">None</span>,
             <span class="ident">body_rx</span>: <span class="prelude-val">None</span>,
+            <span class="ident">is_closing</span>: <span class="bool-val">false</span>,
         }
     }
 
@@ -452,7 +489,9 @@
 
     <span class="kw">fn</span> <span class="ident">poll_read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">can_read_head</span>() {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">can_read_head</span>() {
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">read_head</span>() {
                     <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">has_body</span>)))) <span class="op">=&gt;</span> {
                         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">has_body</span> {
@@ -541,12 +580,16 @@
 
     <span class="kw">fn</span> <span class="ident">poll_write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">body_rx</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">should_poll</span>() {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">body_rx</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">should_poll</span>() {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">body</span>)) <span class="op">=</span> <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">poll_msg</span>()) {
                     <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">write_head</span>(<span class="ident">head</span>, <span class="ident">body</span>.<span class="ident">is_some</span>());
                     <span class="self">self</span>.<span class="ident">body_rx</span> <span class="op">=</span> <span class="ident">body</span>;
                 } <span class="kw">else</span> {
-                    <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">close_write</span>();
+                    <span class="self">self</span>.<span class="ident">is_closing</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                    <span class="comment">//self.conn.close_read();</span>
+                    <span class="comment">//self.conn.close_write();</span>
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
                 }
             } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">has_queued_body</span>() {
@@ -582,6 +625,16 @@
         })
     }
 
+    <span class="kw">fn</span> <span class="ident">poll_close</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">is_closing</span>);
+
+        <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">close_and_shutdown</span>());
+        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">close_read</span>();
+        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">close_write</span>();
+        <span class="self">self</span>.<span class="ident">is_closing</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()))
+    }
+
     <span class="kw">fn</span> <span class="ident">is_done</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">read_done</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">is_read_closed</span>();
 
@@ -615,6 +668,10 @@
         <span class="self">self</span>.<span class="ident">poll_read</span>()<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">poll_write</span>()<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">poll_flush</span>()<span class="question-mark">?</span>;
+
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
+            <span class="self">self</span>.<span class="ident">poll_close</span>()<span class="question-mark">?</span>;
+        }
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_done</span>() {
             <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">shutdown</span>());
@@ -677,6 +734,7 @@
 
 <span class="comment">// ===== impl Client =====</span>
 
+
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">rx</span>: <span class="ident">ClientRx</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
         <span class="ident">Client</span> {
@@ -697,11 +755,13 @@
 
     <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">PollBody</span><span class="op">&gt;</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">poll</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">cb</span>)))) <span class="op">=&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">ClientMsg</span>::<span class="ident">Request</span>(<span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">cb</span>)))) <span class="op">=&gt;</span> {
                 <span class="self">self</span>.<span class="ident">callback</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cb</span>);
                 <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">body</span>))))
             },
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">ClientMsg</span>::<span class="ident">Close</span>))) <span class="op">|</span>
             <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>)) <span class="op">=&gt;</span> {
+                <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;client tx closed&quot;</span>);
                 <span class="comment">// user has dropped sender handle</span>
                 <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>))
             },
