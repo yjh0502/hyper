@@ -796,21 +796,6 @@
 <span id="751">751</span>
 <span id="752">752</span>
 <span id="753">753</span>
-<span id="754">754</span>
-<span id="755">755</span>
-<span id="756">756</span>
-<span id="757">757</span>
-<span id="758">758</span>
-<span id="759">759</span>
-<span id="760">760</span>
-<span id="761">761</span>
-<span id="762">762</span>
-<span id="763">763</span>
-<span id="764">764</span>
-<span id="765">765</span>
-<span id="766">766</span>
-<span id="767">767</span>
-<span id="768">768</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Server</span>
 <span class="doccomment">//!</span>
@@ -863,8 +848,7 @@
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">service</span>::{<span class="ident">const_service</span>, <span class="ident">service_fn</span>};
 
-<span class="doccomment">/// An instance of the HTTP protocol, and implementation of tokio-proto&#39;s</span>
-<span class="doccomment">/// `ServerProto` trait.</span>
+<span class="doccomment">/// A configuration of the HTTP protocol.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This structure is used to create instances of `Server` or to spawn off tasks</span>
 <span class="doccomment">/// which handle a connection to an HTTP server. Each instance of `Http` can be</span>
@@ -888,7 +872,6 @@
     <span class="ident">reactor</span>: <span class="ident">Core</span>,
     <span class="ident">listener</span>: <span class="ident">TcpListener</span>,
     <span class="ident">shutdown_timeout</span>: <span class="ident">Duration</span>,
-    <span class="ident">no_proto</span>: <span class="ident">bool</span>,
 }
 
 <span class="doccomment">/// A stream mapping incoming IOs to new services.</span>
@@ -941,24 +924,17 @@ pub struct SpawnAll&lt;I, S, E&gt; {
 
 <span class="comment">// ===== impl Http =====</span>
 
-<span class="comment">// This is wrapped in this macro because using `Http` as a `ServerProto` will</span>
-<span class="comment">// never trigger a deprecation warning, so we have to annoy more people to</span>
-<span class="comment">// protect some others.</span>
-<span class="macro">feat_server_proto</span><span class="macro">!</span> {
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">Http</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-        <span class="doccomment">/// Creates a new instance of the HTTP protocol, ready to spawn a server or</span>
-        <span class="doccomment">/// start accepting connections.</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="ident">Http</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-            <span class="ident">Http</span> {
-                <span class="ident">keep_alive</span>: <span class="bool-val">true</span>,
-                <span class="ident">pipeline</span>: <span class="bool-val">false</span>,
-                <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
-            }
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">Http</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Creates a new instance of the HTTP protocol, ready to spawn a server or</span>
+    <span class="doccomment">/// start accepting connections.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="ident">Http</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
+        <span class="ident">Http</span> {
+            <span class="ident">keep_alive</span>: <span class="bool-val">true</span>,
+            <span class="ident">pipeline</span>: <span class="bool-val">false</span>,
+            <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
         }
     }
-}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">Http</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Enables or disables HTTP keep-alive.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is true.</span>
@@ -1001,7 +977,6 @@ pub struct SpawnAll&lt;I, S, E&gt; {
             <span class="ident">listener</span>: <span class="ident">listener</span>,
             <span class="ident">protocol</span>: <span class="self">self</span>.<span class="ident">clone</span>(),
             <span class="ident">shutdown_timeout</span>: <span class="ident">Duration</span>::<span class="ident">new</span>(<span class="number">1</span>, <span class="number">0</span>),
-            <span class="ident">no_proto</span>: <span class="bool-val">false</span>,
         })
     }
 
@@ -1134,9 +1109,9 @@ pub struct SpawnAll&lt;I, S, E&gt; {
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Configure this server to not use tokio-proto infrastructure internally.</span>
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span><span class="op">=</span><span class="string">&quot;0.11.11&quot;</span>, <span class="ident">note</span><span class="op">=</span><span class="string">&quot;no_proto is always enabled&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">no_proto</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">no_proto</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="self">self</span>
     }
 
@@ -1164,7 +1139,7 @@ pub struct SpawnAll&lt;I, S, E&gt; {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_until</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">shutdown_signal</span>: <span class="ident">F</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (), <span class="ident">Error</span> <span class="op">=</span> ()<span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> <span class="ident">Server</span> { <span class="ident">protocol</span>, <span class="ident">new_service</span>, <span class="kw-2">mut</span> <span class="ident">reactor</span>, <span class="ident">listener</span>, <span class="ident">shutdown_timeout</span>, <span class="ident">no_proto</span> } <span class="op">=</span> <span class="self">self</span>;
+        <span class="kw">let</span> <span class="ident">Server</span> { <span class="ident">protocol</span>, <span class="ident">new_service</span>, <span class="kw-2">mut</span> <span class="ident">reactor</span>, <span class="ident">listener</span>, <span class="ident">shutdown_timeout</span> } <span class="op">=</span> <span class="self">self</span>;
 
         <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">reactor</span>.<span class="ident">handle</span>();
 
@@ -1181,15 +1156,10 @@ pub struct SpawnAll&lt;I, S, E&gt; {
                 <span class="ident">info</span>: <span class="ident">Rc</span>::<span class="ident">downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">info</span>),
             };
             <span class="ident">info</span>.<span class="ident">borrow_mut</span>().<span class="ident">active</span> <span class="op">+=</span> <span class="number">1</span>;
-            <span class="kw">if</span> <span class="ident">no_proto</span> {
-                <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">protocol</span>.<span class="ident">serve_connection</span>(<span class="ident">socket</span>, <span class="ident">s</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span>_<span class="op">|</span> ())
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;no_proto error: {}&quot;</span>, <span class="ident">err</span>));
-                <span class="ident">handle</span>.<span class="ident">spawn</span>(<span class="ident">fut</span>);
-            } <span class="kw">else</span> {
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-                <span class="ident">protocol</span>.<span class="ident">bind_connection</span>(<span class="kw-2">&amp;</span><span class="ident">handle</span>, <span class="ident">socket</span>, <span class="ident">addr</span>, <span class="ident">s</span>);
-            }
+            <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">protocol</span>.<span class="ident">serve_connection</span>(<span class="ident">socket</span>, <span class="ident">s</span>)
+                .<span class="ident">map</span>(<span class="op">|</span>_<span class="op">|</span> ())
+                .<span class="ident">map_err</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;server connection error: ({}) {}&quot;</span>, <span class="ident">addr</span>, <span class="ident">err</span>));
+            <span class="ident">handle</span>.<span class="ident">spawn</span>(<span class="ident">fut</span>);
             <span class="prelude-val">Ok</span>(())
         });
 
