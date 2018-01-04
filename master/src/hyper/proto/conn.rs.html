@@ -2284,7 +2284,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_conn_body_write_length</span>() {
         <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">pretty_env_logger</span>;
-        <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">pretty_env_logger</span>::<span class="ident">init</span>();
+        <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">pretty_env_logger</span>::<span class="ident">try_init</span>();
         <span class="kw">let</span> _: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">future</span>::<span class="ident">lazy</span>(<span class="op">||</span> {
             <span class="kw">let</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">AsyncIo</span>::<span class="ident">new_buf</span>(<span class="macro">vec</span><span class="macro">!</span>[], <span class="number">0</span>);
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Conn</span>::<span class="op">&lt;</span>_, <span class="ident">proto</span>::<span class="ident">Chunk</span>, <span class="ident">ServerTransaction</span><span class="op">&gt;</span>::<span class="ident">new</span>(<span class="ident">io</span>, <span class="ident">Default</span>::<span class="ident">default</span>());
