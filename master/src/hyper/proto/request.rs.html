@@ -413,13 +413,9 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">body_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">B</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">body</span>.<span class="ident">as_ref</span>() }
 
-    <span class="doccomment">/// The remote socket address of this request</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is an `Option`, because some underlying transports may not have</span>
-    <span class="doccomment">/// a socket address, such as Unix Sockets.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This field is not used for outgoing requests.</span>
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span><span class="op">=</span><span class="string">&quot;0.11.12&quot;</span>, <span class="ident">note</span><span class="op">=</span><span class="string">&quot;This method will be gone in future versions.&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remote_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">remote_addr</span> }
 
     <span class="doccomment">/// The target path of this Request.</span>
@@ -549,6 +545,10 @@
         <span class="ident">version</span>: <span class="ident">req</span>.<span class="ident">version</span>,
     };
     (<span class="ident">head</span>, <span class="ident">req</span>.<span class="ident">body</span>)
+}
+
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">addr</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">addr</span>: <span class="ident">SocketAddr</span>) {
+    <span class="ident">req</span>.<span class="ident">remote_addr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">addr</span>);
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
