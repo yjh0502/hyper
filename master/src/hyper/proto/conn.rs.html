@@ -1233,6 +1233,20 @@
 <span id="1188">1188</span>
 <span id="1189">1189</span>
 <span id="1190">1190</span>
+<span id="1191">1191</span>
+<span id="1192">1192</span>
+<span id="1193">1193</span>
+<span id="1194">1194</span>
+<span id="1195">1195</span>
+<span id="1196">1196</span>
+<span id="1197">1197</span>
+<span id="1198">1198</span>
+<span id="1199">1199</span>
+<span id="1200">1200</span>
+<span id="1201">1201</span>
+<span id="1202">1202</span>
+<span id="1203">1203</span>
+<span id="1204">1204</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
@@ -1474,7 +1488,21 @@
         <span class="ident">ret</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">maybe_park_read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_keep_alive</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">can_read_head</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">can_read_body</span>());
+
+        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Conn::read_keep_alive&quot;</span>);
+
+        <span class="kw">if</span> <span class="ident">T</span>::<span class="ident">should_read_first</span>() <span class="op">||</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">is_idle</span>() {
+            <span class="self">self</span>.<span class="ident">maybe_park_read</span>();
+        } <span class="kw">else</span> {
+            <span class="self">self</span>.<span class="ident">try_empty_read</span>()<span class="question-mark">?</span>;
+        }
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">fn</span> <span class="ident">maybe_park_read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">io</span>.<span class="ident">is_read_blocked</span>() {
             <span class="comment">// the Io object is ready to read, which means it will never alert</span>
             <span class="comment">// us that it is ready until we drain it. However, we&#39;re currently</span>
@@ -1494,7 +1522,7 @@
     <span class="comment">//</span>
     <span class="comment">// This should only be called for Clients wanting to enter the idle</span>
     <span class="comment">// state.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_empty_read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_empty_read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">can_read_head</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">can_read_body</span>());
 
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">io</span>.<span class="ident">read_buf</span>().<span class="ident">is_empty</span>() {
