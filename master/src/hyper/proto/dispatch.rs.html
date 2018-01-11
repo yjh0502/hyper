@@ -602,66 +602,25 @@
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
             } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">can_read_head</span>() {
-                <span class="comment">// can dispatch receive, or does it still care about, an incoming message?</span>
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">poll_ready</span>() {
-                    <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(())) <span class="op">=&gt;</span> (),
-                    <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;dispatch not ready when conn is&quot;</span>),
-                    <span class="prelude-val">Err</span>(()) <span class="op">=&gt;</span> {
-                        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;dispatch no longer receiving messages&quot;</span>);
-                        <span class="self">self</span>.<span class="ident">close</span>();
-                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
-                    }
-                }
-                <span class="comment">// dispatch is ready for a message, try to read one</span>
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">read_head</span>() {
-                    <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">has_body</span>)))) <span class="op">=&gt;</span> {
-                        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">has_body</span> {
-                            <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="kw">super</span>::<span class="ident">body</span>::<span class="ident">channel</span>();
-                            <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">poll_ready</span>(); <span class="comment">// register this task if rx is dropped</span>
-                            <span class="self">self</span>.<span class="ident">body_tx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tx</span>);
-                            <span class="prelude-val">Some</span>(<span class="ident">rx</span>)
-                        } <span class="kw">else</span> {
-                            <span class="prelude-val">None</span>
-                        };
-                        <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">recv_msg</span>(<span class="prelude-val">Ok</span>((<span class="ident">head</span>, <span class="ident">body</span>)))<span class="question-mark">?</span>;
-                    },
-                    <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>)) <span class="op">=&gt;</span> {
-                        <span class="comment">// read eof, conn will start to shutdown automatically</span>
-                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
-                    }
-                    <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>),
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=&gt;</span> {
-                        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;read_head error: {}&quot;</span>, <span class="ident">err</span>);
-                        <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">recv_msg</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>))<span class="question-mark">?</span>;
-                        <span class="comment">// if here, the dispatcher gave the user the error</span>
-                        <span class="comment">// somewhere else. we still need to shutdown, but</span>
-                        <span class="comment">// not as a second error.</span>
-                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
-                    }
-                }
+                <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">poll_read_head</span>());
             } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">can_write_continue</span>() {
                 <span class="macro">try_nb</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">flush</span>());
             } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">body</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">body_tx</span>.<span class="ident">take</span>() {
-                <span class="kw">let</span> <span class="ident">can_read_body</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">can_read_body</span>();
-                <span class="kw">match</span> <span class="ident">body</span>.<span class="ident">poll_ready</span>() {
-                    <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(())) <span class="op">=&gt;</span> (),
-                    <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> {
-                        <span class="self">self</span>.<span class="ident">body_tx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">body</span>);
-                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>);
-                    },
-                    <span class="prelude-val">Err</span>(<span class="ident">_canceled</span>) <span class="op">=&gt;</span> {
-                        <span class="comment">// user doesn&#39;t care about the body</span>
-                        <span class="comment">// so we should stop reading</span>
-                        <span class="kw">if</span> <span class="ident">can_read_body</span> {
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">can_read_body</span>() {
+                    <span class="kw">match</span> <span class="ident">body</span>.<span class="ident">poll_ready</span>() {
+                        <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(())) <span class="op">=&gt;</span> (),
+                        <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> {
+                            <span class="self">self</span>.<span class="ident">body_tx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">body</span>);
+                            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>);
+                        },
+                        <span class="prelude-val">Err</span>(<span class="ident">_canceled</span>) <span class="op">=&gt;</span> {
+                            <span class="comment">// user doesn&#39;t care about the body</span>
+                            <span class="comment">// so we should stop reading</span>
                             <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;body receiver dropped before eof, closing&quot;</span>);
                             <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">close_read</span>();
                             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
                         }
-                        <span class="comment">// else the conn body is done, and user dropped,</span>
-                        <span class="comment">// so everything is fine!</span>
                     }
-                }
-                <span class="kw">if</span> <span class="ident">can_read_body</span> {
                     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">read_body</span>() {
                         <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">chunk</span>))) <span class="op">=&gt;</span> {
                             <span class="kw">match</span> <span class="ident">body</span>.<span class="ident">start_send</span>(<span class="prelude-val">Ok</span>(<span class="ident">chunk</span>)) {
@@ -696,6 +655,47 @@
                 }
             } <span class="kw">else</span> {
                 <span class="kw">return</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">read_keep_alive</span>().<span class="ident">map</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>);
+            }
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">poll_read_head</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="comment">// can dispatch receive, or does it still care about, an incoming message?</span>
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">poll_ready</span>() {
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(())) <span class="op">=&gt;</span> (),
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;dispatch not ready when conn is&quot;</span>),
+            <span class="prelude-val">Err</span>(()) <span class="op">=&gt;</span> {
+                <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;dispatch no longer receiving messages&quot;</span>);
+                <span class="self">self</span>.<span class="ident">close</span>();
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
+            }
+        }
+        <span class="comment">// dispatch is ready for a message, try to read one</span>
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">read_head</span>() {
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">has_body</span>)))) <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">has_body</span> {
+                    <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="kw">super</span>::<span class="ident">body</span>::<span class="ident">channel</span>();
+                    <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">poll_ready</span>(); <span class="comment">// register this task if rx is dropped</span>
+                    <span class="self">self</span>.<span class="ident">body_tx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tx</span>);
+                    <span class="prelude-val">Some</span>(<span class="ident">rx</span>)
+                } <span class="kw">else</span> {
+                    <span class="prelude-val">None</span>
+                };
+                <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">recv_msg</span>(<span class="prelude-val">Ok</span>((<span class="ident">head</span>, <span class="ident">body</span>)))<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()))
+            },
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>)) <span class="op">=&gt;</span> {
+                <span class="comment">// read eof, conn will start to shutdown automatically</span>
+                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()))
+            }
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=&gt;</span> {
+                <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;read_head error: {}&quot;</span>, <span class="ident">err</span>);
+                <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">recv_msg</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>))<span class="question-mark">?</span>;
+                <span class="comment">// if here, the dispatcher gave the user the error</span>
+                <span class="comment">// somewhere else. we still need to shutdown, but</span>
+                <span class="comment">// not as a second error.</span>
+                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()))
             }
         }
     }
