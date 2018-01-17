@@ -1278,6 +1278,34 @@
 <span id="1233">1233</span>
 <span id="1234">1234</span>
 <span id="1235">1235</span>
+<span id="1236">1236</span>
+<span id="1237">1237</span>
+<span id="1238">1238</span>
+<span id="1239">1239</span>
+<span id="1240">1240</span>
+<span id="1241">1241</span>
+<span id="1242">1242</span>
+<span id="1243">1243</span>
+<span id="1244">1244</span>
+<span id="1245">1245</span>
+<span id="1246">1246</span>
+<span id="1247">1247</span>
+<span id="1248">1248</span>
+<span id="1249">1249</span>
+<span id="1250">1250</span>
+<span id="1251">1251</span>
+<span id="1252">1252</span>
+<span id="1253">1253</span>
+<span id="1254">1254</span>
+<span id="1255">1255</span>
+<span id="1256">1256</span>
+<span id="1257">1257</span>
+<span id="1258">1258</span>
+<span id="1259">1259</span>
+<span id="1260">1260</span>
+<span id="1261">1261</span>
+<span id="1262">1262</span>
+<span id="1263">1263</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
@@ -1518,20 +1546,17 @@
             <span class="ident">Reading</span>::<span class="ident">Body</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">decoder</span>) <span class="op">=&gt;</span> {
                 <span class="kw">match</span> <span class="ident">decoder</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">io</span>) {
                     <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">slice</span>)) <span class="op">=&gt;</span> {
-                        <span class="kw">let</span> <span class="ident">chunk</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">slice</span>.<span class="ident">is_empty</span>() {
-                            <span class="prelude-val">Some</span>(<span class="kw">super</span>::<span class="ident">Chunk</span>::<span class="ident">from</span>(<span class="ident">slice</span>))
-                        } <span class="kw">else</span> {
-                            <span class="prelude-val">None</span>
-                        };
-                        <span class="kw">let</span> <span class="ident">reading</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">decoder</span>.<span class="ident">is_eof</span>() {
+                        <span class="kw">let</span> (<span class="ident">reading</span>, <span class="ident">chunk</span>) <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">slice</span>.<span class="ident">is_empty</span>() {
+                            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="kw">super</span>::<span class="ident">Chunk</span>::<span class="ident">from</span>(<span class="ident">slice</span>))));
+                        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">decoder</span>.<span class="ident">is_eof</span>() {
                             <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;incoming body completed&quot;</span>);
-                            <span class="ident">Reading</span>::<span class="ident">KeepAlive</span>
-                        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">chunk</span>.<span class="ident">is_some</span>() {
-                            <span class="ident">Reading</span>::<span class="ident">Body</span>(<span class="ident">decoder</span>.<span class="ident">clone</span>())
+                            (<span class="ident">Reading</span>::<span class="ident">KeepAlive</span>, <span class="prelude-val">None</span>)
                         } <span class="kw">else</span> {
                             <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;decode stream unexpectedly ended&quot;</span>);
-                            <span class="comment">//TODO: Should this return an UnexpectedEof?</span>
-                            <span class="ident">Reading</span>::<span class="ident">Closed</span>
+                            <span class="comment">// this should actually be unreachable:</span>
+                            <span class="comment">// the decoder will return an UnexpectedEof if there were</span>
+                            <span class="comment">// no bytes to read and it isn&#39;t eof yet...</span>
+                            (<span class="ident">Reading</span>::<span class="ident">Closed</span>, <span class="prelude-val">None</span>)
                         };
                         (<span class="ident">reading</span>, <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">chunk</span>)))
                     },
@@ -2353,6 +2378,37 @@
 
             <span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">poll</span>() {
                 <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>)) <span class="op">=&gt;</span> (),
+                <span class="ident">other</span> <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;unexpected frame: {:?}&quot;</span>, <span class="ident">other</span>)
+            }
+            <span class="prelude-val">Ok</span>(())
+        }).<span class="ident">wait</span>();
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_conn_read_body_end</span>() {
+        <span class="kw">let</span> _: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">future</span>::<span class="ident">lazy</span>(<span class="op">||</span> {
+            <span class="kw">let</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">AsyncIo</span>::<span class="ident">new_buf</span>(<span class="string">b&quot;POST / HTTP/1.1\r\nContent-Length: 5\r\n\r\n12345&quot;</span>.<span class="ident">to_vec</span>(), <span class="number">1024</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Conn</span>::<span class="op">&lt;</span>_, <span class="ident">proto</span>::<span class="ident">Chunk</span>, <span class="ident">ServerTransaction</span><span class="op">&gt;</span>::<span class="ident">new</span>(<span class="ident">io</span>, <span class="ident">Default</span>::<span class="ident">default</span>());
+            <span class="ident">conn</span>.<span class="ident">state</span>.<span class="ident">busy</span>();
+
+            <span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">poll</span>() {
+                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">Frame</span>::<span class="ident">Message</span> { <span class="ident">body</span>: <span class="bool-val">true</span>, .. }))) <span class="op">=&gt;</span> (),
+                <span class="ident">other</span> <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;unexpected frame: {:?}&quot;</span>, <span class="ident">other</span>)
+            }
+
+            <span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">poll</span>() {
+                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">Frame</span>::<span class="ident">Body</span> { <span class="ident">chunk</span>: <span class="prelude-val">Some</span>(_) }))) <span class="op">=&gt;</span> (),
+                <span class="ident">other</span> <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;unexpected frame: {:?}&quot;</span>, <span class="ident">other</span>)
+            }
+
+            <span class="comment">// When the body is done, `poll` MUST return a `Body` frame with chunk set to `None`</span>
+            <span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">poll</span>() {
+                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">Frame</span>::<span class="ident">Body</span> { <span class="ident">chunk</span>: <span class="prelude-val">None</span> }))) <span class="op">=&gt;</span> (),
+                <span class="ident">other</span> <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;unexpected frame: {:?}&quot;</span>, <span class="ident">other</span>)
+            }
+
+            <span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">poll</span>() {
+                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> (),
                 <span class="ident">other</span> <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;unexpected frame: {:?}&quot;</span>, <span class="ident">other</span>)
             }
             <span class="prelude-val">Ok</span>(())
