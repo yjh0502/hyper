@@ -830,16 +830,12 @@
 <span id="785">785</span>
 <span id="786">786</span>
 <span id="787">787</span>
-<span id="788">788</span>
-<span id="789">789</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Server</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! A `Server` is created to listen on a port, parse HTTP requests, and hand</span>
 <span class="doccomment">//! them off to a `Service`.</span>
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">compat_impl</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">compat</span>;
 <span class="kw">mod</span> <span class="ident">service</span>;
@@ -1026,7 +1022,7 @@ pub struct SpawnAll&lt;I, S, E&gt; {
                     <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
               <span class="ident">Bd</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">B</span>, <span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
     {
-        <span class="self">self</span>.<span class="ident">bind</span>(<span class="ident">addr</span>, <span class="self">self</span>::<span class="ident">compat_impl</span>::<span class="ident">new_service</span>(<span class="ident">new_service</span>))
+        <span class="self">self</span>.<span class="ident">bind</span>(<span class="ident">addr</span>, <span class="self">self</span>::<span class="ident">compat</span>::<span class="ident">new_service</span>(<span class="ident">new_service</span>))
     }
 
     <span class="doccomment">/// Bind the provided `addr` and return a server with a shared `Core`.</span>
