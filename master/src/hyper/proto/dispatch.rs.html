@@ -514,6 +514,7 @@
 <span id="469">469</span>
 <span id="470">470</span>
 <span id="471">471</span>
+<span id="472">472</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
 
@@ -590,6 +591,7 @@
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_done</span>() {
             <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">shutdown</span>());
+            <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">take_error</span>()<span class="question-mark">?</span>;
             <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Dispatch::poll done&quot;</span>);
             <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()))
         } <span class="kw">else</span> {
