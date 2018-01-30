@@ -568,6 +568,8 @@
 <span id="523">523</span>
 <span id="524">524</span>
 <span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Client</span>
 
@@ -585,7 +587,7 @@
 <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">reactor</span>::<span class="ident">Handle</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_service</span>::<span class="ident">Service</span>;
 
-<span class="kw">use</span> <span class="ident">header</span>::{<span class="ident">Headers</span>, <span class="ident">Host</span>};
+<span class="kw">use</span> <span class="ident">header</span>::{<span class="ident">Host</span>};
 <span class="kw">use</span> <span class="ident">proto</span>;
 <span class="kw">use</span> <span class="ident">proto</span>::<span class="ident">request</span>;
 <span class="kw">use</span> <span class="ident">method</span>::<span class="ident">Method</span>;
@@ -751,12 +753,14 @@
                 ))));
             }
         };
-        <span class="kw">let</span> <span class="ident">host</span> <span class="op">=</span> <span class="ident">Host</span>::<span class="ident">new</span>(<span class="ident">domain</span>.<span class="ident">host</span>().<span class="ident">expect</span>(<span class="string">&quot;authority implies host&quot;</span>).<span class="ident">to_owned</span>(), <span class="ident">domain</span>.<span class="ident">port</span>());
         <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">head</span>, <span class="ident">body</span>) <span class="op">=</span> <span class="ident">request</span>::<span class="ident">split</span>(<span class="ident">req</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">Headers</span>::<span class="ident">new</span>();
-        <span class="ident">headers</span>.<span class="ident">set</span>(<span class="ident">host</span>);
-        <span class="ident">headers</span>.<span class="ident">extend</span>(<span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">iter</span>());
-        <span class="ident">head</span>.<span class="ident">headers</span> <span class="op">=</span> <span class="ident">headers</span>;
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">has</span>::<span class="op">&lt;</span><span class="ident">Host</span><span class="op">&gt;</span>() {
+            <span class="kw">let</span> <span class="ident">host</span> <span class="op">=</span> <span class="ident">Host</span>::<span class="ident">new</span>(
+                <span class="ident">domain</span>.<span class="ident">host</span>().<span class="ident">expect</span>(<span class="string">&quot;authority implies host&quot;</span>).<span class="ident">to_owned</span>(),
+                <span class="ident">domain</span>.<span class="ident">port</span>(),
+            );
+            <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">set_pos</span>(<span class="number">0</span>, <span class="ident">host</span>);
+        }
 
         <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">Sink</span>;
         <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">sync</span>::{<span class="ident">mpsc</span>, <span class="ident">oneshot</span>};
