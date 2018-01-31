@@ -570,10 +570,17 @@
 <span id="525">525</span>
 <span id="526">526</span>
 <span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Client</span>
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cell</span>::<span class="ident">RefCell</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cell</span>::{<span class="ident">Cell</span>, <span class="ident">RefCell</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
@@ -772,10 +779,11 @@
             <span class="kw">let</span> <span class="ident">pool_key</span> <span class="op">=</span> <span class="ident">Rc</span>::<span class="ident">new</span>(<span class="ident">domain</span>.<span class="ident">to_string</span>());
             <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">connect</span>(<span class="ident">url</span>)
                 .<span class="ident">and_then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">io</span><span class="op">|</span> {
-                    <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">mpsc</span>::<span class="ident">channel</span>(<span class="number">0</span>);
+                    <span class="comment">// 1 extra slot for possible Close message</span>
+                    <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">mpsc</span>::<span class="ident">channel</span>(<span class="number">1</span>);
                     <span class="kw">let</span> <span class="ident">tx</span> <span class="op">=</span> <span class="ident">HyperClient</span> {
                         <span class="ident">tx</span>: <span class="ident">RefCell</span>::<span class="ident">new</span>(<span class="ident">tx</span>),
-                        <span class="ident">should_close</span>: <span class="bool-val">true</span>,
+                        <span class="ident">should_close</span>: <span class="ident">Cell</span>::<span class="ident">new</span>(<span class="bool-val">true</span>),
                     };
                     <span class="kw">let</span> <span class="ident">pooled</span> <span class="op">=</span> <span class="ident">pool</span>.<span class="ident">pooled</span>(<span class="ident">pool_key</span>, <span class="ident">tx</span>);
                     <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">proto</span>::<span class="ident">Conn</span>::<span class="op">&lt;</span>_, _, <span class="ident">proto</span>::<span class="ident">ClientTransaction</span>, _<span class="op">&gt;</span>::<span class="ident">new</span>(<span class="ident">io</span>, <span class="ident">pooled</span>.<span class="ident">clone</span>());
@@ -800,6 +808,7 @@
             <span class="kw">use</span> <span class="ident">proto</span>::<span class="ident">dispatch</span>::<span class="ident">ClientMsg</span>;
 
             <span class="kw">let</span> (<span class="ident">callback</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">oneshot</span>::<span class="ident">channel</span>();
+            <span class="ident">client</span>.<span class="ident">should_close</span>.<span class="ident">set</span>(<span class="bool-val">false</span>);
 
             <span class="kw">match</span> <span class="ident">client</span>.<span class="ident">tx</span>.<span class="ident">borrow_mut</span>().<span class="ident">start_send</span>(<span class="ident">ClientMsg</span>::<span class="ident">Request</span>(<span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">callback</span>)) {
                 <span class="prelude-val">Ok</span>(_) <span class="op">=&gt;</span> (),
@@ -847,7 +856,12 @@
 }
 
 <span class="kw">struct</span> <span class="ident">HyperClient</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="ident">should_close</span>: <span class="ident">bool</span>,
+    <span class="comment">// A sentinel that is usually always true. If this is dropped</span>
+    <span class="comment">// while true, this will try to shutdown the dispatcher task.</span>
+    <span class="comment">//</span>
+    <span class="comment">// This should be set to false whenever it is checked out of the</span>
+    <span class="comment">// pool and successfully used to send a request.</span>
+    <span class="ident">should_close</span>: <span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
     <span class="ident">tx</span>: <span class="ident">RefCell</span><span class="op">&lt;</span>::<span class="ident">futures</span>::<span class="ident">sync</span>::<span class="ident">mpsc</span>::<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">proto</span>::<span class="ident">dispatch</span>::<span class="ident">ClientMsg</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>,
 }
 
@@ -855,7 +869,7 @@
     <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">HyperClient</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
         <span class="ident">HyperClient</span> {
             <span class="ident">tx</span>: <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">clone</span>(),
-            <span class="ident">should_close</span>: <span class="self">self</span>.<span class="ident">should_close</span>,
+            <span class="ident">should_close</span>: <span class="self">self</span>.<span class="ident">should_close</span>.<span class="ident">clone</span>(),
         }
     }
 }
@@ -871,8 +885,8 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">HyperClient</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">should_close</span> {
-            <span class="self">self</span>.<span class="ident">should_close</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">should_close</span>.<span class="ident">get</span>() {
+            <span class="self">self</span>.<span class="ident">should_close</span>.<span class="ident">set</span>(<span class="bool-val">false</span>);
             <span class="kw">let</span> _ <span class="op">=</span> <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">borrow_mut</span>().<span class="ident">try_send</span>(<span class="ident">proto</span>::<span class="ident">dispatch</span>::<span class="ident">ClientMsg</span>::<span class="ident">Close</span>);
         }
     }
