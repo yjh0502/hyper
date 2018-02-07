@@ -769,9 +769,6 @@
 <span id="724">724</span>
 <span id="725">725</span>
 <span id="726">726</span>
-<span id="727">727</span>
-<span id="728">728</span>
-<span id="729">729</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cell</span>::<span class="ident">Cell</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">VecDeque</span>;
@@ -1291,9 +1288,6 @@
             <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">has_remaining</span>() {
                 <span class="kw">return</span> <span class="ident">buf</span>.<span class="ident">bytes</span>();
             }
-        }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">buf</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">bufs</span>.<span class="ident">front</span>() {
-            <span class="kw">return</span> <span class="ident">buf</span>.<span class="ident">bytes</span>();
         }
         <span class="kw-2">&amp;</span>[]
     }
