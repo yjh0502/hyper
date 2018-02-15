@@ -620,7 +620,7 @@
                     };
                 },
                 <span class="ident">State</span>::<span class="ident">Connecting</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">c</span>) <span class="op">=&gt;</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sock</span> <span class="op">=</span> <span class="macro">try_ready</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">handle</span>));
+                    <span class="kw">let</span> <span class="ident">sock</span> <span class="op">=</span> <span class="macro">try_ready</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">handle</span>));
 
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">dur</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">keep_alive_timeout</span> {
                         <span class="ident">sock</span>.<span class="ident">set_keepalive</span>(<span class="prelude-val">Some</span>(<span class="ident">dur</span>))<span class="question-mark">?</span>;
