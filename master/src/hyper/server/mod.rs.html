@@ -888,6 +888,34 @@
 <span id="842">842</span>
 <span id="843">843</span>
 <span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Server</span>
 <span class="doccomment">//!</span>
@@ -1148,6 +1176,34 @@ pub struct SpawnAll&lt;I, S, E&gt; {
     <span class="doccomment">///</span>
     <span class="doccomment">/// This returns a Future that must be polled in order for HTTP to be</span>
     <span class="doccomment">/// driven on the connection.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # extern crate futures;</span>
+    <span class="doccomment">/// # extern crate hyper;</span>
+    <span class="doccomment">/// # extern crate tokio_core;</span>
+    <span class="doccomment">/// # extern crate tokio_io;</span>
+    <span class="doccomment">/// # use futures::Future;</span>
+    <span class="doccomment">/// # use hyper::server::{Http, Request, Response, Service};</span>
+    <span class="doccomment">/// # use tokio_io::{AsyncRead, AsyncWrite};</span>
+    <span class="doccomment">/// # use tokio_core::reactor::Handle;</span>
+    <span class="doccomment">/// # fn run&lt;I, S&gt;(some_io: I, some_service: S, some_handle: &amp;Handle)</span>
+    <span class="doccomment">/// # where</span>
+    <span class="doccomment">/// #     I: AsyncRead + AsyncWrite + &#39;static,</span>
+    <span class="doccomment">/// #     S: Service&lt;Request=Request, Response=Response, Error=hyper::Error&gt; + &#39;static,</span>
+    <span class="doccomment">/// # {</span>
+    <span class="doccomment">/// let http = Http::&lt;hyper::Chunk&gt;::new();</span>
+    <span class="doccomment">/// let conn = http.serve_connection(some_io, some_service);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let fut = conn</span>
+    <span class="doccomment">///     .map(|_| ())</span>
+    <span class="doccomment">///     .map_err(|e| eprintln!(&quot;server connection error: {}&quot;, e));</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// some_handle.spawn(fut);</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// # fn main() {}</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serve_connection</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">I</span>, <span class="ident">Bd</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="ident">I</span>, <span class="ident">service</span>: <span class="ident">S</span>) <span class="op">-&gt;</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span> <span class="op">=</span> <span class="ident">Request</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Bd</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span><span class="op">&gt;</span>,
               <span class="ident">Bd</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
