@@ -1674,7 +1674,7 @@ where
                     }
                     <span class="comment">// Sleep 10ms.</span>
                     <span class="kw">let</span> <span class="ident">delay</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>::<span class="ident">from_millis</span>(<span class="number">10</span>);
-                    <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Accept error: {}. Sleeping {:?}...&quot;</span>,
+                    <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;accept error: {}; sleeping {:?}&quot;</span>,
                         <span class="ident">e</span>, <span class="ident">delay</span>);
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="ident">Timeout</span>::<span class="ident">new</span>(<span class="ident">delay</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">handle</span>)
                         .<span class="ident">expect</span>(<span class="string">&quot;can always set a timeout&quot;</span>);
