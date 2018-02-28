@@ -683,6 +683,15 @@
 <span id="637">637</span>
 <span id="638">638</span>
 <span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Client</span>
 
@@ -777,7 +786,6 @@
         }
     }
 
-    <span class="doccomment">/// Create a new client with a specific connector.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">configured</span>(<span class="ident">config</span>: <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">exec</span>: <span class="ident">Exec</span>) <span class="op">-&gt;</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">B</span><span class="op">&gt;</span> {
         <span class="ident">Client</span> {
@@ -804,6 +812,14 @@
     <span class="doccomment">/// Send a constructed Request using this Client.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">FutureResponse</span> {
+        <span class="comment">// TODO(0.12): do this at construction time.</span>
+        <span class="comment">//</span>
+        <span class="comment">// It cannot be done in the constructor because the Client::configured</span>
+        <span class="comment">// does not have `B: &#39;static` bounds, which are required to spawn</span>
+        <span class="comment">// the interval. In 0.12, add a static bounds to the constructor,</span>
+        <span class="comment">// and move this.</span>
+        <span class="self">self</span>.<span class="ident">schedule_pool_timer</span>();
+
         <span class="kw">match</span> <span class="ident">req</span>.<span class="ident">version</span>() {
             <span class="ident">HttpVersion</span>::<span class="ident">Http10</span> <span class="op">|</span>
             <span class="ident">HttpVersion</span>::<span class="ident">Http11</span> <span class="op">=&gt;</span> (),
@@ -935,6 +951,12 @@
 
         <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">resp</span>)
     }
+
+    <span class="kw">fn</span> <span class="ident">schedule_pool_timer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Exec</span>::<span class="ident">Handle</span>(<span class="kw-2">ref</span> <span class="ident">h</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">executor</span> {
+            <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">spawn_expired_interval</span>(<span class="ident">h</span>);
+        }
+    }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Service</span> <span class="kw">for</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">B</span><span class="op">&gt;</span>
@@ -1049,13 +1071,9 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="self">self</span>::<span class="ident">pool</span>::<span class="ident">Ready</span> <span class="kw">for</span> <span class="ident">HyperClient</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">is_closed</span>() {
-            <span class="prelude-val">Err</span>(())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()))
-        }
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="self">self</span>::<span class="ident">pool</span>::<span class="ident">Closed</span> <span class="kw">for</span> <span class="ident">HyperClient</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">is_closed</span>()
     }
 }
 
