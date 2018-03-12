@@ -236,6 +236,8 @@
 <span id="190">190</span>
 <span id="191">191</span>
 <span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Pieces pertaining to the HTTP message protocol.</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
@@ -373,7 +375,9 @@
     <span class="ident">ret</span>
 }
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ServerTransaction</span> <span class="op">=</span> <span class="ident">h1</span>::<span class="ident">role</span>::<span class="ident">Server</span><span class="op">&lt;</span><span class="ident">h1</span>::<span class="ident">role</span>::<span class="ident">NoUpgrades</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ServerTransaction</span> <span class="op">=</span> <span class="ident">h1</span>::<span class="ident">role</span>::<span class="ident">Server</span><span class="op">&lt;</span><span class="ident">h1</span>::<span class="ident">role</span>::<span class="ident">YesUpgrades</span><span class="op">&gt;</span>;
+<span class="comment">//pub type ServerTransaction = h1::role::Server&lt;h1::role::NoUpgrades&gt;;</span>
+<span class="comment">//pub type ServerUpgradeTransaction = h1::role::Server&lt;h1::role::YesUpgrades&gt;;</span>
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ClientTransaction</span> <span class="op">=</span> <span class="ident">h1</span>::<span class="ident">role</span>::<span class="ident">Client</span><span class="op">&lt;</span><span class="ident">h1</span>::<span class="ident">role</span>::<span class="ident">NoUpgrades</span><span class="op">&gt;</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ClientUpgradeTransaction</span> <span class="op">=</span> <span class="ident">h1</span>::<span class="ident">role</span>::<span class="ident">Client</span><span class="op">&lt;</span><span class="ident">h1</span>::<span class="ident">role</span>::<span class="ident">YesUpgrades</span><span class="op">&gt;</span>;

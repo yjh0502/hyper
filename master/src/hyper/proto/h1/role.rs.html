@@ -820,6 +820,10 @@
 <span id="774">774</span>
 <span id="775">775</span>
 <span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
@@ -955,7 +959,11 @@
         <span class="comment">// replying with the latter status code response.</span>
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">if</span> ::<span class="ident">StatusCode</span>::<span class="ident">SwitchingProtocols</span> <span class="op">==</span> <span class="ident">head</span>.<span class="ident">subject</span> {
             <span class="ident">T</span>::<span class="ident">on_encode_upgrade</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">head</span>)
-                .<span class="ident">map</span>(<span class="op">|</span>_<span class="op">|</span> <span class="ident">Server</span>::<span class="ident">set_length</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">head</span>, <span class="ident">has_body</span>, <span class="ident">method</span>.<span class="ident">as_ref</span>()))
+                .<span class="ident">map</span>(<span class="op">|</span>_<span class="op">|</span> {
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enc</span> <span class="op">=</span> <span class="ident">Server</span>::<span class="ident">set_length</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">head</span>, <span class="ident">has_body</span>, <span class="ident">method</span>.<span class="ident">as_ref</span>());
+                    <span class="ident">enc</span>.<span class="ident">set_last</span>();
+                    <span class="ident">enc</span>
+                })
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">subject</span>.<span class="ident">is_informational</span>() {
             <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;response with 1xx status code not supported&quot;</span>);
             <span class="ident">head</span> <span class="op">=</span> <span class="ident">MessageHead</span>::<span class="ident">default</span>();

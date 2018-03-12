@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `handshake` fn in crate `hyper`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, handshake">
+    <meta name="description" content="API documentation for the Rust `conn` mod in crate `hyper`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, conn">
 
-    <title>hyper::client::conn::handshake - Rust</title>
+    <title>hyper::server::conn - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
@@ -17,7 +17,7 @@
     
     
 </head>
-<body class="rustdoc fn">
+<body class="rustdoc mod">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -30,7 +30,7 @@
     <nav class="sidebar">
         <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../../index.html'>hyper</a>::<wbr><a href='../index.html'>client</a>::<wbr><a href='index.html'>conn</a></p><script>window.sidebarCurrent = {name: 'handshake', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Module conn</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li></ul></div><p class='location'><a href='../../index.html'>hyper</a>::<wbr><a href='../index.html'>server</a></p><script>window.sidebarCurrent = {name: 'conn', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div>
     </nav>
 
     <nav class="sub">
@@ -45,15 +45,36 @@
     </nav>
 
     <section id='main' class="content">
-<h1 class='fqn'><span class='in-band'>Function <a href='../../index.html'>hyper</a>::<wbr><a href='../index.html'>client</a>::<wbr><a href='index.html'>conn</a>::<wbr><a class="fn" href=''>handshake</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Module <a href='../../index.html'>hyper</a>::<wbr><a href='../index.html'>server</a>::<wbr><a class="mod" href=''>conn</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../../src/hyper/client/conn.rs.html#24-30' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn handshake&lt;T&gt;(io: T) -&gt; <a class="struct" href="../../../hyper/client/conn/struct.Handshake.html" title="struct hyper::client::conn::Handshake">Handshake</a>&lt;T, <a class="struct" href="../../../hyper/struct.Body.html" title="struct hyper::Body">Body</a>&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href="https://docs.rs/tokio-io/0.1.6/tokio_io/async_read/trait.AsyncRead.html" title="trait tokio_io::async_read::AsyncRead">AsyncRead</a> + <a class="trait" href="https://docs.rs/tokio-io/0.1.6/tokio_io/async_write/trait.AsyncWrite.html" title="trait tokio_io::async_write::AsyncWrite">AsyncWrite</a>,&nbsp;</span></pre><div class='docblock'><p>Returns a <code>Handshake</code> future over some IO.</p>
+               </span><a class='srclink' href='../../../src/hyper/server/conn.rs.html#1-123' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>Lower-level Server connection API.</p>
 
-<p>This is a shortcut for <code>Builder::new().handshake(io)</code>.</p>
-</div></section>
+<p>The types in thie module are to provide a lower-level API based around a
+single connection. Accepting a connection and binding it with a service
+are not handled at this level. This module provides the building blocks to
+customize those things externally.</p>
+
+<p>If don&#39;t have need to manage connections yourself, consider using the
+higher-level <a href="super">Server</a> API.</p>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Connection.html"
+                                  title='struct hyper::server::conn::Connection'>Connection</a></td>
+                           <td class='docblock-short'>
+                                <p>A future binding a connection with a Service.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Parts.html"
+                                  title='struct hyper::server::conn::Parts'>Parts</a></td>
+                           <td class='docblock-short'>
+                                <p>Deconstructed parts of a <code>Connection</code>.</p>
+                           </td>
+                       </tr></table></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
