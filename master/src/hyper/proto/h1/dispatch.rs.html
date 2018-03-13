@@ -536,13 +536,11 @@
 <span id="490">490</span>
 <span id="491">491</span>
 <span id="492">492</span>
-<span id="493">493</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
 
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">Bytes</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">AsyncSink</span>, <span class="ident">Future</span>, <span class="ident">Poll</span>, <span class="ident">Stream</span>};
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">sync</span>::<span class="ident">oneshot</span>;
 <span class="kw">use</span> <span class="ident">tokio_io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
 <span class="kw">use</span> <span class="ident">tokio_service</span>::<span class="ident">Service</span>;
 
@@ -573,7 +571,7 @@
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="ident">callback</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">oneshot</span>::<span class="ident">Sender</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>::<span class="ident">Response</span>, (::<span class="ident">Error</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientMsg</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;&gt;</span>)<span class="op">&gt;&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">callback</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>::<span class="ident">client</span>::<span class="ident">dispatch</span>::<span class="ident">Callback</span><span class="op">&lt;</span><span class="ident">ClientMsg</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, ::<span class="ident">Response</span><span class="op">&gt;&gt;</span>,
     <span class="ident">rx</span>: <span class="ident">ClientRx</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
 }
 
@@ -1015,7 +1013,7 @@
                 <span class="ident">subject</span>: ::<span class="ident">proto</span>::<span class="ident">RequestLine</span>::<span class="ident">default</span>(),
                 <span class="ident">headers</span>: <span class="ident">Default</span>::<span class="ident">default</span>(),
             };
-            <span class="kw">let</span> <span class="ident">res_rx</span> <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">send</span>((<span class="ident">req</span>, <span class="prelude-val">None</span>::<span class="op">&lt;</span>::<span class="ident">Body</span><span class="op">&gt;</span>)).<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">res_rx</span> <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">try_send</span>((<span class="ident">req</span>, <span class="prelude-val">None</span>::<span class="op">&lt;</span>::<span class="ident">Body</span><span class="op">&gt;</span>)).<span class="ident">unwrap</span>();
 
             <span class="kw">let</span> <span class="ident">a1</span> <span class="op">=</span> <span class="ident">dispatcher</span>.<span class="ident">poll</span>().<span class="ident">expect</span>(<span class="string">&quot;error should be sent on channel&quot;</span>);
             <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">a1</span>.<span class="ident">is_ready</span>(), <span class="string">&quot;dispatcher should be closed&quot;</span>);
