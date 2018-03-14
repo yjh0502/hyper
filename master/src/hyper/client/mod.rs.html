@@ -701,6 +701,13 @@
 <span id="655">655</span>
 <span id="656">656</span>
 <span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Client</span>
 
@@ -947,20 +954,27 @@
                     } <span class="kw">else</span> {
                         <span class="ident">ClientError</span>::<span class="ident">Normal</span>(<span class="ident">err</span>)
                     }
+                })
+                .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">res</span><span class="op">|</span> {
+                    <span class="comment">// when pooled is dropped, it will try to insert back into the</span>
+                    <span class="comment">// pool. To delay that, spawn a future that completes once the</span>
+                    <span class="comment">// sender is ready again.</span>
+                    <span class="comment">//</span>
+                    <span class="comment">// This *should* only be once the related `Connection` has polled</span>
+                    <span class="comment">// for a new request to start.</span>
+                    <span class="comment">//</span>
+                    <span class="comment">// It won&#39;t be ready if there is a body to stream.</span>
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=</span> <span class="ident">pooled</span>.<span class="ident">tx</span>.<span class="ident">poll_ready</span>() {
+                        <span class="comment">// If the executor doesn&#39;t have room, oh well. Things will likely</span>
+                        <span class="comment">// be blowing up soon, but this specific task isn&#39;t required.</span>
+                        <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">executor</span>.<span class="ident">execute</span>(<span class="ident">future</span>::<span class="ident">poll_fn</span>(<span class="kw">move</span> <span class="op">||</span> {
+                            <span class="ident">pooled</span>.<span class="ident">tx</span>.<span class="ident">poll_ready</span>().<span class="ident">map_err</span>(<span class="op">|</span>_<span class="op">|</span> ())
+                        }));
+                    }
+
+                    <span class="ident">res</span>
                 });
 
-            <span class="comment">// when pooled is dropped, it will try to insert back into the</span>
-            <span class="comment">// pool. To delay that, spawn a future that completes once the</span>
-            <span class="comment">// sender is ready again.</span>
-            <span class="comment">//</span>
-            <span class="comment">// This *should* only be once the related `Connection` has polled</span>
-            <span class="comment">// for a new request to start.</span>
-            <span class="comment">//</span>
-            <span class="comment">// If the executor doesn&#39;t have room, oh well. Things will likely</span>
-            <span class="comment">// be blowing up soon, but this specific task isn&#39;t required.</span>
-            <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">executor</span>.<span class="ident">execute</span>(<span class="ident">future</span>::<span class="ident">poll_fn</span>(<span class="kw">move</span> <span class="op">||</span> {
-                <span class="ident">pooled</span>.<span class="ident">tx</span>.<span class="ident">poll_ready</span>().<span class="ident">map_err</span>(<span class="op">|</span>_<span class="op">|</span> ())
-            }));
 
             <span class="ident">fut</span>
         });
