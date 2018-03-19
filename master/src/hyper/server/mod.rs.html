@@ -867,75 +867,37 @@
 <span id="821">821</span>
 <span id="822">822</span>
 <span id="823">823</span>
-<span id="824">824</span>
-<span id="825">825</span>
-<span id="826">826</span>
-<span id="827">827</span>
-<span id="828">828</span>
-<span id="829">829</span>
-<span id="830">830</span>
-<span id="831">831</span>
-<span id="832">832</span>
-<span id="833">833</span>
-<span id="834">834</span>
-<span id="835">835</span>
-<span id="836">836</span>
-<span id="837">837</span>
-<span id="838">838</span>
-<span id="839">839</span>
-<span id="840">840</span>
-<span id="841">841</span>
-<span id="842">842</span>
-<span id="843">843</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Server</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! A `Server` is created to listen on a port, parse HTTP requests, and hand</span>
 <span class="doccomment">//! them off to a `Service`.</span>
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">compat</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">conn</span>;
 <span class="kw">mod</span> <span class="ident">service</span>;
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cell</span>::<span class="ident">RefCell</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">SocketAddr</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">rc</span>::{<span class="ident">Rc</span>, <span class="ident">Weak</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">net</span>::{<span class="ident">SocketAddr</span>, <span class="ident">TcpListener</span> <span class="kw">as</span> <span class="ident">StdTcpListener</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>, <span class="ident">Weak</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
 
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">task</span>::{<span class="self">self</span>, <span class="ident">Task</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">future</span>::{<span class="self">self</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Future</span>, <span class="ident">Stream</span>, <span class="ident">Poll</span>, <span class="ident">Async</span>};
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">http</span>;
-
+<span class="kw">use</span> <span class="ident">futures_timer</span>::<span class="ident">Delay</span>;
+<span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">Request</span>, <span class="ident">Response</span>};
 <span class="kw">use</span> <span class="ident">tokio_io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">reactor</span>::{<span class="ident">Core</span>, <span class="ident">Handle</span>, <span class="ident">Timeout</span>};
+<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">spawn</span>;
+<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">reactor</span>::<span class="ident">Handle</span>;
 <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">net</span>::<span class="ident">TcpListener</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_service</span>::{<span class="ident">NewService</span>, <span class="ident">Service</span>};
 
+<span class="kw">use</span> <span class="ident">proto</span>::<span class="ident">body</span>::{<span class="ident">Body</span>, <span class="ident">Entity</span>};
 <span class="kw">use</span> <span class="ident">proto</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">proto</span>::<span class="ident">Body</span>;
 <span class="kw">use</span> <span class="self">self</span>::<span class="ident">addr_stream</span>::<span class="ident">AddrStream</span>;
 <span class="kw">use</span> <span class="self">self</span>::<span class="ident">hyper_service</span>::<span class="ident">HyperService</span>;
-
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">proto</span>::<span class="ident">response</span>::<span class="ident">Response</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">proto</span>::<span class="ident">request</span>::<span class="ident">Request</span>;
-
-<span class="macro">feat_server_proto</span><span class="macro">!</span> {
-    <span class="kw">mod</span> <span class="ident">server_proto</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">server_proto</span>::{
-        <span class="ident">__ProtoRequest</span>,
-        <span class="ident">__ProtoResponse</span>,
-        <span class="ident">__ProtoTransport</span>,
-        <span class="ident">__ProtoBindTransport</span>,
-    };
-}
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">conn</span>::<span class="ident">Connection</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">service</span>::{<span class="ident">const_service</span>, <span class="ident">service_fn</span>};
@@ -958,12 +920,12 @@
 <span class="doccomment">/// This server is intended as a convenience for creating a TCP listener on an</span>
 <span class="doccomment">/// address and then serving TCP connections accepted with the service provided.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">B</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
-      <span class="ident">B</span>::<span class="ident">Item</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+<span class="kw">where</span>
+    <span class="ident">B</span>: <span class="ident">Entity</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
 {
-    <span class="ident">protocol</span>: <span class="ident">Http</span><span class="op">&lt;</span><span class="ident">B</span>::<span class="ident">Item</span><span class="op">&gt;</span>,
+    <span class="ident">protocol</span>: <span class="ident">Http</span><span class="op">&lt;</span><span class="ident">B</span>::<span class="ident">Data</span><span class="op">&gt;</span>,
     <span class="ident">new_service</span>: <span class="ident">S</span>,
-    <span class="ident">reactor</span>: <span class="ident">Core</span>,
+    <span class="ident">handle</span>: <span class="ident">Handle</span>,
     <span class="ident">listener</span>: <span class="ident">TcpListener</span>,
     <span class="ident">shutdown_timeout</span>: <span class="ident">Duration</span>,
 }
@@ -990,16 +952,26 @@ pub struct SpawnAll&lt;I, S, E&gt; {
 
 <span class="doccomment">/// A stream of connections from binding to an address.</span>
 <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;streams do nothing unless polled&quot;</span>]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AddrIncoming</span> {
     <span class="ident">addr</span>: <span class="ident">SocketAddr</span>,
     <span class="ident">keep_alive_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
     <span class="ident">listener</span>: <span class="ident">TcpListener</span>,
     <span class="ident">handle</span>: <span class="ident">Handle</span>,
     <span class="ident">sleep_on_errors</span>: <span class="ident">bool</span>,
-    <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timeout</span><span class="op">&gt;</span>,
+    <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Delay</span><span class="op">&gt;</span>,
 }
 
+<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">AddrIncoming</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;AddrIncoming&quot;</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;addr&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">addr</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;keep_alive_timeout&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">keep_alive_timeout</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;listener&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">listener</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;handle&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">handle</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;sleep_on_errors&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sleep_on_errors</span>)
+            .<span class="ident">finish</span>()
+    }
+}
 
 <span class="comment">// ===== impl Http =====</span>
 
@@ -1063,33 +1035,40 @@ pub struct SpawnAll&lt;I, S, E&gt; {
     <span class="doccomment">/// The returned `Server` contains one method, `run`, which is used to</span>
     <span class="doccomment">/// actually run the server.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bind</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Bd</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">SocketAddr</span>, <span class="ident">new_service</span>: <span class="ident">S</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Server</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Bd</span><span class="op">&gt;&gt;</span>
-        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">NewService</span><span class="op">&lt;</span><span class="ident">Request</span> <span class="op">=</span> <span class="ident">Request</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Bd</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-              <span class="ident">Bd</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">B</span>, <span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
+        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">NewService</span><span class="op">&lt;</span><span class="ident">Request</span> <span class="op">=</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Bd</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+              <span class="ident">Bd</span>: <span class="ident">Entity</span><span class="op">&lt;</span><span class="ident">Data</span><span class="op">=</span><span class="ident">B</span>, <span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> <span class="ident">core</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">Core</span>::<span class="ident">new</span>());
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">core</span>.<span class="ident">handle</span>();
-        <span class="kw">let</span> <span class="ident">listener</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">TcpListener</span>::<span class="ident">bind</span>(<span class="ident">addr</span>, <span class="kw-2">&amp;</span><span class="ident">handle</span>));
+        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">Handle</span>::<span class="ident">current</span>();
+        <span class="kw">let</span> <span class="ident">std_listener</span> <span class="op">=</span> <span class="ident">StdTcpListener</span>::<span class="ident">bind</span>(<span class="ident">addr</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">listener</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">TcpListener</span>::<span class="ident">from_std</span>(<span class="ident">std_listener</span>, <span class="kw-2">&amp;</span><span class="ident">handle</span>));
 
         <span class="prelude-val">Ok</span>(<span class="ident">Server</span> {
             <span class="ident">new_service</span>: <span class="ident">new_service</span>,
-            <span class="ident">reactor</span>: <span class="ident">core</span>,
+            <span class="ident">handle</span>: <span class="ident">handle</span>,
             <span class="ident">listener</span>: <span class="ident">listener</span>,
             <span class="ident">protocol</span>: <span class="self">self</span>.<span class="ident">clone</span>(),
             <span class="ident">shutdown_timeout</span>: <span class="ident">Duration</span>::<span class="ident">new</span>(<span class="number">1</span>, <span class="number">0</span>),
         })
     }
 
-
-    <span class="doccomment">/// Bind a `NewService` using types from the `http` crate.</span>
+    <span class="doccomment">/// Bind the provided `addr` and return a server with the default `Handle`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// See `Http::bind`.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compat&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bind_compat</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Bd</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">SocketAddr</span>, <span class="ident">new_service</span>: <span class="ident">S</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Server</span><span class="op">&lt;</span><span class="ident">compat</span>::<span class="ident">NewCompatService</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">Bd</span><span class="op">&gt;&gt;</span>
-        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">NewService</span><span class="op">&lt;</span><span class="ident">Request</span> <span class="op">=</span> <span class="ident">http</span>::<span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">http</span>::<span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Bd</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span>
-                    <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-              <span class="ident">Bd</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">B</span>, <span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// This is method will bind the `addr` provided with a new TCP listener ready</span>
+    <span class="doccomment">/// to accept connections. Each connection will be processed with the</span>
+    <span class="doccomment">/// `new_service` object provided as well, creating a new service per</span>
+    <span class="doccomment">/// connection.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serve_addr</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Bd</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">SocketAddr</span>, <span class="ident">new_service</span>: <span class="ident">S</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Serve</span><span class="op">&lt;</span><span class="ident">AddrIncoming</span>, <span class="ident">S</span><span class="op">&gt;&gt;</span>
+        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">NewService</span><span class="op">&lt;</span><span class="ident">Request</span> <span class="op">=</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Bd</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span><span class="op">&gt;</span>,
+              <span class="ident">Bd</span>: <span class="ident">Entity</span><span class="op">&lt;</span><span class="ident">Data</span><span class="op">=</span><span class="ident">B</span>, <span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
     {
-        <span class="self">self</span>.<span class="ident">bind</span>(<span class="ident">addr</span>, <span class="self">self</span>::<span class="ident">compat</span>::<span class="ident">new_service</span>(<span class="ident">new_service</span>))
+        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">Handle</span>::<span class="ident">current</span>();
+        <span class="kw">let</span> <span class="ident">std_listener</span> <span class="op">=</span> <span class="ident">StdTcpListener</span>::<span class="ident">bind</span>(<span class="ident">addr</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">listener</span> <span class="op">=</span> <span class="ident">TcpListener</span>::<span class="ident">from_std</span>(<span class="ident">std_listener</span>, <span class="kw-2">&amp;</span><span class="ident">handle</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">incoming</span> <span class="op">=</span> <span class="ident">AddrIncoming</span>::<span class="ident">new</span>(<span class="ident">listener</span>, <span class="ident">handle</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">sleep_on_errors</span>)<span class="question-mark">?</span>;
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">keep_alive</span> {
+            <span class="ident">incoming</span>.<span class="ident">set_keepalive</span>(<span class="prelude-val">Some</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">90</span>)));
+        }
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">serve_incoming</span>(<span class="ident">incoming</span>, <span class="ident">new_service</span>))
     }
 
     <span class="doccomment">/// Bind the provided `addr` and return a server with a shared `Core`.</span>
@@ -1101,10 +1080,11 @@ pub struct SpawnAll&lt;I, S, E&gt; {
     <span class="doccomment">/// `new_service` object provided as well, creating a new service per</span>
     <span class="doccomment">/// connection.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serve_addr_handle</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Bd</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">SocketAddr</span>, <span class="ident">handle</span>: <span class="kw-2">&amp;</span><span class="ident">Handle</span>, <span class="ident">new_service</span>: <span class="ident">S</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Serve</span><span class="op">&lt;</span><span class="ident">AddrIncoming</span>, <span class="ident">S</span><span class="op">&gt;&gt;</span>
-        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">NewService</span><span class="op">&lt;</span><span class="ident">Request</span> <span class="op">=</span> <span class="ident">Request</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Bd</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span><span class="op">&gt;</span>,
-              <span class="ident">Bd</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">B</span>, <span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
+        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">NewService</span><span class="op">&lt;</span><span class="ident">Request</span> <span class="op">=</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Bd</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span><span class="op">&gt;</span>,
+              <span class="ident">Bd</span>: <span class="ident">Entity</span><span class="op">&lt;</span><span class="ident">Data</span><span class="op">=</span><span class="ident">B</span>, <span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> <span class="ident">listener</span> <span class="op">=</span> <span class="ident">TcpListener</span>::<span class="ident">bind</span>(<span class="ident">addr</span>, <span class="kw-2">&amp;</span><span class="ident">handle</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">std_listener</span> <span class="op">=</span> <span class="ident">StdTcpListener</span>::<span class="ident">bind</span>(<span class="ident">addr</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">listener</span> <span class="op">=</span> <span class="ident">TcpListener</span>::<span class="ident">from_std</span>(<span class="ident">std_listener</span>, <span class="kw-2">&amp;</span><span class="ident">handle</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">incoming</span> <span class="op">=</span> <span class="ident">AddrIncoming</span>::<span class="ident">new</span>(<span class="ident">listener</span>, <span class="ident">handle</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">sleep_on_errors</span>)<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">keep_alive</span> {
             <span class="ident">incoming</span>.<span class="ident">set_keepalive</span>(<span class="prelude-val">Some</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">90</span>)));
@@ -1118,8 +1098,8 @@ pub struct SpawnAll&lt;I, S, E&gt; {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serve_incoming</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span>, <span class="ident">Bd</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">incoming</span>: <span class="ident">I</span>, <span class="ident">new_service</span>: <span class="ident">S</span>) <span class="op">-&gt;</span> <span class="ident">Serve</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">=</span>::<span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
               <span class="ident">I</span>::<span class="ident">Item</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span>,
-              <span class="ident">S</span>: <span class="ident">NewService</span><span class="op">&lt;</span><span class="ident">Request</span> <span class="op">=</span> <span class="ident">Request</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Bd</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span><span class="op">&gt;</span>,
-              <span class="ident">Bd</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">B</span>, <span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
+              <span class="ident">S</span>: <span class="ident">NewService</span><span class="op">&lt;</span><span class="ident">Request</span> <span class="op">=</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Bd</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span><span class="op">&gt;</span>,
+              <span class="ident">Bd</span>: <span class="ident">Entity</span><span class="op">&lt;</span><span class="ident">Data</span><span class="op">=</span><span class="ident">B</span>, <span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
     {
         <span class="ident">Serve</span> {
             <span class="ident">incoming</span>: <span class="ident">incoming</span>,
@@ -1144,16 +1124,18 @@ pub struct SpawnAll&lt;I, S, E&gt; {
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # extern crate futures;</span>
     <span class="doccomment">/// # extern crate hyper;</span>
-    <span class="doccomment">/// # extern crate tokio_core;</span>
+    <span class="doccomment">/// # extern crate tokio;</span>
     <span class="doccomment">/// # extern crate tokio_io;</span>
     <span class="doccomment">/// # use futures::Future;</span>
-    <span class="doccomment">/// # use hyper::server::{Http, Request, Response, Service};</span>
+    <span class="doccomment">/// # use hyper::{Body, Request, Response};</span>
+    <span class="doccomment">/// # use hyper::server::{Http, Service};</span>
     <span class="doccomment">/// # use tokio_io::{AsyncRead, AsyncWrite};</span>
-    <span class="doccomment">/// # use tokio_core::reactor::Handle;</span>
-    <span class="doccomment">/// # fn run&lt;I, S&gt;(some_io: I, some_service: S, some_handle: &amp;Handle)</span>
+    <span class="doccomment">/// # use tokio::reactor::Handle;</span>
+    <span class="doccomment">/// # fn run&lt;I, S&gt;(some_io: I, some_service: S)</span>
     <span class="doccomment">/// # where</span>
-    <span class="doccomment">/// #     I: AsyncRead + AsyncWrite + &#39;static,</span>
-    <span class="doccomment">/// #     S: Service&lt;Request=Request, Response=Response, Error=hyper::Error&gt; + &#39;static,</span>
+    <span class="doccomment">/// #     I: AsyncRead + AsyncWrite + Send + &#39;static,</span>
+    <span class="doccomment">/// #     S: Service&lt;Request=Request&lt;Body&gt;, Response=Response&lt;Body&gt;, Error=hyper::Error&gt; + Send + &#39;static,</span>
+    <span class="doccomment">/// #     S::Future: Send</span>
     <span class="doccomment">/// # {</span>
     <span class="doccomment">/// let http = Http::&lt;hyper::Chunk&gt;::new();</span>
     <span class="doccomment">/// let conn = http.serve_connection(some_io, some_service);</span>
@@ -1162,16 +1144,14 @@ pub struct SpawnAll&lt;I, S, E&gt; {
     <span class="doccomment">///     .map(|_| ())</span>
     <span class="doccomment">///     .map_err(|e| eprintln!(&quot;server connection error: {}&quot;, e));</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// some_handle.spawn(fut);</span>
+    <span class="doccomment">/// tokio::spawn(fut);</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// # fn main() {}</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serve_connection</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">I</span>, <span class="ident">Bd</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="ident">I</span>, <span class="ident">service</span>: <span class="ident">S</span>) <span class="op">-&gt;</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span> <span class="op">=</span> <span class="ident">Request</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Bd</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span><span class="op">&gt;</span>,
-              <span class="ident">Bd</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
-              <span class="ident">Bd</span>::<span class="ident">Item</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span> <span class="op">=</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Bd</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span><span class="op">&gt;</span>,
+              <span class="ident">Bd</span>: <span class="ident">Entity</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
               <span class="ident">I</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span>,
-
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">proto</span>::<span class="ident">Conn</span>::<span class="ident">new</span>(<span class="ident">io</span>);
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">keep_alive</span> {
@@ -1210,20 +1190,36 @@ pub struct SpawnAll&lt;I, S, E&gt; {
 
 <span class="comment">// ===== impl Server =====</span>
 
+
+<span class="doccomment">/// TODO: add docs</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Run</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span>(), <span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>);
+
+<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Run</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Run&quot;</span>).<span class="ident">finish</span>()
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Run</span> {
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> ();
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span>;
+
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">poll</span>()
+    }
+}
+
+
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">B</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">NewService</span><span class="op">&lt;</span><span class="ident">Request</span> <span class="op">=</span> <span class="ident">Request</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-          <span class="ident">B</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-          <span class="ident">B</span>::<span class="ident">Item</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+    <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">NewService</span><span class="op">&lt;</span><span class="ident">Request</span> <span class="op">=</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+          <span class="op">&lt;</span><span class="ident">S</span> <span class="kw">as</span> <span class="ident">NewService</span><span class="op">&gt;</span>::<span class="ident">Instance</span>: <span class="ident">Send</span>,
+          <span class="op">&lt;&lt;</span><span class="ident">S</span> <span class="kw">as</span> <span class="ident">NewService</span><span class="op">&gt;</span>::<span class="ident">Instance</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&gt;</span>::<span class="ident">Future</span>: <span class="ident">Send</span>,
+          <span class="ident">B</span>: <span class="ident">Entity</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+          <span class="ident">B</span>::<span class="ident">Data</span>: <span class="ident">Send</span>,
 {
     <span class="doccomment">/// Returns the local address that this server is bound to.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">local_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">listener</span>.<span class="ident">local_addr</span>()))
-    }
-
-    <span class="doccomment">/// Returns a handle to the underlying event loop that this server will be</span>
-    <span class="doccomment">/// running on.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Handle</span> {
-        <span class="self">self</span>.<span class="ident">reactor</span>.<span class="ident">handle</span>()
     }
 
     <span class="doccomment">/// Configure the amount of time this server will wait for a &quot;graceful</span>
@@ -1239,17 +1235,11 @@ pub struct SpawnAll&lt;I, S, E&gt; {
         <span class="self">self</span>
     }
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span><span class="op">=</span><span class="string">&quot;0.11.11&quot;</span>, <span class="ident">note</span><span class="op">=</span><span class="string">&quot;no_proto is always enabled&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">no_proto</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>
-    }
-
     <span class="doccomment">/// Execute this server infinitely.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method does not currently return, but it will return an error if</span>
     <span class="doccomment">/// one occurs.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="self">self</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Run</span> {
         <span class="self">self</span>.<span class="ident">run_until</span>(<span class="ident">future</span>::<span class="ident">empty</span>())
     }
 
@@ -1266,40 +1256,42 @@ pub struct SpawnAll&lt;I, S, E&gt; {
     <span class="doccomment">/// `shutdown_timeout` time waiting for active connections to shut down.</span>
     <span class="doccomment">/// Once the `shutdown_timeout` elapses or all active connections are</span>
     <span class="doccomment">/// cleaned out then this method will return.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_until</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">shutdown_signal</span>: <span class="ident">F</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (), <span class="ident">Error</span> <span class="op">=</span> ()<span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_until</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">shutdown_signal</span>: <span class="ident">F</span>) <span class="op">-&gt;</span> <span class="ident">Run</span>
+        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (), <span class="ident">Error</span> <span class="op">=</span> ()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class="ident">Server</span> { <span class="ident">protocol</span>, <span class="ident">new_service</span>, <span class="kw-2">mut</span> <span class="ident">reactor</span>, <span class="ident">listener</span>, <span class="ident">shutdown_timeout</span> } <span class="op">=</span> <span class="self">self</span>;
+        <span class="kw">let</span> <span class="ident">Server</span> { <span class="ident">protocol</span>, <span class="ident">new_service</span>, <span class="ident">handle</span>, <span class="ident">listener</span>, <span class="ident">shutdown_timeout</span> } <span class="op">=</span> <span class="self">self</span>;
 
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">reactor</span>.<span class="ident">handle</span>();
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">incoming</span> <span class="op">=</span> <span class="ident">AddrIncoming</span>::<span class="ident">new</span>(<span class="ident">listener</span>, <span class="ident">handle</span>.<span class="ident">clone</span>(), <span class="ident">protocol</span>.<span class="ident">sleep_on_errors</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">incoming</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">AddrIncoming</span>::<span class="ident">new</span>(<span class="ident">listener</span>, <span class="ident">handle</span>.<span class="ident">clone</span>(), <span class="ident">protocol</span>.<span class="ident">sleep_on_errors</span>) {
+            <span class="prelude-val">Ok</span>(<span class="ident">incoming</span>) <span class="op">=&gt;</span> <span class="ident">incoming</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="ident">Run</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">future</span>::<span class="ident">err</span>(<span class="ident">err</span>.<span class="ident">into</span>()))),
+        };
 
         <span class="kw">if</span> <span class="ident">protocol</span>.<span class="ident">keep_alive</span> {
             <span class="ident">incoming</span>.<span class="ident">set_keepalive</span>(<span class="prelude-val">Some</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">90</span>)));
         }
 
         <span class="comment">// Mini future to track the number of active services</span>
-        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">Rc</span>::<span class="ident">new</span>(<span class="ident">RefCell</span>::<span class="ident">new</span>(<span class="ident">Info</span> {
+        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="ident">Info</span> {
             <span class="ident">active</span>: <span class="number">0</span>,
             <span class="ident">blocker</span>: <span class="prelude-val">None</span>,
         }));
 
         <span class="comment">// Future for our server&#39;s execution</span>
-        <span class="kw">let</span> <span class="ident">srv</span> <span class="op">=</span> <span class="ident">incoming</span>.<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">socket</span><span class="op">|</span> {
+        <span class="kw">let</span> <span class="ident">info_cloned</span> <span class="op">=</span> <span class="ident">info</span>.<span class="ident">clone</span>();
+        <span class="kw">let</span> <span class="ident">srv</span> <span class="op">=</span> <span class="ident">incoming</span>.<span class="ident">for_each</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">socket</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">socket</span>.<span class="ident">remote_addr</span>;
             <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;accepted new connection ({})&quot;</span>, <span class="ident">addr</span>);
 
-            <span class="kw">let</span> <span class="ident">addr_service</span> <span class="op">=</span> <span class="ident">SocketAddrService</span>::<span class="ident">new</span>(<span class="ident">addr</span>, <span class="ident">new_service</span>.<span class="ident">new_service</span>()<span class="question-mark">?</span>);
+            <span class="kw">let</span> <span class="ident">service</span> <span class="op">=</span> <span class="ident">new_service</span>.<span class="ident">new_service</span>()<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">NotifyService</span> {
-                <span class="ident">inner</span>: <span class="ident">addr_service</span>,
-                <span class="ident">info</span>: <span class="ident">Rc</span>::<span class="ident">downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">info</span>),
+                <span class="ident">inner</span>: <span class="ident">service</span>,
+                <span class="ident">info</span>: <span class="ident">Arc</span>::<span class="ident">downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">info_cloned</span>),
             };
-            <span class="ident">info</span>.<span class="ident">borrow_mut</span>().<span class="ident">active</span> <span class="op">+=</span> <span class="number">1</span>;
+            <span class="ident">info_cloned</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">active</span> <span class="op">+=</span> <span class="number">1</span>;
             <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">protocol</span>.<span class="ident">serve_connection</span>(<span class="ident">socket</span>, <span class="ident">s</span>)
                 .<span class="ident">map</span>(<span class="op">|</span>_<span class="op">|</span> ())
                 .<span class="ident">map_err</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;server connection error: ({}) {}&quot;</span>, <span class="ident">addr</span>, <span class="ident">err</span>));
-            <span class="ident">handle</span>.<span class="ident">spawn</span>(<span class="ident">fut</span>);
+            <span class="ident">spawn</span>(<span class="ident">fut</span>);
             <span class="prelude-val">Ok</span>(())
         });
 
@@ -1314,29 +1306,34 @@ pub struct SpawnAll&lt;I, S, E&gt; {
         <span class="comment">//</span>
         <span class="comment">// When we get a shutdown signal (`Ok`) then we drop the TCP listener to</span>
         <span class="comment">// stop accepting incoming connections.</span>
-        <span class="kw">match</span> <span class="ident">reactor</span>.<span class="ident">run</span>(<span class="ident">shutdown_signal</span>.<span class="ident">select</span>(<span class="ident">srv</span>)) {
-            <span class="prelude-val">Ok</span>(((), <span class="ident">_incoming</span>)) <span class="op">=&gt;</span> {}
-            <span class="prelude-val">Err</span>((<span class="ident">e</span>, <span class="ident">_other</span>)) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
-        }
+        <span class="kw">let</span> <span class="ident">main_execution</span> <span class="op">=</span> <span class="ident">shutdown_signal</span>.<span class="ident">select</span>(<span class="ident">srv</span>).<span class="ident">then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">result</span><span class="op">|</span> {
+            <span class="kw">match</span> <span class="ident">result</span> {
+                <span class="prelude-val">Ok</span>(((), <span class="ident">_incoming</span>)) <span class="op">=&gt;</span> {},
+                <span class="prelude-val">Err</span>((<span class="ident">e</span>, <span class="ident">_other</span>)) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="ident">future</span>::<span class="ident">Either</span>::<span class="ident">A</span>(<span class="ident">future</span>::<span class="ident">err</span>(<span class="ident">e</span>.<span class="ident">into</span>()))
+            }
 
-        <span class="comment">// Ok we&#39;ve stopped accepting new connections at this point, but we want</span>
-        <span class="comment">// to give existing connections a chance to clear themselves out. Wait</span>
-        <span class="comment">// at most `shutdown_timeout` time before we just return clearing</span>
-        <span class="comment">// everything out.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Our custom `WaitUntilZero` will resolve once all services constructed</span>
-        <span class="comment">// here have been destroyed.</span>
-        <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">Timeout</span>::<span class="ident">new</span>(<span class="ident">shutdown_timeout</span>, <span class="kw-2">&amp;</span><span class="ident">handle</span>));
-        <span class="kw">let</span> <span class="ident">wait</span> <span class="op">=</span> <span class="ident">WaitUntilZero</span> { <span class="ident">info</span>: <span class="ident">info</span>.<span class="ident">clone</span>() };
-        <span class="kw">match</span> <span class="ident">reactor</span>.<span class="ident">run</span>(<span class="ident">wait</span>.<span class="ident">select</span>(<span class="ident">timeout</span>)) {
-            <span class="prelude-val">Ok</span>(_) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(()),
-            <span class="prelude-val">Err</span>((<span class="ident">e</span>, _)) <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>.<span class="ident">into</span>())
-        }
+            <span class="comment">// Ok we&#39;ve stopped accepting new connections at this point, but we want</span>
+            <span class="comment">// to give existing connections a chance to clear themselves out. Wait</span>
+            <span class="comment">// at most `shutdown_timeout` time before we just return clearing</span>
+            <span class="comment">// everything out.</span>
+            <span class="comment">//</span>
+            <span class="comment">// Our custom `WaitUntilZero` will resolve once all services constructed</span>
+            <span class="comment">// here have been destroyed.</span>
+            <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="ident">Delay</span>::<span class="ident">new</span>(<span class="ident">shutdown_timeout</span>);
+            <span class="kw">let</span> <span class="ident">wait</span> <span class="op">=</span> <span class="ident">WaitUntilZero</span> { <span class="ident">info</span>: <span class="ident">info</span>.<span class="ident">clone</span>() };
+            <span class="ident">future</span>::<span class="ident">Either</span>::<span class="ident">B</span>(<span class="ident">wait</span>.<span class="ident">select</span>(<span class="ident">timeout</span>).<span class="ident">then</span>(<span class="op">|</span><span class="ident">result</span><span class="op">|</span> {
+                <span class="kw">match</span> <span class="ident">result</span> {
+                    <span class="prelude-val">Ok</span>(_) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(()),
+                    <span class="prelude-val">Err</span>((<span class="ident">e</span>, _)) <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>.<span class="ident">into</span>())
+                }
+            }))
+        });
+
+        <span class="ident">Run</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">main_execution</span>))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">fmt</span>::<span class="ident">Debug</span>, <span class="ident">B</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;&gt;</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">B</span>::<span class="ident">Item</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">fmt</span>::<span class="ident">Debug</span>, <span class="ident">B</span>: <span class="ident">Entity</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;&gt;</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">B</span><span class="op">&gt;</span>
 {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Server&quot;</span>)
@@ -1372,9 +1369,8 @@ pub struct SpawnAll&lt;I, S, E&gt; {
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">=</span><span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
     <span class="ident">I</span>::<span class="ident">Item</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span>,
-    <span class="ident">S</span>: <span class="ident">NewService</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">=</span><span class="ident">Request</span>, <span class="ident">Response</span><span class="op">=</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>::<span class="ident">Item</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+    <span class="ident">S</span>: <span class="ident">NewService</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">=</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Response</span><span class="op">=</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
+    <span class="ident">B</span>: <span class="ident">Entity</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">I</span>::<span class="ident">Item</span>, <span class="ident">S</span>::<span class="ident">Instance</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span>;
@@ -1396,7 +1392,7 @@ impl&lt;I, S, E&gt; Future for SpawnAll&lt;I, S, E&gt;
 where
     I: Stream&lt;Error=io::Error&gt;,
     I::Item: AsyncRead + AsyncWrite,
-    S: NewService&lt;Request=Request, Response=Response&lt;B&gt;, Error=::Error&gt;,
+    S: NewService&lt;Request=Request&lt;Body&gt;, Response=Response&lt;B&gt;, Error=::Error&gt;,
     B: Stream&lt;Error=::Error&gt;,
     B::Item: AsRef&lt;[u8]&gt;,
     //E: Executor&lt;Connection&lt;I::Item, S::Instance&gt;&gt;,
@@ -1470,8 +1466,8 @@ where
         }
         <span class="self">self</span>.<span class="ident">timeout</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">listener</span>.<span class="ident">accept</span>() {
-                <span class="prelude-val">Ok</span>((<span class="ident">socket</span>, <span class="ident">addr</span>)) <span class="op">=&gt;</span> {
+            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">listener</span>.<span class="ident">poll_accept</span>() {
+                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>((<span class="ident">socket</span>, <span class="ident">addr</span>))) <span class="op">=&gt;</span> {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">dur</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">keep_alive_timeout</span> {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">socket</span>.<span class="ident">set_keepalive</span>(<span class="prelude-val">Some</span>(<span class="ident">dur</span>)) {
                             <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;error trying to set TCP keepalive: {}&quot;</span>, <span class="ident">e</span>);
@@ -1479,7 +1475,7 @@ where
                     }
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">AddrStream</span>::<span class="ident">new</span>(<span class="ident">socket</span>, <span class="ident">addr</span>))));
                 },
-                <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">WouldBlock</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>),
+                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>),
                 <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sleep_on_errors</span> <span class="op">=&gt;</span> {
                     <span class="comment">// Connection errors can be ignored directly, continue by</span>
                     <span class="comment">// accepting the next request.</span>
@@ -1490,8 +1486,7 @@ where
                     <span class="kw">let</span> <span class="ident">delay</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>::<span class="ident">from_millis</span>(<span class="number">10</span>);
                     <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;accept error: {}; sleeping {:?}&quot;</span>,
                         <span class="ident">e</span>, <span class="ident">delay</span>);
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="ident">Timeout</span>::<span class="ident">new</span>(<span class="ident">delay</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">handle</span>)
-                        .<span class="ident">expect</span>(<span class="string">&quot;can always set a timeout&quot;</span>);
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="ident">Delay</span>::<span class="ident">new</span>(<span class="ident">delay</span>);
                     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">timeout</span>.<span class="ident">poll</span>()
                         .<span class="ident">expect</span>(<span class="string">&quot;timeout never fails&quot;</span>);
                     <span class="kw">match</span> <span class="ident">result</span> {
@@ -1589,48 +1584,15 @@ where
     }
 }
 
-<span class="comment">// ===== SocketAddrService</span>
-
-<span class="comment">// This is used from `Server::run`, which captures the remote address</span>
-<span class="comment">// in this service, and then injects it into each `Request`.</span>
-<span class="kw">struct</span> <span class="ident">SocketAddrService</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="ident">addr</span>: <span class="ident">SocketAddr</span>,
-    <span class="ident">inner</span>: <span class="ident">S</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">SocketAddrService</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">addr</span>: <span class="ident">SocketAddr</span>, <span class="ident">service</span>: <span class="ident">S</span>) <span class="op">-&gt;</span> <span class="ident">SocketAddrService</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">SocketAddrService</span> {
-            <span class="ident">addr</span>: <span class="ident">addr</span>,
-            <span class="ident">inner</span>: <span class="ident">service</span>,
-        }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Service</span> <span class="kw">for</span> <span class="ident">SocketAddrService</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">=</span><span class="ident">Request</span><span class="op">&gt;</span>,
-{
-    <span class="kw">type</span> <span class="ident">Request</span> <span class="op">=</span> <span class="ident">S</span>::<span class="ident">Request</span>;
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">S</span>::<span class="ident">Response</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">S</span>::<span class="ident">Error</span>;
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">S</span>::<span class="ident">Future</span>;
-
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">req</span>: <span class="self">Self</span>::<span class="ident">Request</span>) <span class="op">-&gt;</span> <span class="self">Self</span>::<span class="ident">Future</span> {
-        <span class="ident">proto</span>::<span class="ident">request</span>::<span class="ident">addr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">req</span>, <span class="self">self</span>.<span class="ident">addr</span>);
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">call</span>(<span class="ident">req</span>)
-    }
-}
-
 <span class="comment">// ===== NotifyService =====</span>
 
 <span class="kw">struct</span> <span class="ident">NotifyService</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
     <span class="ident">inner</span>: <span class="ident">S</span>,
-    <span class="ident">info</span>: <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">Info</span><span class="op">&gt;&gt;</span>,
+    <span class="ident">info</span>: <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Info</span><span class="op">&gt;&gt;</span>,
 }
 
 <span class="kw">struct</span> <span class="ident">WaitUntilZero</span> {
-    <span class="ident">info</span>: <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">Info</span><span class="op">&gt;&gt;</span>,
+    <span class="ident">info</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Info</span><span class="op">&gt;&gt;</span>,
 }
 
 <span class="kw">struct</span> <span class="ident">Info</span> {
@@ -1655,7 +1617,7 @@ where
             <span class="prelude-val">Some</span>(<span class="ident">info</span>) <span class="op">=&gt;</span> <span class="ident">info</span>,
             <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span>,
         };
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">info</span>.<span class="ident">borrow_mut</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">info</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
         <span class="ident">info</span>.<span class="ident">active</span> <span class="op">-=</span> <span class="number">1</span>;
         <span class="kw">if</span> <span class="ident">info</span>.<span class="ident">active</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">task</span>) <span class="op">=</span> <span class="ident">info</span>.<span class="ident">blocker</span>.<span class="ident">take</span>() {
@@ -1670,7 +1632,7 @@ where
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io</span>::<span class="ident">Error</span>;
 
     <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">info</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">info</span>.<span class="ident">borrow_mut</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">info</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">info</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
         <span class="kw">if</span> <span class="ident">info</span>.<span class="ident">active</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="prelude-val">Ok</span>(().<span class="ident">into</span>())
         } <span class="kw">else</span> {
@@ -1681,7 +1643,7 @@ where
 }
 
 <span class="kw">mod</span> <span class="ident">hyper_service</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Request</span>, <span class="ident">Response</span>, <span class="ident">Service</span>, <span class="ident">Stream</span>};
+    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Body</span>, <span class="ident">Entity</span>, <span class="ident">Request</span>, <span class="ident">Response</span>, <span class="ident">Service</span>};
     <span class="doccomment">/// A &quot;trait alias&quot; for any type that implements `Service` with hyper&#39;s</span>
     <span class="doccomment">/// Request, Response, and Error types, and a streaming body.</span>
     <span class="doccomment">///</span>
@@ -1708,24 +1670,22 @@ where
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Sealed</span> <span class="kw">for</span> <span class="ident">S</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span>
-            <span class="ident">Request</span><span class="op">=</span><span class="ident">Request</span>,
+            <span class="ident">Request</span><span class="op">=</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>,
             <span class="ident">Response</span><span class="op">=</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
             <span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span>,
         <span class="op">&gt;</span>,
-        <span class="ident">B</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
-        <span class="ident">B</span>::<span class="ident">Item</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+        <span class="ident">B</span>: <span class="ident">Entity</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
     {}
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">HyperService</span> <span class="kw">for</span> <span class="ident">S</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span>
-            <span class="ident">Request</span><span class="op">=</span><span class="ident">Request</span>,
+            <span class="ident">Request</span><span class="op">=</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>,
             <span class="ident">Response</span><span class="op">=</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
             <span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span>,
         <span class="op">&gt;</span>,
         <span class="ident">S</span>: <span class="ident">Sealed</span>,
-        <span class="ident">B</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
-        <span class="ident">B</span>::<span class="ident">Item</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+        <span class="ident">B</span>: <span class="ident">Entity</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
     {
         <span class="kw">type</span> <span class="ident">ResponseBody</span> <span class="op">=</span> <span class="ident">B</span>;
         <span class="kw">type</span> <span class="ident">Sealed</span> <span class="op">=</span> <span class="ident">Opaque</span>;
