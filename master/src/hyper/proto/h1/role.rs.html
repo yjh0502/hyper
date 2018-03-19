@@ -824,6 +824,7 @@
 <span id="778">778</span>
 <span id="779">779</span>
 <span id="780">780</span>
+<span id="781">781</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
@@ -1041,6 +1042,7 @@
                 <span class="kw">match</span> <span class="ident">head</span>.<span class="ident">subject</span> {
                     <span class="comment">// TODO: support for 1xx codes needs improvement everywhere</span>
                     <span class="comment">// would be 100...199 =&gt; false</span>
+                    <span class="ident">StatusCode</span>::<span class="ident">SwitchingProtocols</span> <span class="op">|</span>
                     <span class="ident">StatusCode</span>::<span class="ident">NoContent</span> <span class="op">|</span>
                     <span class="ident">StatusCode</span>::<span class="ident">NotModified</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>,
                     _ <span class="op">=&gt;</span> <span class="bool-val">true</span>,
