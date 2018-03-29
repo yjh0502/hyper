@@ -10,8 +10,11 @@
     <title>conn.rs.html -- source</title>
 
     <link rel="stylesheet" type="text/css" href="../../../normalize.css">
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css" id="themeStyle">
+    <script src="../../../storage.js"></script>
     
 
     
@@ -33,6 +36,13 @@
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -530,6 +540,7 @@
 <span id="484">484</span>
 <span id="485">485</span>
 <span id="486">486</span>
+<span id="487">487</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Lower-level client connection API.</span>
 <span class="doccomment">//!</span>
@@ -544,9 +555,10 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
 
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">Bytes</span>;
-<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Future</span>, <span class="ident">Poll</span>};
+<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Future</span>, <span class="ident">FutureExt</span>, <span class="ident">Poll</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">future</span>::{<span class="self">self</span>, <span class="ident">Either</span>};
-<span class="kw">use</span> <span class="ident">tokio_io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
+<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">task</span>;
+<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
 
 <span class="kw">use</span> <span class="ident">proto</span>;
 <span class="kw">use</span> <span class="ident">proto</span>::<span class="ident">body</span>::<span class="ident">Entity</span>;
@@ -656,8 +668,8 @@
     <span class="doccomment">/// Polls to determine whether this sender can be used yet for a request.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the associated connection is closed, this returns an Error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">poll_ready</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)
     }
 
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
@@ -695,7 +707,7 @@
     <span class="doccomment">/// # use http::header::HOST;</span>
     <span class="doccomment">/// # use hyper::client::conn::SendRequest;</span>
     <span class="doccomment">/// # use hyper::Body;</span>
-    <span class="doccomment">/// use futures::Future;</span>
+    <span class="doccomment">/// use futures::FutureExt;</span>
     <span class="doccomment">/// use hyper::Request;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # fn doc(mut tx: SendRequest&lt;Body&gt;) {</span>
@@ -719,19 +731,19 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">ResponseFuture</span> {
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">send</span>(<span class="ident">req</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">rx</span>) <span class="op">=&gt;</span> {
-                <span class="ident">Either</span>::<span class="ident">A</span>(<span class="ident">rx</span>.<span class="ident">then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">res</span><span class="op">|</span> {
+                <span class="ident">rx</span>.<span class="ident">then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">res</span><span class="op">|</span> {
                     <span class="kw">match</span> <span class="ident">res</span> {
                         <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">res</span>)) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">res</span>),
                         <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
                         <span class="comment">// this is definite bug if it happens, but it shouldn&#39;t happen!</span>
                         <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;dispatch dropped without returning error&quot;</span>),
                     }
-                }))
+                }).<span class="ident">left</span>()
             },
             <span class="prelude-val">Err</span>(<span class="ident">_req</span>) <span class="op">=&gt;</span> {
                 <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;connection was not ready&quot;</span>);
                 <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> ::<span class="ident">Error</span>::<span class="ident">new_canceled</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;connection was not ready&quot;</span>));
-                <span class="ident">Either</span>::<span class="ident">B</span>(<span class="ident">future</span>::<span class="ident">err</span>(<span class="ident">err</span>))
+                <span class="ident">future</span>::<span class="ident">err</span>(<span class="ident">err</span>).<span class="ident">right</span>()
             }
         };
 
@@ -747,7 +759,7 @@
     {
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">try_send</span>(<span class="ident">req</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">rx</span>) <span class="op">=&gt;</span> {
-                <span class="ident">Either</span>::<span class="ident">A</span>(<span class="ident">rx</span>.<span class="ident">then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">res</span><span class="op">|</span> {
+                <span class="ident">Either</span>::<span class="ident">Left</span>(<span class="ident">rx</span>.<span class="ident">then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">res</span><span class="op">|</span> {
                     <span class="kw">match</span> <span class="ident">res</span> {
                         <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">res</span>)) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">res</span>),
                         <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
@@ -759,7 +771,7 @@
             <span class="prelude-val">Err</span>(<span class="ident">req</span>) <span class="op">=&gt;</span> {
                 <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;connection was not ready&quot;</span>);
                 <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> ::<span class="ident">Error</span>::<span class="ident">new_canceled</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;connection was not ready&quot;</span>));
-                <span class="ident">Either</span>::<span class="ident">B</span>(<span class="ident">future</span>::<span class="ident">err</span>((<span class="ident">err</span>, <span class="prelude-val">Some</span>(<span class="ident">req</span>))))
+                <span class="ident">Either</span>::<span class="ident">Right</span>(<span class="ident">future</span>::<span class="ident">err</span>((<span class="ident">err</span>, <span class="prelude-val">Some</span>(<span class="ident">req</span>))))
             }
         };
         <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">inner</span>)
@@ -810,8 +822,8 @@ impl&lt;T, B&gt; Service for SendRequest&lt;T, B&gt; {
     <span class="doccomment">/// upgrade. Once the upgrade is completed, the connection would be &quot;done&quot;,</span>
     <span class="doccomment">/// but it is not desired to actally shutdown the IO object. Instead you</span>
     <span class="doccomment">/// would take it back using `into_parts`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_without_shutdown</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll_without_shutdown</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_without_shutdown</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll_without_shutdown</span>(<span class="ident">cx</span>)
     }
 }
 
@@ -823,8 +835,8 @@ impl&lt;T, B&gt; Service for SendRequest&lt;T, B&gt; {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> ();
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll</span>()
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll</span>(<span class="ident">cx</span>)
     }
 }
 
@@ -896,8 +908,8 @@ impl&lt;T, B&gt; Service for SendRequest&lt;T, B&gt; {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">SendRequest</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>);
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll</span>()
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll</span>(<span class="ident">cx</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">async</span><span class="op">|</span> {
                 <span class="ident">async</span>.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">tx</span>, <span class="ident">dispatch</span>)<span class="op">|</span> {
                     (<span class="ident">tx</span>, <span class="ident">Connection</span> { <span class="ident">inner</span>: <span class="ident">dispatch</span> })
@@ -927,8 +939,8 @@ impl&lt;T, B&gt; Service for SendRequest&lt;T, B&gt; {
     <span class="op">&gt;</span>);
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll</span>()
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll</span>(<span class="ident">cx</span>)
     }
 }
 
@@ -950,7 +962,7 @@ impl&lt;T, B&gt; Service for SendRequest&lt;T, B&gt; {
     <span class="op">&gt;</span>);
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">io</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;polled more than once&quot;</span>);
         <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">dispatch</span>::<span class="ident">channel</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">proto</span>::<span class="ident">Conn</span>::<span class="ident">new</span>(<span class="ident">io</span>);
@@ -974,8 +986,8 @@ impl&lt;T, B&gt; Service for SendRequest&lt;T, B&gt; {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll</span>()
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll</span>(<span class="ident">cx</span>)
     }
 }
 
@@ -1031,20 +1043,22 @@ impl&lt;T, B&gt; Service for SendRequest&lt;T, B&gt; {
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>↑</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>↓</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>↹</dt>
+                    <dt><kbd>↹</kbd></dt>
                     <dd>Switch tab</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt style="width:31px;">+ / -</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 

@@ -10,8 +10,11 @@
     <title>error.rs.html -- source</title>
 
     <link rel="stylesheet" type="text/css" href="../../normalize.css">
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
@@ -33,6 +36,13 @@
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -292,6 +302,10 @@
 <span id="246">246</span>
 <span id="247">247</span>
 <span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Error and Result module.</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
@@ -316,7 +330,8 @@
     <span class="ident">Io</span>,
     <span class="ident">TooLarge</span>,
     <span class="ident">Incomplete</span>,
-    <span class="ident">Utf8</span>
+    <span class="ident">Utf8</span>,
+    <span class="ident">Executor</span>
 };
 
 <span class="doccomment">/// Result type often returned from methods that can have hyper `Error`s.</span>
@@ -351,6 +366,8 @@
     <span class="ident">Io</span>(<span class="ident">IoError</span>),
     <span class="doccomment">/// Parsing a field as string failed</span>
     <span class="ident">Utf8</span>(<span class="ident">Utf8Error</span>),
+    <span class="doccomment">/// Executing a future failed</span>
+    <span class="ident">Executor</span>,
 
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="ident">__Nonexhaustive</span>(<span class="ident">Void</span>)
@@ -422,6 +439,7 @@
             <span class="ident">Cancel</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=&gt;</span> <span class="ident">e</span>.<span class="ident">description</span>(),
             <span class="ident">Io</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=&gt;</span> <span class="ident">e</span>.<span class="ident">description</span>(),
             <span class="ident">Utf8</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=&gt;</span> <span class="ident">e</span>.<span class="ident">description</span>(),
+            <span class="ident">Executor</span> <span class="op">=&gt;</span> <span class="string">&quot;executor is missing or failed to spawn&quot;</span>,
             <span class="ident">Error</span>::<span class="ident">__Nonexhaustive</span>(..) <span class="op">=&gt;</span>  <span class="macro">unreachable</span><span class="macro">!</span>(),
         }
     }
@@ -555,20 +573,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>↑</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>↓</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>↹</dt>
+                    <dt><kbd>↹</kbd></dt>
                     <dd>Switch tab</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt style="width:31px;">+ / -</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
