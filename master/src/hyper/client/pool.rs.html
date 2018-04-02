@@ -620,6 +620,18 @@
 <span id="564">564</span>
 <span id="565">565</span>
 <span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
@@ -661,12 +673,9 @@
     <span class="comment">// connection.</span>
     <span class="ident">parked</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">oneshot</span>::<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>,
     <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="comment">// Used to prevent multiple intervals from being spawned to clear</span>
-    <span class="comment">// expired connections.</span>
-    <span class="comment">//</span>
-    <span class="comment">// TODO(0.12): Remove the need for this when Client::schedule_pool_timer</span>
-    <span class="comment">// can be done in Client::new.</span>
-    <span class="ident">expired_timer_spawned</span>: <span class="ident">bool</span>,
+    <span class="comment">// A oneshot channel is used to allow the interval to be notified when</span>
+    <span class="comment">// the Pool completely drops. That way, the interval can cancel immediately.</span>
+    <span class="ident">idle_interval_ref</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">oneshot</span>::<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Never</span><span class="op">&gt;&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
@@ -675,9 +684,9 @@
             <span class="ident">inner</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="ident">PoolInner</span> {
                 <span class="ident">enabled</span>: <span class="ident">enabled</span>,
                 <span class="ident">idle</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
+                <span class="ident">idle_interval_ref</span>: <span class="prelude-val">None</span>,
                 <span class="ident">parked</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
                 <span class="ident">timeout</span>: <span class="ident">timeout</span>,
-                <span class="ident">expired_timer_spawned</span>: <span class="bool-val">false</span>,
             }))
         }
     }
@@ -845,20 +854,21 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Closed</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">spawn_expired_interval</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">dur</span> <span class="op">=</span> {
+        <span class="kw">let</span> (<span class="ident">dur</span>, <span class="ident">rx</span>) <span class="op">=</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
 
             <span class="kw">if</span> <span class="op">!</span><span class="ident">inner</span>.<span class="ident">enabled</span> {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
             }
 
-            <span class="kw">if</span> <span class="ident">inner</span>.<span class="ident">expired_timer_spawned</span> {
+            <span class="kw">if</span> <span class="ident">inner</span>.<span class="ident">idle_interval_ref</span>.<span class="ident">is_some</span>() {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
             }
-            <span class="ident">inner</span>.<span class="ident">expired_timer_spawned</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">dur</span>) <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">timeout</span> {
-                <span class="ident">dur</span>
+                <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">oneshot</span>::<span class="ident">channel</span>();
+                <span class="ident">inner</span>.<span class="ident">idle_interval_ref</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tx</span>);
+                (<span class="ident">dur</span>, <span class="ident">rx</span>)
             } <span class="kw">else</span> {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
             }
@@ -868,6 +878,7 @@
         <span class="kw">super</span>::<span class="ident">execute</span>(<span class="ident">IdleInterval</span> {
             <span class="ident">interval</span>: <span class="ident">interval</span>,
             <span class="ident">pool</span>: <span class="ident">Arc</span>::<span class="ident">downgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>),
+            <span class="ident">pool_drop_notifier</span>: <span class="ident">rx</span>,
         }, <span class="ident">cx</span>)
     }
 }
@@ -1034,6 +1045,10 @@
 <span class="kw">struct</span> <span class="ident">IdleInterval</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">interval</span>: <span class="ident">Interval</span>,
     <span class="ident">pool</span>: <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">PoolInner</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>,
+    <span class="comment">// This allows the IdleInterval to be notified as soon as the entire</span>
+    <span class="comment">// Pool is fully dropped, and shutdown. This channel is never sent on,</span>
+    <span class="comment">// but Err(Canceled) will be received when the Pool is dropped.</span>
+    <span class="ident">pool_drop_notifier</span>: <span class="ident">oneshot</span>::<span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">Never</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Closed</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">IdleInterval</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
@@ -1042,6 +1057,15 @@
 
     <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
+            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">pool_drop_notifier</span>.<span class="ident">poll</span>(<span class="ident">cx</span>) {
+                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">n</span>)) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">n</span> {},
+                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Pending</span>) <span class="op">=&gt;</span> (),
+                <span class="prelude-val">Err</span>(<span class="ident">_canceled</span>) <span class="op">=&gt;</span> {
+                    <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;pool closed, canceling idle interval&quot;</span>);
+                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
+                }
+            }
+
             <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">interval</span>.<span class="ident">poll_next</span>(<span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="op">|</span>_<span class="op">|</span> <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;interval cannot error&quot;</span>)));
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">inner</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">upgrade</span>() {
