@@ -658,6 +658,17 @@
 <span id="602">602</span>
 <span id="603">603</span>
 <span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Client</span>
 
@@ -668,6 +679,7 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
 
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Future</span>, <span class="ident">FutureExt</span>, <span class="ident">Never</span>, <span class="ident">Poll</span>};
+<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">channel</span>::<span class="ident">oneshot</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">future</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">task</span>;
 <span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">Method</span>, <span class="ident">Request</span>, <span class="ident">Response</span>, <span class="ident">Uri</span>, <span class="ident">Version</span>};
@@ -896,7 +908,7 @@
                         <span class="ident">ClientError</span>::<span class="ident">Normal</span>(<span class="ident">err</span>)
                     }
                 })
-                .<span class="ident">and_then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">res</span><span class="op">|</span> {
+                .<span class="ident">and_then</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">res</span><span class="op">|</span> {
                     <span class="ident">future</span>::<span class="ident">lazy</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">cx</span><span class="op">|</span> {
                         <span class="comment">// when pooled is dropped, it will try to insert back into the</span>
                         <span class="comment">// pool. To delay that, spawn a future that completes once the</span>
@@ -906,14 +918,24 @@
                         <span class="comment">// for a new request to start.</span>
                         <span class="comment">//</span>
                         <span class="comment">// It won&#39;t be ready if there is a body to stream.</span>
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Pending</span>) <span class="op">=</span> <span class="ident">pooled</span>.<span class="ident">tx</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>) {
+                        <span class="kw">if</span> <span class="ident">pooled</span>.<span class="ident">tx</span>.<span class="ident">is_ready</span>() {
+                            <span class="ident">drop</span>(<span class="ident">pooled</span>);
+                        } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">res</span>.<span class="ident">body</span>().<span class="ident">is_empty</span>() {
+                            <span class="kw">let</span> (<span class="ident">delayed_tx</span>, <span class="ident">delayed_rx</span>) <span class="op">=</span> <span class="ident">oneshot</span>::<span class="ident">channel</span>();
+                            <span class="ident">res</span>.<span class="ident">body_mut</span>().<span class="ident">delayed_eof</span>(<span class="ident">delayed_rx</span>);
                             <span class="comment">// If the executor doesn&#39;t have room, oh well. Things will likely</span>
                             <span class="comment">// be blowing up soon, but this specific task isn&#39;t required.</span>
-                            <span class="ident">execute</span>(<span class="ident">future</span>::<span class="ident">poll_fn</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">cx</span><span class="op">|</span> {
-                                <span class="ident">pooled</span>.<span class="ident">tx</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>).<span class="ident">or</span>(<span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(())))
-                            }), <span class="ident">cx</span>).<span class="ident">ok</span>();
+                            <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">future</span>::<span class="ident">poll_fn</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">cx</span><span class="op">|</span> {
+                                <span class="ident">pooled</span>.<span class="ident">tx</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)
+                            })
+                                .<span class="ident">then</span>(<span class="kw">move</span> <span class="op">|</span>_<span class="op">|</span> {
+                                    <span class="comment">// At this point, `pooled` is dropped, and had a chance</span>
+                                    <span class="comment">// to insert into the pool (if conn was idle)</span>
+                                    <span class="ident">drop</span>(<span class="ident">delayed_tx</span>);
+                                    <span class="prelude-val">Ok</span>(())
+                                });
+                            <span class="ident">execute</span>(<span class="ident">fut</span>, <span class="ident">cx</span>).<span class="ident">ok</span>();
                         }
-
                         <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
                     })
                 });
