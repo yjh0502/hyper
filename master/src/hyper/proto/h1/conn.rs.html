@@ -1201,7 +1201,7 @@
 <span class="doccomment">/// `Transaction`s over HTTP.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The connection will determine when a message begins and ends as well as</span>
-<span class="doccomment">/// determine if this  connection can be kept alive after the message,</span>
+<span class="doccomment">/// determine if this connection can be kept alive after the message,</span>
 <span class="doccomment">/// or if it is complete.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">B</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">io</span>: <span class="ident">Buffered</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">EncodedBuf</span><span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>,
