@@ -895,7 +895,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Http1Transaction</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="ident">Incoming</span><span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Http1Transaction</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="ident">Incoming</span><span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">S</span>::<span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">read_buf</span>)) {
                 <span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">len</span>)) <span class="op">=&gt;</span> {
@@ -905,14 +905,14 @@
                 <span class="prelude-val">None</span> <span class="op">=&gt;</span> {
                     <span class="kw">if</span> <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">capacity</span>() <span class="op">&gt;=</span> <span class="self">self</span>.<span class="ident">max_buf_size</span> {
                         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;max_buf_size ({}) reached, closing&quot;</span>, <span class="self">self</span>.<span class="ident">max_buf_size</span>);
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">TooLarge</span>);
+                        <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">new_too_large</span>());
                     }
                 },
             }
-            <span class="kw">match</span> <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">read_from_io</span>()) {
+            <span class="kw">match</span> <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">read_from_io</span>().<span class="ident">map_err</span>(::<span class="ident">Error</span>::<span class="ident">new_io</span>)) {
                 <span class="number">0</span> <span class="op">=&gt;</span> {
                     <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;parse eof&quot;</span>);
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Incomplete</span>);
+                    <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">new_incomplete</span>());
                 }
                 _ <span class="op">=&gt;</span> {},
             }

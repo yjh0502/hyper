@@ -1181,6 +1181,7 @@
 <span id="1125">1125</span>
 <span id="1126">1126</span>
 <span id="1127">1127</span>
+<span id="1128">1128</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="self">self</span>};
@@ -1204,7 +1205,7 @@
 <span class="doccomment">/// The connection will determine when a message begins and ends as well as</span>
 <span class="doccomment">/// determine if this connection can be kept alive after the message,</span>
 <span class="doccomment">/// or if it is complete.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">B</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">B</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">io</span>: <span class="ident">Buffered</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">EncodedBuf</span><span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>,
     <span class="ident">state</span>: <span class="ident">State</span>,
     <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
@@ -1330,7 +1331,8 @@ where I: AsyncRead + AsyncWrite,
                 _ <span class="op">=&gt;</span> {
                     <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;unimplemented HTTP Version = {:?}&quot;</span>, <span class="ident">version</span>);
                     <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">close_read</span>();
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Version</span>);
+                    <span class="comment">//TODO: replace this with a more descriptive error</span>
+                    <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">new_version</span>());
                 }
             };
             <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">version</span> <span class="op">=</span> <span class="ident">version</span>;
@@ -1429,7 +1431,7 @@ where I: AsyncRead + AsyncWrite,
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_mid_message</span>() {
             <span class="self">self</span>.<span class="ident">maybe_park_read</span>();
         } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">require_empty_read</span>()<span class="question-mark">?</span>;
+            <span class="self">self</span>.<span class="ident">require_empty_read</span>().<span class="ident">map_err</span>(::<span class="ident">Error</span>::<span class="ident">new_io</span>)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
