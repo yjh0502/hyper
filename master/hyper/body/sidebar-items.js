@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Body","An `Entity` of `Chunk`s, used when receiving bodies."],["EntityStream","A wrapper to consume an `Entity` as a futures `Stream`."],["Sender","A sender half used with `Body::channel()`."]],"trait":[["Entity","This trait represents a streaming body of a `Request` or `Response`."]]});
+initSidebarItems({"struct":[["Body","A `Payload` of `Chunk`s, used when receiving bodies."],["Sender","A sender half used with `Body::channel()`."]],"trait":[["Payload","This trait represents a streaming body of a `Request` or `Response`."]]});

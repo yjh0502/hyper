@@ -1407,7 +1407,7 @@
 
 <span class="kw">fn</span> <span class="ident">set_length</span>(<span class="ident">headers</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HeaderMap</span>, <span class="ident">body</span>: <span class="ident">BodyLength</span>, <span class="ident">can_chunked</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">Encoder</span> {
     <span class="comment">// If the user already set specific headers, we should respect them, regardless</span>
-    <span class="comment">// of what the Entity knows about itself. They set them for a reason.</span>
+    <span class="comment">// of what the Payload knows about itself. They set them for a reason.</span>
 
     <span class="comment">// Because of the borrow checker, we can&#39;t check the for an existing</span>
     <span class="comment">// Content-Length header while holding an `Entry` for the Transfer-Encoding</span>

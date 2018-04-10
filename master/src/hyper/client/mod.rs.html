@@ -754,7 +754,6 @@
 <span id="698">698</span>
 <span id="699">699</span>
 <span id="700">700</span>
-<span id="701">701</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Client</span>
 
@@ -774,8 +773,7 @@
 <span class="kw">use</span> <span class="ident">tokio_executor</span>::<span class="ident">spawn</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_service</span>::<span class="ident">Service</span>;
 
-<span class="kw">use</span> <span class="ident">proto</span>::<span class="ident">body</span>::{<span class="ident">Body</span>, <span class="ident">Entity</span>};
-<span class="kw">use</span> <span class="ident">proto</span>;
+<span class="kw">use</span> <span class="ident">body</span>::{<span class="ident">Body</span>, <span class="ident">Payload</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="ident">pool</span>::<span class="ident">Pool</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">connect</span>::{<span class="ident">Connect</span>, <span class="ident">HttpConnector</span>};
@@ -792,7 +790,7 @@
 <span class="kw">mod</span> <span class="ident">tests</span>;
 
 <span class="doccomment">/// A Client to make outgoing HTTP requests.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">B</span> <span class="op">=</span> <span class="ident">proto</span>::<span class="ident">Body</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">B</span> <span class="op">=</span> <span class="ident">Body</span><span class="op">&gt;</span> {
     <span class="ident">connector</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
     <span class="ident">executor</span>: <span class="ident">Exec</span>,
     <span class="ident">h1_writev</span>: <span class="ident">bool</span>,
@@ -801,21 +799,21 @@
     <span class="ident">set_host</span>: <span class="ident">bool</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">HttpConnector</span>, <span class="ident">proto</span>::<span class="ident">Body</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">HttpConnector</span>, <span class="ident">Body</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Create a new Client with the default config.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">handle</span>: <span class="kw-2">&amp;</span><span class="ident">Handle</span>) <span class="op">-&gt;</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">HttpConnector</span>, <span class="ident">proto</span>::<span class="ident">Body</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">handle</span>: <span class="kw-2">&amp;</span><span class="ident">Handle</span>) <span class="op">-&gt;</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">HttpConnector</span>, <span class="ident">Body</span><span class="op">&gt;</span> {
         <span class="ident">Config</span>::<span class="ident">default</span>().<span class="ident">build</span>(<span class="ident">handle</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">HttpConnector</span>, <span class="ident">proto</span>::<span class="ident">Body</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">HttpConnector</span>, <span class="ident">proto</span>::<span class="ident">Body</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">HttpConnector</span>, <span class="ident">Body</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">HttpConnector</span>, <span class="ident">Body</span><span class="op">&gt;</span> {
         <span class="ident">Client</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">Handle</span>::<span class="ident">current</span>())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">HttpConnector</span>, <span class="ident">proto</span>::<span class="ident">Body</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">HttpConnector</span>, <span class="ident">Body</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Configure a Client.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
@@ -834,7 +832,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configure</span>() <span class="op">-&gt;</span> <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">UseDefaultConnector</span>, <span class="ident">proto</span>::<span class="ident">Body</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configure</span>() <span class="op">-&gt;</span> <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">UseDefaultConnector</span>, <span class="ident">Body</span><span class="op">&gt;</span> {
         <span class="ident">Config</span>::<span class="ident">default</span>()
     }
 }
@@ -857,7 +855,7 @@
 <span class="kw">where</span> <span class="ident">C</span>: <span class="ident">Connect</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
       <span class="ident">C</span>::<span class="ident">Transport</span>: <span class="lifetime">&#39;static</span>,
       <span class="ident">C</span>::<span class="ident">Future</span>: <span class="lifetime">&#39;static</span>,
-      <span class="ident">B</span>: <span class="ident">Entity</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+      <span class="ident">B</span>: <span class="ident">Payload</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
       <span class="ident">B</span>::<span class="ident">Data</span>: <span class="ident">Send</span>,
 {
 
@@ -865,16 +863,16 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Note</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This requires that the `Entity` type have a `Default` implementation.</span>
+    <span class="doccomment">/// This requires that the `Payload` type have a `Default` implementation.</span>
     <span class="doccomment">/// It *should* return an &quot;empty&quot; version of itself, such that</span>
-    <span class="doccomment">/// `Entity::is_end_stream` is `true`.</span>
+    <span class="doccomment">/// `Payload::is_end_stream` is `true`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="ident">Uri</span>) <span class="op">-&gt;</span> <span class="ident">FutureResponse</span>
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">Default</span>,
     {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">B</span>::<span class="ident">default</span>();
         <span class="kw">if</span> <span class="op">!</span><span class="ident">body</span>.<span class="ident">is_end_stream</span>() {
-            <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;default Entity used for get() does not return true for is_end_stream&quot;</span>);
+            <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;default Payload used for get() does not return true for is_end_stream&quot;</span>);
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Request</span>::<span class="ident">new</span>(<span class="ident">body</span>);
@@ -1049,7 +1047,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Service</span> <span class="kw">for</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">B</span><span class="op">&gt;</span>
 <span class="kw">where</span> <span class="ident">C</span>: <span class="ident">Connect</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
       <span class="ident">C</span>::<span class="ident">Future</span>: <span class="lifetime">&#39;static</span>,
-      <span class="ident">B</span>: <span class="ident">Entity</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+      <span class="ident">B</span>: <span class="ident">Payload</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
       <span class="ident">B</span>::<span class="ident">Data</span>: <span class="ident">Send</span>,
 {
     <span class="kw">type</span> <span class="ident">Request</span> <span class="op">=</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>;
@@ -1112,7 +1110,7 @@
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="ident">Connect</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">C</span>::<span class="ident">Future</span>: <span class="lifetime">&#39;static</span>,
-    <span class="ident">B</span>: <span class="ident">Entity</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="ident">B</span>: <span class="ident">Payload</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">B</span>::<span class="ident">Data</span>: <span class="ident">Send</span>,
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>;
@@ -1202,10 +1200,10 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UseDefaultConnector</span>(());
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">UseDefaultConnector</span>, <span class="ident">proto</span>::<span class="ident">Body</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">UseDefaultConnector</span>, <span class="ident">proto</span>::<span class="ident">Body</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">UseDefaultConnector</span>, <span class="ident">Body</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">UseDefaultConnector</span>, <span class="ident">Body</span><span class="op">&gt;</span> {
         <span class="ident">Config</span> {
-            <span class="ident">_body_type</span>: <span class="ident">PhantomData</span>::<span class="op">&lt;</span><span class="ident">proto</span>::<span class="ident">Body</span><span class="op">&gt;</span>,
+            <span class="ident">_body_type</span>: <span class="ident">PhantomData</span>::<span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>,
             <span class="ident">connector</span>: <span class="ident">UseDefaultConnector</span>(()),
             <span class="ident">keep_alive</span>: <span class="bool-val">true</span>,
             <span class="ident">keep_alive_timeout</span>: <span class="prelude-val">Some</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">90</span>)),
@@ -1324,7 +1322,7 @@
 <span class="kw">where</span> <span class="ident">C</span>: <span class="ident">Connect</span>,
       <span class="ident">C</span>::<span class="ident">Transport</span>: <span class="lifetime">&#39;static</span>,
       <span class="ident">C</span>::<span class="ident">Future</span>: <span class="lifetime">&#39;static</span>,
-      <span class="ident">B</span>: <span class="ident">Entity</span> <span class="op">+</span> <span class="ident">Send</span>,
+      <span class="ident">B</span>: <span class="ident">Payload</span> <span class="op">+</span> <span class="ident">Send</span>,
       <span class="ident">B</span>::<span class="ident">Data</span>: <span class="ident">Send</span>,
 {
     <span class="doccomment">/// Construct the Client with this configuration.</span>
@@ -1347,7 +1345,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">UseDefaultConnector</span>, <span class="ident">B</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">B</span>: <span class="ident">Entity</span> <span class="op">+</span> <span class="ident">Send</span>,
+    <span class="ident">B</span>: <span class="ident">Payload</span> <span class="op">+</span> <span class="ident">Send</span>,
     <span class="ident">B</span>::<span class="ident">Data</span>: <span class="ident">Send</span>,
 {
     <span class="doccomment">/// Construct the Client with this configuration.</span>

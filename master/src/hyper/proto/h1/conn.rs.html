@@ -1182,6 +1182,7 @@
 <span id="1126">1126</span>
 <span id="1127">1127</span>
 <span id="1128">1128</span>
+<span id="1129">1129</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="self">self</span>};
@@ -1193,7 +1194,8 @@
 <span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">Method</span>, <span class="ident">Version</span>};
 <span class="kw">use</span> <span class="ident">tokio_io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
 
-<span class="kw">use</span> <span class="ident">proto</span>::{<span class="ident">BodyLength</span>, <span class="ident">Chunk</span>, <span class="ident">Decode</span>, <span class="ident">Http1Transaction</span>, <span class="ident">MessageHead</span>};
+<span class="kw">use</span> ::<span class="ident">Chunk</span>;
+<span class="kw">use</span> <span class="ident">proto</span>::{<span class="ident">BodyLength</span>, <span class="ident">Decode</span>, <span class="ident">Http1Transaction</span>, <span class="ident">MessageHead</span>};
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">io</span>::{<span class="ident">Cursor</span>, <span class="ident">Buffered</span>};
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">EncodedBuf</span>, <span class="ident">Encoder</span>, <span class="ident">Decoder</span>};
 

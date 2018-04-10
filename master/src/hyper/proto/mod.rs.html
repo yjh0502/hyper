@@ -184,10 +184,6 @@
 <span id="128">128</span>
 <span id="129">129</span>
 <span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Pieces pertaining to the HTTP message protocol.</span>
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">BytesMut</span>;
@@ -195,12 +191,8 @@
 
 <span class="kw">use</span> <span class="ident">headers</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">body</span>::<span class="ident">Body</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">chunk</span>::<span class="ident">Chunk</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="self">self</span>::<span class="ident">h1</span>::{<span class="ident">dispatch</span>, <span class="ident">Conn</span>};
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">body</span>;
-<span class="kw">mod</span> <span class="ident">chunk</span>;
 <span class="kw">mod</span> <span class="ident">h1</span>;
 <span class="comment">//mod h2;</span>
 

@@ -59,7 +59,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/hyper/proto/body.rs.html#1-498' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/hyper/body.rs.html#1-444' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Streaming bodies for Requests and Responses</p>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
@@ -67,15 +67,7 @@
                            <td><a class="struct" href="struct.Body.html"
                                   title='struct hyper::body::Body'>Body</a></td>
                            <td class='docblock-short'>
-                                <p>An <code>Entity</code> of <code>Chunk</code>s, used when receiving bodies.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.EntityStream.html"
-                                  title='struct hyper::body::EntityStream'>EntityStream</a></td>
-                           <td class='docblock-short'>
-                                <p>A wrapper to consume an <code>Entity</code> as a futures <code>Stream</code>.</p>
+                                <p>A <code>Payload</code> of <code>Chunk</code>s, used when receiving bodies.</p>
 
                            </td>
                        </tr>
@@ -89,8 +81,8 @@
                        </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class="trait" href="trait.Entity.html"
-                                  title='trait hyper::body::Entity'>Entity</a></td>
+                           <td><a class="trait" href="trait.Payload.html"
+                                  title='trait hyper::body::Payload'>Payload</a></td>
                            <td class='docblock-short'>
                                 <p>This trait represents a streaming body of a <code>Request</code> or <code>Response</code>.</p>
 
