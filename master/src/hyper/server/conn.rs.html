@@ -175,7 +175,6 @@
 <span id="119">119</span>
 <span id="120">120</span>
 <span id="121">121</span>
-<span id="122">122</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Lower-level Server connection API.</span>
 <span class="doccomment">//!</span>
@@ -191,8 +190,7 @@
 
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">Bytes</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Future</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">task</span>;
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
+<span class="kw">use</span> <span class="ident">tokio_io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
 
 <span class="kw">use</span> <span class="ident">proto</span>;
 <span class="kw">use</span> <span class="ident">proto</span>::<span class="ident">body</span>::{<span class="ident">Body</span>, <span class="ident">Entity</span>};
@@ -269,8 +267,8 @@
     <span class="doccomment">/// upgrade. Once the upgrade is completed, the connection would be &quot;done&quot;,</span>
     <span class="doccomment">/// but it is not desired to actally shutdown the IO object. Instead you</span>
     <span class="doccomment">/// would take it back using `into_parts`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_without_shutdown</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">poll_without_shutdown</span>(<span class="ident">cx</span>));
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_without_shutdown</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">poll_without_shutdown</span>());
         <span class="prelude-val">Ok</span>(().<span class="ident">into</span>())
     }
 }
@@ -283,8 +281,8 @@
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> ();
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">poll</span>(<span class="ident">cx</span>)
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">poll</span>()
     }
 }
 

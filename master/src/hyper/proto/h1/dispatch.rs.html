@@ -571,22 +571,17 @@
 <span id="515">515</span>
 <span id="516">516</span>
 <span id="517">517</span>
-<span id="518">518</span>
-<span id="519">519</span>
-<span id="520">520</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
 
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">Bytes</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Future</span>, <span class="ident">Poll</span>, <span class="ident">Stream</span>};
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">task</span>;
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
 <span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">Request</span>, <span class="ident">Response</span>, <span class="ident">StatusCode</span>};
+<span class="kw">use</span> <span class="ident">tokio_io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
+<span class="kw">use</span> <span class="ident">tokio_service</span>::<span class="ident">Service</span>;
 
 <span class="kw">use</span> <span class="ident">proto</span>::<span class="ident">body</span>::<span class="ident">Entity</span>;
 <span class="kw">use</span> <span class="ident">proto</span>::{<span class="ident">Body</span>, <span class="ident">BodyLength</span>, <span class="ident">Conn</span>, <span class="ident">Http1Transaction</span>, <span class="ident">MessageHead</span>, <span class="ident">RequestHead</span>, <span class="ident">RequestLine</span>, <span class="ident">ResponseHead</span>};
-
-<span class="kw">use</span> ::<span class="ident">service</span>::<span class="ident">Service</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Dispatcher</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">Bs</span>, <span class="ident">I</span>, <span class="ident">B</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">conn</span>: <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">B</span>, <span class="ident">T</span><span class="op">&gt;</span>,
@@ -600,9 +595,9 @@
     <span class="kw">type</span> <span class="ident">PollItem</span>;
     <span class="kw">type</span> <span class="ident">PollBody</span>;
     <span class="kw">type</span> <span class="ident">RecvItem</span>;
-    <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">PollBody</span><span class="op">&gt;</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>, <span class="ident">msg</span>: ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">RecvItem</span>, <span class="ident">Body</span>)<span class="op">&gt;</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">PollBody</span><span class="op">&gt;</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">RecvItem</span>, <span class="ident">Body</span>)<span class="op">&gt;</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span>;
     <span class="kw">fn</span> <span class="ident">should_poll</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span>;
 }
 
@@ -648,57 +643,57 @@
 
     <span class="doccomment">/// The &quot;Future&quot; poll function. Runs this dispatcher until the</span>
     <span class="doccomment">/// connection is shutdown, or an error occurs.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_until_shutdown</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">poll_catch</span>(<span class="ident">cx</span>, <span class="bool-val">true</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_until_shutdown</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">poll_catch</span>(<span class="bool-val">true</span>)
     }
 
     <span class="doccomment">/// Run this dispatcher until HTTP says this connection is done,</span>
     <span class="doccomment">/// but don&#39;t call `AsyncWrite::shutdown` on the underlying IO.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is useful for HTTP upgrades.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_without_shutdown</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">poll_catch</span>(<span class="ident">cx</span>, <span class="bool-val">false</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_without_shutdown</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">poll_catch</span>(<span class="bool-val">false</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_catch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>, <span class="ident">should_shutdown</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">poll_inner</span>(<span class="ident">cx</span>, <span class="ident">should_shutdown</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
+    <span class="kw">fn</span> <span class="ident">poll_catch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">should_shutdown</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">poll_inner</span>(<span class="ident">should_shutdown</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
             <span class="comment">// An error means we&#39;re shutting down either way.</span>
             <span class="comment">// We just try to give the error to the user,</span>
             <span class="comment">// and close the connection with an Ok. If we</span>
             <span class="comment">// cannot give it to the user, then return the Err.</span>
-            <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">recv_msg</span>(<span class="ident">cx</span>, <span class="prelude-val">Err</span>(<span class="ident">e</span>)).<span class="ident">map</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>)
+            <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">recv_msg</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)).<span class="ident">map</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>)
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_inner</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>, <span class="ident">should_shutdown</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">poll_read</span>(<span class="ident">cx</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">poll_write</span>(<span class="ident">cx</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">poll_flush</span>(<span class="ident">cx</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">poll_inner</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">should_shutdown</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">poll_read</span>()<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">poll_write</span>()<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">poll_flush</span>()<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_done</span>() {
             <span class="kw">if</span> <span class="ident">should_shutdown</span> {
-                <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">shutdown</span>(<span class="ident">cx</span>));
+                <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">shutdown</span>());
             }
             <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">take_error</span>()<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()))
         } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Pending</span>)
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
             } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">can_read_head</span>() {
-                <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">poll_read_head</span>(<span class="ident">cx</span>));
+                <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">poll_read_head</span>());
             } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">body</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">body_tx</span>.<span class="ident">take</span>() {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">can_read_body</span>() {
-                    <span class="kw">match</span> <span class="ident">body</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>) {
+                    <span class="kw">match</span> <span class="ident">body</span>.<span class="ident">poll_ready</span>() {
                         <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(())) <span class="op">=&gt;</span> (),
-                        <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Pending</span>) <span class="op">=&gt;</span> {
+                        <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> {
                             <span class="self">self</span>.<span class="ident">body_tx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">body</span>);
-                            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Pending</span>);
+                            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>);
                         },
                         <span class="prelude-val">Err</span>(<span class="ident">_canceled</span>) <span class="op">=&gt;</span> {
                             <span class="comment">// user doesn&#39;t care about the body</span>
@@ -708,7 +703,7 @@
                             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
                         }
                     }
-                    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">read_body</span>(<span class="ident">cx</span>) {
+                    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">read_body</span>() {
                         <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">chunk</span>))) <span class="op">=&gt;</span> {
                             <span class="kw">match</span> <span class="ident">body</span>.<span class="ident">send_data</span>(<span class="ident">chunk</span>) {
                                 <span class="prelude-val">Ok</span>(()) <span class="op">=&gt;</span> {
@@ -726,9 +721,9 @@
                         <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>)) <span class="op">=&gt;</span> {
                             <span class="comment">// just drop, the body will close automatically</span>
                         },
-                        <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Pending</span>) <span class="op">=&gt;</span> {
+                        <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> {
                             <span class="self">self</span>.<span class="ident">body_tx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">body</span>);
-                            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Pending</span>);
+                            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>);
                         }
                         <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> {
                             <span class="ident">body</span>.<span class="ident">send_error</span>(::<span class="ident">Error</span>::<span class="ident">Io</span>(<span class="ident">e</span>));
@@ -738,16 +733,16 @@
                     <span class="comment">// just drop, the body will close automatically</span>
                 }
             } <span class="kw">else</span> {
-                <span class="kw">return</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">read_keep_alive</span>(<span class="ident">cx</span>).<span class="ident">map</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>);
+                <span class="kw">return</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">read_keep_alive</span>().<span class="ident">map</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>);
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_read_head</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_read_head</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="comment">// can dispatch receive, or does it still care about, an incoming message?</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>) {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">poll_ready</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(())) <span class="op">=&gt;</span> (),
-            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Pending</span>) <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;dispatch not ready when conn is&quot;</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;dispatch not ready when conn is&quot;</span>),
             <span class="prelude-val">Err</span>(()) <span class="op">=&gt;</span> {
                 <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;dispatch no longer receiving messages&quot;</span>);
                 <span class="self">self</span>.<span class="ident">close</span>();
@@ -755,27 +750,27 @@
             }
         }
         <span class="comment">// dispatch is ready for a message, try to read one</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">read_head</span>(<span class="ident">cx</span>) {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">read_head</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">has_body</span>)))) <span class="op">=&gt;</span> {
                 <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">has_body</span> {
                     <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">Body</span>::<span class="ident">channel</span>();
-                    <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>); <span class="comment">// register this task if rx is dropped</span>
+                    <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">poll_ready</span>(); <span class="comment">// register this task if rx is dropped</span>
                     <span class="self">self</span>.<span class="ident">body_tx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tx</span>);
                     <span class="ident">rx</span>
                 } <span class="kw">else</span> {
                     <span class="ident">Body</span>::<span class="ident">empty</span>()
                 };
-                <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">recv_msg</span>(<span class="ident">cx</span>, <span class="prelude-val">Ok</span>((<span class="ident">head</span>, <span class="ident">body</span>)))<span class="question-mark">?</span>;
+                <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">recv_msg</span>(<span class="prelude-val">Ok</span>((<span class="ident">head</span>, <span class="ident">body</span>)))<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()))
             },
             <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>)) <span class="op">=&gt;</span> {
                 <span class="comment">// read eof, conn will start to shutdown automatically</span>
                 <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()))
             }
-            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Pending</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Pending</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>),
             <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=&gt;</span> {
                 <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;read_head error: {}&quot;</span>, <span class="ident">err</span>);
-                <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">recv_msg</span>(<span class="ident">cx</span>, <span class="prelude-val">Err</span>(<span class="ident">err</span>))<span class="question-mark">?</span>;
+                <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">recv_msg</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>))<span class="question-mark">?</span>;
                 <span class="comment">// if here, the dispatcher gave the user the error</span>
                 <span class="comment">// somewhere else. we still need to shutdown, but</span>
                 <span class="comment">// not as a second error.</span>
@@ -784,12 +779,12 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
             } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">body_rx</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">can_write_head</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">should_poll</span>() {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">body</span>)) <span class="op">=</span> <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">poll_msg</span>(<span class="ident">cx</span>)) {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">body</span>)) <span class="op">=</span> <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">poll_msg</span>()) {
                     <span class="kw">let</span> <span class="ident">body_type</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">body</span><span class="op">|</span> {
                         <span class="ident">body</span>.<span class="ident">content_length</span>()
                             .<span class="ident">map</span>(<span class="ident">BodyLength</span>::<span class="ident">Known</span>)
@@ -802,27 +797,27 @@
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
                 }
             } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">can_buffer_body</span>() {
-                <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">poll_flush</span>(<span class="ident">cx</span>));
+                <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">poll_flush</span>());
             } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">body</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">body_rx</span>.<span class="ident">take</span>() {
-                <span class="kw">let</span> <span class="ident">chunk</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">body</span>.<span class="ident">poll_data</span>(<span class="ident">cx</span>)<span class="question-mark">?</span> {
+                <span class="kw">let</span> <span class="ident">chunk</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">body</span>.<span class="ident">poll_data</span>()<span class="question-mark">?</span> {
                     <span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">chunk</span>)) <span class="op">=&gt;</span> {
                         <span class="self">self</span>.<span class="ident">body_rx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">body</span>);
                         <span class="ident">chunk</span>
                     },
                     <span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>) <span class="op">=&gt;</span> {
                         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">can_write_body</span>() {
-                            <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">write_body</span>(<span class="ident">cx</span>,  <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+                            <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">write_body</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
                         }
                         <span class="kw">continue</span>;
                     },
-                    <span class="ident">Async</span>::<span class="ident">Pending</span> <span class="op">=&gt;</span> {
+                    <span class="ident">Async</span>::<span class="ident">NotReady</span> <span class="op">=&gt;</span> {
                         <span class="self">self</span>.<span class="ident">body_rx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">body</span>);
-                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Pending</span>);
+                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>);
                     }
                 };
 
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">can_write_body</span>() {
-                    <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">write_body</span>(<span class="ident">cx</span>, <span class="prelude-val">Some</span>(<span class="ident">chunk</span>))<span class="question-mark">?</span>;
+                    <span class="macro">assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">write_body</span>(<span class="prelude-val">Some</span>(<span class="ident">chunk</span>))<span class="question-mark">?</span>.<span class="ident">is_ready</span>());
                 <span class="comment">// This allows when chunk is `None`, or `Some([])`.</span>
                 } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">chunk</span>.<span class="ident">as_ref</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> {
                     <span class="comment">// ok</span>
@@ -830,13 +825,13 @@
                     <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;unexpected chunk when body cannot write&quot;</span>);
                 }
             } <span class="kw">else</span> {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Pending</span>);
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>);
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">flush</span>(<span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
+    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">flush</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
             <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;error writing: {}&quot;</span>, <span class="ident">err</span>);
             <span class="ident">err</span>.<span class="ident">into</span>()
         })
@@ -879,8 +874,8 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">poll_until_shutdown</span>(<span class="ident">cx</span>)
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">poll_until_shutdown</span>()
     }
 }
 
@@ -904,13 +899,13 @@
     <span class="kw">type</span> <span class="ident">PollBody</span> <span class="op">=</span> <span class="ident">Bs</span>;
     <span class="kw">type</span> <span class="ident">RecvItem</span> <span class="op">=</span> <span class="ident">RequestHead</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">PollBody</span><span class="op">&gt;</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">PollBody</span><span class="op">&gt;</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">fut</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">in_flight</span>.<span class="ident">take</span>() {
-            <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">fut</span>.<span class="ident">poll</span>(<span class="ident">cx</span>)<span class="question-mark">?</span> {
+            <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">fut</span>.<span class="ident">poll</span>()<span class="question-mark">?</span> {
                 <span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">res</span>) <span class="op">=&gt;</span> <span class="ident">res</span>,
-                <span class="ident">Async</span>::<span class="ident">Pending</span> <span class="op">=&gt;</span> {
+                <span class="ident">Async</span>::<span class="ident">NotReady</span> <span class="op">=&gt;</span> {
                     <span class="self">self</span>.<span class="ident">in_flight</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">fut</span>);
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Pending</span>);
+                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>);
                 }
             };
             <span class="kw">let</span> (<span class="ident">parts</span>, <span class="ident">body</span>) <span class="op">=</span> <span class="ident">resp</span>.<span class="ident">into_parts</span>();
@@ -930,7 +925,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>, <span class="ident">msg</span>: ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">RecvItem</span>, <span class="ident">Body</span>)<span class="op">&gt;</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">RecvItem</span>, <span class="ident">Body</span>)<span class="op">&gt;</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">msg</span>, <span class="ident">body</span>) <span class="op">=</span> <span class="ident">msg</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Request</span>::<span class="ident">new</span>(<span class="ident">body</span>);
         <span class="kw-2">*</span><span class="ident">req</span>.<span class="ident">method_mut</span>() <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">subject</span>.<span class="number">0</span>;
@@ -941,9 +936,9 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">in_flight</span>.<span class="ident">is_some</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Pending</span>)
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()))
         }
@@ -974,16 +969,16 @@
     <span class="kw">type</span> <span class="ident">PollBody</span> <span class="op">=</span> <span class="ident">B</span>;
     <span class="kw">type</span> <span class="ident">RecvItem</span> <span class="op">=</span> <span class="ident">ResponseHead</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">PollBody</span><span class="op">&gt;</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">poll_next</span>(<span class="ident">cx</span>) {
+    <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">PollBody</span><span class="op">&gt;</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">poll</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>((<span class="ident">req</span>, <span class="kw-2">mut</span> <span class="ident">cb</span>)))) <span class="op">=&gt;</span> {
                 <span class="comment">// check that future hasn&#39;t been canceled already</span>
-                <span class="kw">match</span> <span class="ident">cb</span>.<span class="ident">poll_cancel</span>(<span class="ident">cx</span>).<span class="ident">expect</span>(<span class="string">&quot;poll_cancel cannot error&quot;</span>) {
+                <span class="kw">match</span> <span class="ident">cb</span>.<span class="ident">poll_cancel</span>().<span class="ident">expect</span>(<span class="string">&quot;poll_cancel cannot error&quot;</span>) {
                     <span class="ident">Async</span>::<span class="ident">Ready</span>(()) <span class="op">=&gt;</span> {
                         <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;request canceled&quot;</span>);
                         <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>))
                     },
-                    <span class="ident">Async</span>::<span class="ident">Pending</span> <span class="op">=&gt;</span> {
+                    <span class="ident">Async</span>::<span class="ident">NotReady</span> <span class="op">=&gt;</span> {
                         <span class="kw">let</span> (<span class="ident">parts</span>, <span class="ident">body</span>) <span class="op">=</span> <span class="ident">req</span>.<span class="ident">into_parts</span>();
                         <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">RequestHead</span> {
                             <span class="ident">version</span>: <span class="ident">parts</span>.<span class="ident">version</span>,
@@ -1006,12 +1001,12 @@
                 <span class="comment">// user has dropped sender handle</span>
                 <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>))
             },
-            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Pending</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Pending</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>),
             <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;receiver cannot error&quot;</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>, <span class="ident">msg</span>: ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">RecvItem</span>, <span class="ident">Body</span>)<span class="op">&gt;</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">RecvItem</span>, <span class="ident">Body</span>)<span class="op">&gt;</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">msg</span> {
             <span class="prelude-val">Ok</span>((<span class="ident">msg</span>, <span class="ident">body</span>)) <span class="op">=&gt;</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cb</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">callback</span>.<span class="ident">take</span>() {
@@ -1029,7 +1024,7 @@
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cb</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">callback</span>.<span class="ident">take</span>() {
                     <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">cb</span>.<span class="ident">send</span>(<span class="prelude-val">Err</span>((<span class="ident">err</span>, <span class="prelude-val">None</span>)));
                     <span class="prelude-val">Ok</span>(())
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>((<span class="ident">req</span>, <span class="ident">cb</span>)))) <span class="op">=</span> <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">poll_next</span>(<span class="ident">cx</span>) {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>((<span class="ident">req</span>, <span class="ident">cb</span>)))) <span class="op">=</span> <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">poll</span>() {
                     <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;canceling queued request with connection error: {}&quot;</span>, <span class="ident">err</span>);
                     <span class="comment">// in this case, the message was never even started, so it&#39;s safe to tell</span>
                     <span class="comment">// the user that the request was completely canceled</span>
@@ -1042,14 +1037,14 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">callback</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">cb</span>) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">cb</span>.<span class="ident">poll_cancel</span>(<span class="ident">cx</span>) {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">cb</span>) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">cb</span>.<span class="ident">poll_cancel</span>() {
                 <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(())) <span class="op">=&gt;</span> {
                     <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;callback receiver has dropped&quot;</span>);
                     <span class="prelude-val">Err</span>(())
                 },
-                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Pending</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(())),
+                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(())),
                 <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;oneshot poll_cancel cannot error&quot;</span>),
             },
             <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(()),
@@ -1066,33 +1061,32 @@
     <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">pretty_env_logger</span>;
 
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">executor</span>::<span class="ident">block_on</span>;
-    <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">lazy</span>;
     <span class="kw">use</span> <span class="ident">mock</span>::<span class="ident">AsyncIo</span>;
     <span class="kw">use</span> <span class="ident">proto</span>::<span class="ident">ClientTransaction</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">client_read_bytes_before_writing_request</span>() {
         <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">pretty_env_logger</span>::<span class="ident">try_init</span>();
-        <span class="ident">block_on</span>(<span class="ident">lazy</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> {
+        ::<span class="ident">futures</span>::<span class="ident">lazy</span>(<span class="op">||</span> {
             <span class="kw">let</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">AsyncIo</span>::<span class="ident">new_buf</span>(<span class="string">b&quot;HTTP/1.1 200 OK\r\n\r\n&quot;</span>.<span class="ident">to_vec</span>(), <span class="number">100</span>);
             <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> ::<span class="ident">client</span>::<span class="ident">dispatch</span>::<span class="ident">channel</span>();
             <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Conn</span>::<span class="op">&lt;</span>_, ::<span class="ident">Chunk</span>, <span class="ident">ClientTransaction</span><span class="op">&gt;</span>::<span class="ident">new</span>(<span class="ident">io</span>);
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher</span>::<span class="ident">new</span>(<span class="ident">Client</span>::<span class="ident">new</span>(<span class="ident">rx</span>), <span class="ident">conn</span>);
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res_rx</span> <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">try_send</span>(::<span class="ident">Request</span>::<span class="ident">new</span>(::<span class="ident">Body</span>::<span class="ident">empty</span>())).<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">res_rx</span> <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">try_send</span>(::<span class="ident">Request</span>::<span class="ident">new</span>(::<span class="ident">Body</span>::<span class="ident">empty</span>())).<span class="ident">unwrap</span>();
 
-            <span class="kw">let</span> <span class="ident">a1</span> <span class="op">=</span> <span class="ident">dispatcher</span>.<span class="ident">poll</span>(<span class="ident">cx</span>).<span class="ident">expect</span>(<span class="string">&quot;error should be sent on channel&quot;</span>);
+            <span class="kw">let</span> <span class="ident">a1</span> <span class="op">=</span> <span class="ident">dispatcher</span>.<span class="ident">poll</span>().<span class="ident">expect</span>(<span class="string">&quot;error should be sent on channel&quot;</span>);
             <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">a1</span>.<span class="ident">is_ready</span>(), <span class="string">&quot;dispatcher should be closed&quot;</span>);
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">res_rx</span>.<span class="ident">poll</span>(<span class="ident">cx</span>)
-                .<span class="ident">expect</span>(<span class="string">&quot;callback poll&quot;</span>);
+            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">res_rx</span>.<span class="ident">wait</span>()
+                .<span class="ident">expect</span>(<span class="string">&quot;callback poll&quot;</span>)
+                .<span class="ident">expect_err</span>(<span class="string">&quot;callback response&quot;</span>);
 
-            <span class="kw">match</span> <span class="ident">result</span> {
-                <span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>((::<span class="ident">Error</span>::<span class="ident">Cancel</span>(_), <span class="prelude-val">Some</span>(_)))) <span class="op">=&gt;</span> (),
-                <span class="ident">other</span> <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;expected Err(Canceled), got {:?}&quot;</span>, <span class="ident">other</span>),
+            <span class="kw">match</span> <span class="ident">err</span> {
+                (::<span class="ident">Error</span>::<span class="ident">Cancel</span>(_), <span class="prelude-val">Some</span>(_)) <span class="op">=&gt;</span> (),
+                <span class="ident">other</span> <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;expected Canceled, got {:?}&quot;</span>, <span class="ident">other</span>),
             }
-            <span class="prelude-val">Ok</span>::<span class="op">&lt;</span>_, ()<span class="op">&gt;</span>(())
-        })).<span class="ident">unwrap</span>();
+            <span class="prelude-val">Ok</span>::<span class="op">&lt;</span>(), ()<span class="op">&gt;</span>(())
+        }).<span class="ident">wait</span>().<span class="ident">unwrap</span>();
     }
 }
 </pre>

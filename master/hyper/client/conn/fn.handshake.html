@@ -59,8 +59,8 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../../src/hyper/client/conn.rs.html#27-33' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn handshake&lt;T&gt;(io: T) -&gt; <a class="struct" href="../../../hyper/client/conn/struct.Handshake.html" title="struct hyper::client::conn::Handshake">Handshake</a>&lt;T, <a class="struct" href="../../../hyper/struct.Body.html" title="struct hyper::Body">Body</a>&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: AsyncRead + AsyncWrite,&nbsp;</span></pre><div class='docblock'><p>Returns a <code>Handshake</code> future over some IO.</p>
+               </span><a class='srclink' href='../../../src/hyper/client/conn.rs.html#26-32' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn handshake&lt;T&gt;(io: T) -&gt; <a class="struct" href="../../../hyper/client/conn/struct.Handshake.html" title="struct hyper::client::conn::Handshake">Handshake</a>&lt;T, <a class="struct" href="../../../hyper/struct.Body.html" title="struct hyper::Body">Body</a>&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href="https://docs.rs/tokio-io/0.1.6/tokio_io/async_read/trait.AsyncRead.html" title="trait tokio_io::async_read::AsyncRead">AsyncRead</a> + <a class="trait" href="https://docs.rs/tokio-io/0.1.6/tokio_io/async_write/trait.AsyncWrite.html" title="trait tokio_io::async_write::AsyncWrite">AsyncWrite</a>,&nbsp;</span></pre><div class='docblock'><p>Returns a <code>Handshake</code> future over some IO.</p>
 <p>This is a shortcut for <code>Builder::new().handshake(io)</code>.</p>
 </div></section>
     <section id='search' class="content hidden"></section>
