@@ -59,7 +59,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/hyper/client/mod.rs.html#1-699' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/hyper/client/mod.rs.html#1-577' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>HTTP Client</p>
 </div><h2 id='reexports' class='section-header'><a href="#reexports">Re-exports</a></h2>
 <table><tr><td><code>pub use self::connect::<a class="trait" href="../../hyper/client/connect/trait.Connect.html" title="trait hyper::client::connect::Connect">Connect</a>;</code></td></tr><tr><td><code>pub use self::connect::<a class="struct" href="../../hyper/client/connect/struct.HttpConnector.html" title="struct hyper::client::connect::HttpConnector">HttpConnector</a>;</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
@@ -82,6 +82,14 @@
                        </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                        <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Builder.html"
+                                  title='struct hyper::client::Builder'>Builder</a></td>
+                           <td class='docblock-short'>
+                                <p>Builder for a Client</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
                            <td><a class="struct" href="struct.Client.html"
                                   title='struct hyper::client::Client'>Client</a></td>
                            <td class='docblock-short'>
@@ -90,26 +98,10 @@
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="struct" href="struct.Config.html"
-                                  title='struct hyper::client::Config'>Config</a></td>
-                           <td class='docblock-short'>
-                                <p>Configuration for a Client</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
                            <td><a class="struct" href="struct.FutureResponse.html"
                                   title='struct hyper::client::FutureResponse'>FutureResponse</a></td>
                            <td class='docblock-short'>
                                 <p>A <code>Future</code> that will resolve to an HTTP Response.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.UseDefaultConnector.html"
-                                  title='struct hyper::client::UseDefaultConnector'>UseDefaultConnector</a></td>
-                           <td class='docblock-short'>
-                                <p>Phantom type used to signal that <code>Config</code> should create a <code>HttpConnector</code>.</p>
 
                            </td>
                        </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
