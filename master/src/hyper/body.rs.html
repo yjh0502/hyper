@@ -499,6 +499,32 @@
 <span id="443">443</span>
 <span id="444">444</span>
 <span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Streaming bodies for Requests and Responses</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
@@ -507,6 +533,7 @@
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">Bytes</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Future</span>, <span class="ident">Poll</span>, <span class="ident">Stream</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">sync</span>::{<span class="ident">mpsc</span>, <span class="ident">oneshot</span>};
+<span class="kw">use</span> <span class="ident">h2</span>;
 <span class="kw">use</span> <span class="ident">http</span>::<span class="ident">HeaderMap</span>;
 
 <span class="kw">use</span> <span class="ident">common</span>::<span class="ident">Never</span>;
@@ -515,9 +542,9 @@
 <span class="kw">type</span> <span class="ident">BodySender</span> <span class="op">=</span> <span class="ident">mpsc</span>::<span class="ident">Sender</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Chunk</span>, ::<span class="ident">Error</span><span class="op">&gt;&gt;</span>;
 
 <span class="doccomment">/// This trait represents a streaming body of a `Request` or `Response`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Payload</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Payload</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
     <span class="doccomment">/// A buffer of bytes representing a single chunk of a body.</span>
-    <span class="kw">type</span> <span class="ident">Data</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">Data</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>;
 
     <span class="doccomment">/// The error type of this stream.</span>
     <span class="kw">type</span> <span class="ident">Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>;
@@ -609,6 +636,7 @@
         <span class="ident">_close_tx</span>: <span class="ident">oneshot</span>::<span class="ident">Sender</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
         <span class="ident">rx</span>: <span class="ident">mpsc</span>::<span class="ident">Receiver</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Chunk</span>, ::<span class="ident">Error</span><span class="op">&gt;&gt;</span>,
     },
+    <span class="ident">H2</span>(<span class="ident">h2</span>::<span class="ident">RecvStream</span>),
     <span class="ident">Wrapped</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Chunk</span>, <span class="ident">Error</span><span class="op">=</span><span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>),
     <span class="ident">Once</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Chunk</span><span class="op">&gt;</span>),
     <span class="ident">Empty</span>,
@@ -721,6 +749,10 @@
         }
     }
 
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">h2</span>(<span class="ident">recv</span>: <span class="ident">h2</span>::<span class="ident">RecvStream</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">Body</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">H2</span>(<span class="ident">recv</span>))
+    }
+
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">delayed_eof</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">fut</span>: <span class="ident">DelayEofUntil</span>) {
         <span class="self">self</span>.<span class="ident">delayed_eof</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DelayEof</span>::<span class="ident">NotEof</span>(<span class="ident">fut</span>));
     }
@@ -771,6 +803,17 @@
                 <span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>)),
                 <span class="ident">Async</span>::<span class="ident">NotReady</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>),
             },
+            <span class="ident">Kind</span>::<span class="ident">H2</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">h2</span>) <span class="op">=&gt;</span> {
+                <span class="ident">h2</span>.<span class="ident">poll</span>()
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">async</span><span class="op">|</span> {
+                        <span class="ident">async</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">opt</span><span class="op">|</span> {
+                            <span class="ident">opt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">bytes</span><span class="op">|</span> {
+                                <span class="ident">Chunk</span>::<span class="ident">h2</span>(<span class="ident">bytes</span>, <span class="ident">h2</span>.<span class="ident">release_capacity</span>())
+                            })
+                        })
+                    })
+                    .<span class="ident">map_err</span>(::<span class="ident">Error</span>::<span class="ident">new_body</span>)
+            },
             <span class="ident">Kind</span>::<span class="ident">Wrapped</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">s</span>) <span class="op">=&gt;</span> <span class="ident">s</span>.<span class="ident">poll</span>().<span class="ident">map_err</span>(::<span class="ident">Error</span>::<span class="ident">new_body</span>),
             <span class="ident">Kind</span>::<span class="ident">Once</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">val</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">val</span>.<span class="ident">take</span>())),
             <span class="ident">Kind</span>::<span class="ident">Empty</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>)),
@@ -793,9 +836,17 @@
         <span class="self">self</span>.<span class="ident">poll_eof</span>()
     }
 
+    <span class="kw">fn</span> <span class="ident">poll_trailers</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderMap</span><span class="op">&gt;</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
+            <span class="ident">Kind</span>::<span class="ident">H2</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">h2</span>) <span class="op">=&gt;</span> <span class="ident">h2</span>.<span class="ident">poll_trailers</span>().<span class="ident">map_err</span>(::<span class="ident">Error</span>::<span class="ident">new_h2</span>),
+            _ <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>)),
+        }
+    }
+
     <span class="kw">fn</span> <span class="ident">is_end_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
             <span class="ident">Kind</span>::<span class="ident">Chan</span> { .. } <span class="op">=&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Kind</span>::<span class="ident">H2</span>(..) <span class="op">=&gt;</span> <span class="bool-val">false</span>,
             <span class="ident">Kind</span>::<span class="ident">Wrapped</span>(..) <span class="op">=&gt;</span> <span class="bool-val">false</span>,
             <span class="ident">Kind</span>::<span class="ident">Once</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) <span class="op">=&gt;</span> <span class="ident">val</span>.<span class="ident">is_none</span>(),
             <span class="ident">Kind</span>::<span class="ident">Empty</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>
@@ -805,6 +856,7 @@
     <span class="kw">fn</span> <span class="ident">content_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
             <span class="ident">Kind</span>::<span class="ident">Chan</span> { .. } <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Kind</span>::<span class="ident">H2</span>(..) <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
             <span class="ident">Kind</span>::<span class="ident">Wrapped</span>(..) <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
             <span class="ident">Kind</span>::<span class="ident">Once</span>(<span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">val</span>)) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>),
             <span class="ident">Kind</span>::<span class="ident">Once</span>(<span class="prelude-val">None</span>) <span class="op">=&gt;</span> <span class="prelude-val">None</span>,

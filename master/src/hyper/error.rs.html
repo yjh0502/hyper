@@ -375,6 +375,17 @@
 <span id="319">319</span>
 <span id="320">320</span>
 <span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Error and Result module.</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
@@ -432,6 +443,9 @@
     <span class="ident">BodyUser</span>,
     <span class="doccomment">/// Error calling AsyncWrite::shutdown()</span>
     <span class="ident">Shutdown</span>,
+
+    <span class="doccomment">/// A general error from h2.</span>
+    <span class="ident">Http2</span>,
 
     <span class="doccomment">/// User tried to create a Request with bad version.</span>
     <span class="ident">UnsupportedVersion</span>,
@@ -593,6 +607,10 @@ pub(crate) enum User {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_shutdown</span>(<span class="ident">cause</span>: <span class="ident">io</span>::<span class="ident">Error</span>) <span class="op">-&gt;</span> <span class="ident">Error</span> {
         <span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">Shutdown</span>, <span class="prelude-val">Some</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">cause</span>)))
     }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_h2</span>(<span class="ident">cause</span>: ::<span class="ident">h2</span>::<span class="ident">Error</span>) <span class="op">-&gt;</span> <span class="ident">Error</span> {
+        <span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">Http2</span>, <span class="prelude-val">Some</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">cause</span>)))
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Error</span> {
@@ -637,6 +655,7 @@ pub(crate) enum User {
             <span class="ident">Kind</span>::<span class="ident">BodyWrite</span> <span class="op">=&gt;</span> <span class="string">&quot;error write a body to connection&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">BodyUser</span> <span class="op">=&gt;</span> <span class="string">&quot;error from user&#39;s Payload stream&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">Shutdown</span> <span class="op">=&gt;</span> <span class="string">&quot;error shutting down connection&quot;</span>,
+            <span class="ident">Kind</span>::<span class="ident">Http2</span> <span class="op">=&gt;</span> <span class="string">&quot;http2 general error&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">UnsupportedVersion</span> <span class="op">=&gt;</span> <span class="string">&quot;request has unsupported HTTP version&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">UnsupportedRequestMethod</span> <span class="op">=&gt;</span> <span class="string">&quot;request has unsupported HTTP method&quot;</span>,
 
@@ -697,6 +716,9 @@ pub(crate) enum User {
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">impl</span> <span class="ident">AssertSendSync</span> <span class="kw">for</span> <span class="ident">Error</span> {}
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+}
 </pre>
 </section>
     <section id='search' class="content hidden"></section>

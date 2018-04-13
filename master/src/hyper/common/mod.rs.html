@@ -56,7 +56,15 @@
 
     <section id='main' class="content"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
 </pre><pre class="rust ">
+<span class="kw">mod</span> <span class="ident">exec</span>;
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="self">self</span>::<span class="ident">exec</span>::<span class="ident">Exec</span>;
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Never</span> {}
 </pre>
