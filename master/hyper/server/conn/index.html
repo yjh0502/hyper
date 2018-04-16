@@ -59,16 +59,24 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../../src/hyper/server/conn.rs.html#1-155' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../../src/hyper/server/conn.rs.html#1-463' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Lower-level Server connection API.</p>
 <p>The types in thie module are to provide a lower-level API based around a
 single connection. Accepting a connection and binding it with a service
 are not handled at this level. This module provides the building blocks to
 customize those things externally.</p>
-<p>If don't have need to manage connections yourself, consider using the
+<p>If you don't have need to manage connections yourself, consider using the
 higher-level <a href="super">Server</a> API.</p>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.AddrIncoming.html"
+                                  title='struct hyper::server::conn::AddrIncoming'>AddrIncoming</a></td>
+                           <td class='docblock-short'>
+                                <p>A stream of connections from binding to an address.</p>
+
+                           </td>
+                       </tr>
                        <tr class=' module-item'>
                            <td><a class="struct" href="struct.Connection.html"
                                   title='struct hyper::server::conn::Connection'>Connection</a></td>
@@ -78,10 +86,26 @@ higher-level <a href="super">Server</a> API.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Http.html"
+                                  title='struct hyper::server::conn::Http'>Http</a></td>
+                           <td class='docblock-short'>
+                                <p>A lower-level configuration of the HTTP protocol.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
                            <td><a class="struct" href="struct.Parts.html"
                                   title='struct hyper::server::conn::Parts'>Parts</a></td>
                            <td class='docblock-short'>
                                 <p>Deconstructed parts of a <code>Connection</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Serve.html"
+                                  title='struct hyper::server::conn::Serve'>Serve</a></td>
+                           <td class='docblock-short'>
+                                <p>A stream mapping incoming IOs to new services.</p>
 
                            </td>
                        </tr></table></section>

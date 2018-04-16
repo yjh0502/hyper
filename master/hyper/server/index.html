@@ -33,7 +33,7 @@
     <nav class="sidebar">
         <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'>Module server</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#reexports">Re-exports</a></li><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../index.html'>hyper</a></p><script>window.sidebarCurrent = {name: 'server', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div>
+        <p class='location'>Module server</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../index.html'>hyper</a></p><script>window.sidebarCurrent = {name: 'server', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div>
     </nav>
 
     <div class="theme-picker">
@@ -59,12 +59,16 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/hyper/server/mod.rs.html#1-847' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/hyper/server/mod.rs.html#1-225' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>HTTP Server</p>
 <p>A <code>Server</code> is created to listen on a port, parse HTTP requests, and hand
 them off to a <code>Service</code>.</p>
-</div><h2 id='reexports' class='section-header'><a href="#reexports">Re-exports</a></h2>
-<table><tr><td><code>pub use self::conn::<a class="struct" href="../../hyper/server/conn/struct.Connection.html" title="struct hyper::server::conn::Connection">Connection</a>;</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+<p>There are two levels of APIs provide for constructing HTTP servers:</p>
+<ul>
+<li>The higher-level <a href="Server"><code>Server</code></a>.</li>
+<li>The lower-level <a href="conn">conn</a> module.</li>
+</ul>
+</div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
                        <tr class=' module-item'>
                            <td><a class="mod" href="conn/index.html"
@@ -76,34 +80,10 @@ them off to a <code>Service</code>.</p>
                        </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class="struct" href="struct.AddrIncoming.html"
-                                  title='struct hyper::server::AddrIncoming'>AddrIncoming</a></td>
+                           <td><a class="struct" href="struct.Builder.html"
+                                  title='struct hyper::server::Builder'>Builder</a></td>
                            <td class='docblock-short'>
-                                <p>A stream of connections from binding to an address.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.Http.html"
-                                  title='struct hyper::server::Http'>Http</a></td>
-                           <td class='docblock-short'>
-                                <p>A configuration of the HTTP protocol.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.Run.html"
-                                  title='struct hyper::server::Run'>Run</a></td>
-                           <td class='docblock-short'>
-                                <p>TODO: add docs</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.Serve.html"
-                                  title='struct hyper::server::Serve'>Serve</a></td>
-                           <td class='docblock-short'>
-                                <p>A stream mapping incoming IOs to new services.</p>
+                                <p>A builder for a <a href="Server"><code>Server</code></a>.</p>
 
                            </td>
                        </tr>
@@ -111,7 +91,7 @@ them off to a <code>Service</code>.</p>
                            <td><a class="struct" href="struct.Server.html"
                                   title='struct hyper::server::Server'>Server</a></td>
                            <td class='docblock-short'>
-                                <p>An instance of a server created through <code>Http::bind</code>.</p>
+                                <p>A listening HTTP server.</p>
 
                            </td>
                        </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
