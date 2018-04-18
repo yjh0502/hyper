@@ -846,7 +846,7 @@
     <span class="kw">fn</span> <span class="ident">is_end_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
             <span class="ident">Kind</span>::<span class="ident">Chan</span> { .. } <span class="op">=&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident">Kind</span>::<span class="ident">H2</span>(..) <span class="op">=&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Kind</span>::<span class="ident">H2</span>(<span class="kw-2">ref</span> <span class="ident">h2</span>) <span class="op">=&gt;</span> <span class="ident">h2</span>.<span class="ident">is_end_stream</span>(),
             <span class="ident">Kind</span>::<span class="ident">Wrapped</span>(..) <span class="op">=&gt;</span> <span class="bool-val">false</span>,
             <span class="ident">Kind</span>::<span class="ident">Once</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) <span class="op">=&gt;</span> <span class="ident">val</span>.<span class="ident">is_none</span>(),
             <span class="ident">Kind</span>::<span class="ident">Empty</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>

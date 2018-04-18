@@ -715,6 +715,8 @@
 <span id="659">659</span>
 <span id="660">660</span>
 <span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Client</span>
 
@@ -973,6 +975,8 @@
                     }
                 })
                 .<span class="ident">and_then</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">res</span><span class="op">|</span> {
+                    <span class="comment">// If pooled is HTTP/2, we can toss this reference immediately.</span>
+                    <span class="comment">//</span>
                     <span class="comment">// when pooled is dropped, it will try to insert back into the</span>
                     <span class="comment">// pool. To delay that, spawn a future that completes once the</span>
                     <span class="comment">// sender is ready again.</span>
@@ -981,7 +985,7 @@
                     <span class="comment">// for a new request to start.</span>
                     <span class="comment">//</span>
                     <span class="comment">// It won&#39;t be ready if there is a body to stream.</span>
-                    <span class="kw">if</span> <span class="ident">pooled</span>.<span class="ident">is_ready</span>() {
+                    <span class="kw">if</span> <span class="ident">ver</span> <span class="op">==</span> <span class="ident">Ver</span>::<span class="ident">Http2</span> <span class="op">||</span> <span class="ident">pooled</span>.<span class="ident">is_ready</span>() {
                         <span class="ident">drop</span>(<span class="ident">pooled</span>);
                     } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">res</span>.<span class="ident">body</span>().<span class="ident">is_empty</span>() {
                         <span class="kw">let</span> (<span class="ident">delayed_tx</span>, <span class="ident">delayed_rx</span>) <span class="op">=</span> <span class="ident">oneshot</span>::<span class="ident">channel</span>();

@@ -580,8 +580,8 @@ pub(crate) enum User {
         <span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">Body</span>, <span class="prelude-val">Some</span>(<span class="ident">cause</span>.<span class="ident">into</span>()))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_body_write</span>(<span class="ident">cause</span>: <span class="ident">io</span>::<span class="ident">Error</span>) <span class="op">-&gt;</span> <span class="ident">Error</span> {
-        <span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">BodyWrite</span>, <span class="prelude-val">Some</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">cause</span>)))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_body_write</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cause</span><span class="op">&gt;&gt;</span>(<span class="ident">cause</span>: <span class="ident">E</span>) <span class="op">-&gt;</span> <span class="ident">Error</span> {
+        <span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">BodyWrite</span>, <span class="prelude-val">Some</span>(<span class="ident">cause</span>.<span class="ident">into</span>()))
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_user_unsupported_version</span>() <span class="op">-&gt;</span> <span class="ident">Error</span> {
