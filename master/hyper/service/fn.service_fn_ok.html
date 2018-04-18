@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `const_service` fn in crate `hyper`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, const_service">
+    <meta name="description" content="API documentation for the Rust `service_fn_ok` fn in crate `hyper`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, service_fn_ok">
 
-    <title>hyper::server::const_service - Rust</title>
+    <title>hyper::service::service_fn_ok - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
@@ -33,7 +33,7 @@
     <nav class="sidebar">
         <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../index.html'>hyper</a>::<wbr><a href='index.html'>server</a></p><script>window.sidebarCurrent = {name: 'const_service', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'><a href='../index.html'>hyper</a>::<wbr><a href='index.html'>service</a></p><script>window.sidebarCurrent = {name: 'service_fn_ok', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
     <div class="theme-picker">
@@ -55,12 +55,21 @@
     </nav>
 
     <section id='main' class="content">
-<h1 class='fqn'><span class='in-band'>Function <a href='../index.html'>hyper</a>::<wbr><a href='index.html'>server</a>::<wbr><a class="fn" href=''>const_service</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Function <a href='../index.html'>hyper</a>::<wbr><a href='index.html'>service</a>::<wbr><a class="fn" href=''>service_fn_ok</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/hyper/server/service.rs.html#20-24' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn const_service&lt;S&gt;(service: S) -&gt; ConstService&lt;S&gt;</pre><div class='docblock'><p>Create a <code>NewService</code> by sharing references of `service.</p>
+               </span><a class='srclink' href='../../src/hyper/service/service.rs.html#76-85' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn service_fn_ok&lt;F, R, S&gt;(f: F) -&gt; ServiceFnOk&lt;F, R&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/function/trait.FnMut.html" title="trait core::ops::function::FnMut">FnMut</a>(<a class="struct" href="../../hyper/struct.Request.html" title="struct hyper::Request">Request</a>&lt;R&gt;) -&gt; <a class="struct" href="../../hyper/struct.Response.html" title="struct hyper::Response">Response</a>&lt;S&gt;,<br>&nbsp;&nbsp;&nbsp;&nbsp;S: <a class="trait" href="../../hyper/body/trait.Payload.html" title="trait hyper::body::Payload">Payload</a>,&nbsp;</span></pre><div class='docblock'><p>Create a <code>Service</code> from a function that never errors.</p>
+<h1 id="example" class="section-header"><a href="#example">Example</a></h1>
+<pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">hyper</span>::{<span class="ident">Body</span>, <span class="ident">Request</span>, <span class="ident">Response</span>};
+<span class="kw">use</span> <span class="ident">hyper</span>::<span class="ident">service</span>::<span class="ident">service_fn_ok</span>;
+
+<span class="kw">let</span> <span class="ident">service</span> <span class="op">=</span> <span class="ident">service_fn_ok</span>(<span class="op">|</span><span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">|</span> {
+    <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;request: {} {}&quot;</span>, <span class="ident">req</span>.<span class="ident">method</span>(), <span class="ident">req</span>.<span class="ident">uri</span>());
+    <span class="ident">Response</span>::<span class="ident">new</span>(<span class="ident">Body</span>::<span class="ident">from</span>(<span class="string">&quot;Hello World&quot;</span>))
+});</pre>
 </div></section>
     <section id='search' class="content hidden"></section>
 

@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `client` mod in crate `hyper`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, client">
+    <meta name="description" content="API documentation for the Rust `service` mod in crate `hyper`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, service">
 
-    <title>hyper::client - Rust</title>
+    <title>hyper::service - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
@@ -33,7 +33,7 @@
     <nav class="sidebar">
         <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'>Module client</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#reexports">Re-exports</a></li><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li></ul></div><p class='location'><a href='../index.html'>hyper</a></p><script>window.sidebarCurrent = {name: 'client', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div>
+        <p class='location'>Module service</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../index.html'>hyper</a></p><script>window.sidebarCurrent = {name: 'service', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div>
     </nav>
 
     <div class="theme-picker">
@@ -55,53 +55,67 @@
     </nav>
 
     <section id='main' class="content">
-<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>hyper</a>::<wbr><a class="mod" href=''>client</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>hyper</a>::<wbr><a class="mod" href=''>service</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/hyper/client/mod.rs.html#1-661' title='goto source code'>[src]</a></span></h1>
-<div class='docblock'><p>HTTP Client</p>
-</div><h2 id='reexports' class='section-header'><a href="#reexports">Re-exports</a></h2>
-<table><tr><td><code>pub use self::connect::<a class="trait" href="../../hyper/client/connect/trait.Connect.html" title="trait hyper::client::connect::Connect">Connect</a>;</code></td></tr><tr><td><code>pub use self::connect::<a class="struct" href="../../hyper/client/connect/struct.HttpConnector.html" title="struct hyper::client::connect::HttpConnector">HttpConnector</a>;</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+               </span><a class='srclink' href='../../src/hyper/service/mod.rs.html#1-35' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>Services and NewServices</p>
+<ul>
+<li>A <a href="Service"><code>Service</code></a> is a trait representing an asynchronous function
+of a request to a response. It's similar to
+<code>async fn(Request) -&gt; Result&lt;Response, Error&gt;</code>.</li>
+<li>A <a href="NewService"><code>NewService</code></a> is a trait creating specific instances of a
+<code>Service</code>.</li>
+</ul>
+<p>These types are conceptually similar to those in
+<a href="https://crates.io/crates/tower">tower</a>, while being specific to hyper.</p>
+<h1 id="service" class="section-header"><a href="#service">Service</a></h1>
+<p>In hyper, especially in the server setting, a <code>Service</code> is usually bound
+to a single connection. It defines how to respond to <strong>all</strong> requests that
+connection will receive.</p>
+<p>While it's possible to implement <code>Service</code> for a type manually, the helpers
+<a href="service_fn"><code>service_fn</code></a> and <a href="service_fn_ok"><code>service_fn_ok</code></a> should be
+sufficient for most cases.</p>
+<h1 id="newservice" class="section-header"><a href="#newservice">NewService</a></h1>
+<p>Since a <code>Service</code> is bound to a single connection, a <a href="::Server"><code>Server</code></a>
+needs a way to make them as it accepts connections. This is what a
+<code>NewService</code> does.</p>
+<p>Resources that need to be shared by all <code>Service</code>s can be put into a
+<code>NewService</code>, and then passed to individual <code>Service</code>s when <code>new_service</code>
+is called.</p>
+</div><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class="mod" href="conn/index.html"
-                                  title='mod hyper::client::conn'>conn</a></td>
+                           <td><a class="trait" href="trait.NewService.html"
+                                  title='trait hyper::service::NewService'>NewService</a></td>
                            <td class='docblock-short'>
-                                <p>Lower-level client connection API.</p>
+                                <p>An asynchronous constructor of <code>Service</code>s.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="mod" href="connect/index.html"
-                                  title='mod hyper::client::connect'>connect</a></td>
+                           <td><a class="trait" href="trait.Service.html"
+                                  title='trait hyper::service::Service'>Service</a></td>
                            <td class='docblock-short'>
-                                <p>The <code>Connect</code> trait, and supporting types.</p>
+                                <p>An asynchronous function from <code>Request</code> to <code>Response</code>.</p>
 
                            </td>
-                       </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+                       </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class="struct" href="struct.Builder.html"
-                                  title='struct hyper::client::Builder'>Builder</a></td>
+                           <td><a class="fn" href="fn.service_fn.html"
+                                  title='fn hyper::service::service_fn'>service_fn</a></td>
                            <td class='docblock-short'>
-                                <p>Builder for a Client</p>
+                                <p>Create a <code>Service</code> from a function.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="struct" href="struct.Client.html"
-                                  title='struct hyper::client::Client'>Client</a></td>
+                           <td><a class="fn" href="fn.service_fn_ok.html"
+                                  title='fn hyper::service::service_fn_ok'>service_fn_ok</a></td>
                            <td class='docblock-short'>
-                                <p>A Client to make outgoing HTTP requests.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.FutureResponse.html"
-                                  title='struct hyper::client::FutureResponse'>FutureResponse</a></td>
-                           <td class='docblock-short'>
-                                <p>A <code>Future</code> that will resolve to an HTTP Response.</p>
+                                <p>Create a <code>Service</code> from a function that never errors.</p>
 
                            </td>
                        </tr></table></section>

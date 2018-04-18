@@ -59,7 +59,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../../src/hyper/server/conn.rs.html#1-463' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../../src/hyper/server/conn.rs.html#1-501' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Lower-level Server connection API.</p>
 <p>The types in thie module are to provide a lower-level API based around a
 single connection. Accepting a connection and binding it with a service
@@ -74,6 +74,14 @@ higher-level <a href="super">Server</a> API.</p>
                                   title='struct hyper::server::conn::AddrIncoming'>AddrIncoming</a></td>
                            <td class='docblock-short'>
                                 <p>A stream of connections from binding to an address.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Connecting.html"
+                                  title='struct hyper::server::conn::Connecting'>Connecting</a></td>
+                           <td class='docblock-short'>
+                                <p>A future binding a <code>Service</code> to a <code>Connection</code>.</p>
 
                            </td>
                        </tr>
