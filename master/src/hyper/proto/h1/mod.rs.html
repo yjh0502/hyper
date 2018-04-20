@@ -68,12 +68,14 @@
 <span id="12">12</span>
 <span id="13">13</span>
 <span id="14">14</span>
+<span id="15">15</span>
 </pre><pre class="rust ">
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="self">self</span>::<span class="ident">conn</span>::<span class="ident">Conn</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="self">self</span>::<span class="ident">dispatch</span>::<span class="ident">Dispatcher</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">decode</span>::<span class="ident">Decoder</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">encode</span>::{<span class="ident">EncodedBuf</span>, <span class="ident">Encoder</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">io</span>::<span class="ident">Cursor</span>; <span class="comment">//TODO: move out of h1::io</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">io</span>::<span class="ident">MINIMUM_MAX_BUFFER_SIZE</span>;
 
 <span class="kw">mod</span> <span class="ident">conn</span>;
 <span class="kw">mod</span> <span class="ident">date</span>;

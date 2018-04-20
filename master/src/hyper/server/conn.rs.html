@@ -555,6 +555,14 @@
 <span id="499">499</span>
 <span id="500">500</span>
 <span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Lower-level Server connection API.</span>
 <span class="doccomment">//!</span>
@@ -706,7 +714,15 @@
     <span class="doccomment">/// Set the maximum buffer size for the connection.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is ~400kb.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Panics</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The minimum value allowed is 8192. This method panics if the passed `max` is less than the minimum.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_buf_size</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="macro">assert</span><span class="macro">!</span>(
+            <span class="ident">max</span> <span class="op">&gt;=</span> <span class="ident">proto</span>::<span class="ident">h1</span>::<span class="ident">MINIMUM_MAX_BUFFER_SIZE</span>,
+            <span class="string">&quot;the max_buf_size cannot be smaller than the minimum that h1 specifies.&quot;</span>
+        );
         <span class="self">self</span>.<span class="ident">max_buf_size</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">max</span>);
         <span class="self">self</span>
     }
