@@ -726,6 +726,31 @@
 <span id="670">670</span>
 <span id="671">671</span>
 <span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Client</span>
 
@@ -979,50 +1004,75 @@
             <span class="kw">if</span> <span class="ident">ver</span> <span class="op">==</span> <span class="ident">Ver</span>::<span class="ident">Http1</span> {
                 <span class="ident">set_relative_uri</span>(<span class="ident">req</span>.<span class="ident">uri_mut</span>(), <span class="ident">pooled</span>.<span class="ident">is_proxied</span>);
             }
-            <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">pooled</span>.<span class="ident">send_request_retryable</span>(<span class="ident">req</span>)
-                .<span class="ident">map_err</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">err</span>, <span class="ident">orig_req</span>)<span class="op">|</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">req</span>) <span class="op">=</span> <span class="ident">orig_req</span> {
-                        <span class="ident">ClientError</span>::<span class="ident">Canceled</span> {
-                            <span class="ident">connection_reused</span>: <span class="ident">conn_reused</span>,
-                            <span class="ident">reason</span>: <span class="ident">err</span>,
-                            <span class="ident">req</span>,
-                        }
-                    } <span class="kw">else</span> {
-                        <span class="ident">ClientError</span>::<span class="ident">Normal</span>(<span class="ident">err</span>)
-                    }
-                })
-                .<span class="ident">and_then</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">res</span><span class="op">|</span> {
-                    <span class="comment">// If pooled is HTTP/2, we can toss this reference immediately.</span>
-                    <span class="comment">//</span>
-                    <span class="comment">// when pooled is dropped, it will try to insert back into the</span>
-                    <span class="comment">// pool. To delay that, spawn a future that completes once the</span>
-                    <span class="comment">// sender is ready again.</span>
-                    <span class="comment">//</span>
-                    <span class="comment">// This *should* only be once the related `Connection` has polled</span>
-                    <span class="comment">// for a new request to start.</span>
-                    <span class="comment">//</span>
-                    <span class="comment">// It won&#39;t be ready if there is a body to stream.</span>
-                    <span class="kw">if</span> <span class="ident">ver</span> <span class="op">==</span> <span class="ident">Ver</span>::<span class="ident">Http2</span> <span class="op">||</span> <span class="ident">pooled</span>.<span class="ident">is_ready</span>() {
-                        <span class="ident">drop</span>(<span class="ident">pooled</span>);
-                    } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">res</span>.<span class="ident">body</span>().<span class="ident">is_empty</span>() {
-                        <span class="kw">let</span> (<span class="ident">delayed_tx</span>, <span class="ident">delayed_rx</span>) <span class="op">=</span> <span class="ident">oneshot</span>::<span class="ident">channel</span>();
-                        <span class="ident">res</span>.<span class="ident">body_mut</span>().<span class="ident">delayed_eof</span>(<span class="ident">delayed_rx</span>);
-                        <span class="ident">executor</span>.<span class="ident">execute</span>(
-                            <span class="ident">future</span>::<span class="ident">poll_fn</span>(<span class="kw">move</span> <span class="op">||</span> {
-                                <span class="ident">pooled</span>.<span class="ident">poll_ready</span>()
-                            })
-                            .<span class="ident">then</span>(<span class="kw">move</span> <span class="op">|</span>_<span class="op">|</span> {
-                                <span class="comment">// At this point, `pooled` is dropped, and had a chance</span>
-                                <span class="comment">// to insert into the pool (if conn was idle)</span>
-                                <span class="ident">drop</span>(<span class="ident">delayed_tx</span>);
-                                <span class="prelude-val">Ok</span>(())
-                            })
-                        );
-                    }
-                    <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
-                });
+            <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">pooled</span>.<span class="ident">send_request_retryable</span>(<span class="ident">req</span>);
 
-            <span class="ident">fut</span>
+            <span class="comment">// As of futures@0.1.21, there is a race condition in the mpsc</span>
+            <span class="comment">// channel, such that sending when the receiver is closing can</span>
+            <span class="comment">// result in the message being stuck inside the queue. It won&#39;t</span>
+            <span class="comment">// ever notify until the Sender side is dropped.</span>
+            <span class="comment">//</span>
+            <span class="comment">// To counteract this, we must check if our senders &#39;want&#39; channel</span>
+            <span class="comment">// has been closed after having tried to send. If so, error out...</span>
+            <span class="kw">if</span> <span class="ident">pooled</span>.<span class="ident">is_closed</span>() {
+                <span class="ident">drop</span>(<span class="ident">pooled</span>);
+                <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">fut</span>
+                    .<span class="ident">map_err</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">err</span>, <span class="ident">orig_req</span>)<span class="op">|</span> {
+                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">req</span>) <span class="op">=</span> <span class="ident">orig_req</span> {
+                            <span class="ident">ClientError</span>::<span class="ident">Canceled</span> {
+                                <span class="ident">connection_reused</span>: <span class="ident">conn_reused</span>,
+                                <span class="ident">reason</span>: <span class="ident">err</span>,
+                                <span class="ident">req</span>,
+                            }
+                        } <span class="kw">else</span> {
+                            <span class="ident">ClientError</span>::<span class="ident">Normal</span>(<span class="ident">err</span>)
+                        }
+                    });
+                <span class="ident">Either</span>::<span class="ident">A</span>(<span class="ident">fut</span>)
+            } <span class="kw">else</span> {
+                <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">fut</span>
+                    .<span class="ident">map_err</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">err</span>, <span class="ident">orig_req</span>)<span class="op">|</span> {
+                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">req</span>) <span class="op">=</span> <span class="ident">orig_req</span> {
+                            <span class="ident">ClientError</span>::<span class="ident">Canceled</span> {
+                                <span class="ident">connection_reused</span>: <span class="ident">conn_reused</span>,
+                                <span class="ident">reason</span>: <span class="ident">err</span>,
+                                <span class="ident">req</span>,
+                            }
+                        } <span class="kw">else</span> {
+                            <span class="ident">ClientError</span>::<span class="ident">Normal</span>(<span class="ident">err</span>)
+                        }
+                    })
+                    .<span class="ident">and_then</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">res</span><span class="op">|</span> {
+                        <span class="comment">// If pooled is HTTP/2, we can toss this reference immediately.</span>
+                        <span class="comment">//</span>
+                        <span class="comment">// when pooled is dropped, it will try to insert back into the</span>
+                        <span class="comment">// pool. To delay that, spawn a future that completes once the</span>
+                        <span class="comment">// sender is ready again.</span>
+                        <span class="comment">//</span>
+                        <span class="comment">// This *should* only be once the related `Connection` has polled</span>
+                        <span class="comment">// for a new request to start.</span>
+                        <span class="comment">//</span>
+                        <span class="comment">// It won&#39;t be ready if there is a body to stream.</span>
+                        <span class="kw">if</span> <span class="ident">ver</span> <span class="op">==</span> <span class="ident">Ver</span>::<span class="ident">Http2</span> <span class="op">||</span> <span class="ident">pooled</span>.<span class="ident">is_ready</span>() {
+                            <span class="ident">drop</span>(<span class="ident">pooled</span>);
+                        } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">res</span>.<span class="ident">body</span>().<span class="ident">is_empty</span>() {
+                            <span class="kw">let</span> (<span class="ident">delayed_tx</span>, <span class="ident">delayed_rx</span>) <span class="op">=</span> <span class="ident">oneshot</span>::<span class="ident">channel</span>();
+                            <span class="ident">res</span>.<span class="ident">body_mut</span>().<span class="ident">delayed_eof</span>(<span class="ident">delayed_rx</span>);
+                            <span class="ident">executor</span>.<span class="ident">execute</span>(
+                                <span class="ident">future</span>::<span class="ident">poll_fn</span>(<span class="kw">move</span> <span class="op">||</span> {
+                                    <span class="ident">pooled</span>.<span class="ident">poll_ready</span>()
+                                })
+                                .<span class="ident">then</span>(<span class="kw">move</span> <span class="op">|</span>_<span class="op">|</span> {
+                                    <span class="comment">// At this point, `pooled` is dropped, and had a chance</span>
+                                    <span class="comment">// to insert into the pool (if conn was idle)</span>
+                                    <span class="ident">drop</span>(<span class="ident">delayed_tx</span>);
+                                    <span class="prelude-val">Ok</span>(())
+                                })
+                            );
+                        }
+                        <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
+                    });
+                <span class="ident">Either</span>::<span class="ident">B</span>(<span class="ident">fut</span>)
+            }
         });
 
         <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">resp</span>)

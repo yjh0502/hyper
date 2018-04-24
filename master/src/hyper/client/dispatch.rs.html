@@ -374,30 +374,6 @@
 <span id="318">318</span>
 <span id="319">319</span>
 <span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
-<span id="335">335</span>
-<span id="336">336</span>
-<span id="337">337</span>
-<span id="338">338</span>
-<span id="339">339</span>
-<span id="340">340</span>
-<span id="341">341</span>
-<span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
 
@@ -557,37 +533,13 @@
     }
 }
 
-<span class="comment">/*
-TODO: with futures 0.2, bring this Drop back and toss Envelope
-
-The problem is, there is a bug in futures 0.1 mpsc channel, where
-even though you may call `rx.close()`, `rx.poll()` may still think
-there are messages and so should park the current task. In futures
-0.2, we can use `try_next`, and not even risk such a bug.
-
-For now, use an `Envelope` that has this drop guard logic instead.
-
-impl&lt;T, U&gt; Drop for Receiver&lt;T, U&gt; {
-    fn drop(&amp;mut self) {
-        self.taker.cancel();
-        self.inner.close();
-
-        // This poll() is safe to call in `Drop`, because we&#39;ve
-        // called, `close`, which promises that no new messages
-        // will arrive, and thus, once we reach the end, we won&#39;t
-        // see a `NotReady` (and try to park), but a Ready(None).
-        //
-        // All other variants:
-        // - Ready(None): the end. we want to stop looping
-        // - NotReady: unreachable
-        // - Err: unreachable
-        while let Ok(Async::Ready(Some((val, cb)))) = self.inner.poll() {
-            let _ = cb.send(Err((::Error::new_canceled(None::&lt;::Error&gt;), Some(val))));
-        }
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="comment">// Notify the giver about the closure first, before dropping</span>
+        <span class="comment">// the mpsc::Receiver.</span>
+        <span class="self">self</span>.<span class="ident">taker</span>.<span class="ident">cancel</span>();
     }
-
 }
-*/</span>
 
 <span class="kw">struct</span> <span class="ident">Envelope</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">Callback</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>)<span class="op">&gt;</span>);
 
