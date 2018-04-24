@@ -386,6 +386,9 @@
 <span id="330">330</span>
 <span id="331">331</span>
 <span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Error and Result module.</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
@@ -428,6 +431,7 @@
     <span class="doccomment">/// Error occurred while connecting.</span>
     <span class="ident">Connect</span>,
     <span class="doccomment">/// Error creating a TcpListener.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
     <span class="ident">Listen</span>,
     <span class="doccomment">/// Error accepting on an Incoming stream.</span>
     <span class="ident">Accept</span>,
@@ -560,6 +564,7 @@ pub(crate) enum User {
         <span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">Io</span>, <span class="prelude-val">Some</span>(<span class="ident">cause</span>.<span class="ident">into</span>()))
     }
 
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_listen</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cause</span><span class="op">&gt;&gt;</span>(<span class="ident">cause</span>: <span class="ident">E</span>) <span class="op">-&gt;</span> <span class="ident">Error</span> {
         <span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">Listen</span>, <span class="prelude-val">Some</span>(<span class="ident">cause</span>.<span class="ident">into</span>()))
     }
@@ -647,6 +652,7 @@ pub(crate) enum User {
             <span class="ident">Kind</span>::<span class="ident">Closed</span> <span class="op">=&gt;</span> <span class="string">&quot;connection closed&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">Connect</span> <span class="op">=&gt;</span> <span class="string">&quot;an error occurred trying to connect&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">Canceled</span> <span class="op">=&gt;</span> <span class="string">&quot;an operation was canceled internally before starting&quot;</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
             <span class="ident">Kind</span>::<span class="ident">Listen</span> <span class="op">=&gt;</span> <span class="string">&quot;error creating server listener&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">Accept</span> <span class="op">=&gt;</span> <span class="string">&quot;error accepting connection&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">NewService</span> <span class="op">=&gt;</span> <span class="string">&quot;calling user&#39;s new_service failed&quot;</span>,

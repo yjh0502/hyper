@@ -289,6 +289,14 @@
 <span id="233">233</span>
 <span id="234">234</span>
 <span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Server</span>
 <span class="doccomment">//!</span>
@@ -309,15 +317,14 @@
 <span class="doccomment">//! ## Example</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! extern crate futures;</span>
 <span class="doccomment">//! extern crate hyper;</span>
-<span class="doccomment">//! extern crate tokio;</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! use futures::Future;</span>
 <span class="doccomment">//! use hyper::{Body, Response, Server};</span>
 <span class="doccomment">//! use hyper::service::service_fn_ok;</span>
 <span class="doccomment">//!</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;runtime&quot;)]</span>
 <span class="doccomment">//! fn main() {</span>
+<span class="doccomment">//! # use hyper::rt::Future;</span>
 <span class="doccomment">//!     // Construct our SocketAddr to listen on...</span>
 <span class="doccomment">//!     let addr = ([127, 0, 0, 1], 3000).into();</span>
 <span class="doccomment">//!</span>
@@ -333,18 +340,20 @@
 <span class="doccomment">//!         .serve(new_service);</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     // Finally, spawn `server` onto an Executor...</span>
-<span class="doccomment">//!     tokio::run(server.map_err(|e| {</span>
+<span class="doccomment">//!     hyper::rt::run(server.map_err(|e| {</span>
 <span class="doccomment">//!         eprintln!(&quot;server error: {}&quot;, e);</span>
 <span class="doccomment">//!     }));</span>
 <span class="doccomment">//! }</span>
+<span class="doccomment">//! # #[cfg(not(feature = &quot;runtime&quot;))]</span>
+<span class="doccomment">//! # fn main() {}</span>
 <span class="doccomment">//! ```</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">conn</span>;
-<span class="kw">mod</span> <span class="ident">tcp</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">tcp</span>;
 
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">SocketAddr</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">SocketAddr</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
 
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Future</span>, <span class="ident">Stream</span>, <span class="ident">Poll</span>};
 <span class="kw">use</span> <span class="ident">tokio_io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
@@ -354,8 +363,7 @@
 <span class="comment">// Renamed `Http` as `Http_` for now so that people upgrading don&#39;t see an</span>
 <span class="comment">// error that `hyper::server::Http` is private...</span>
 <span class="kw">use</span> <span class="self">self</span>::<span class="ident">conn</span>::{<span class="ident">Http</span> <span class="kw">as</span> <span class="ident">Http_</span>, <span class="ident">SpawnAll</span>};
-<span class="comment">//use self::hyper_service::HyperService;</span>
-<span class="kw">use</span> <span class="self">self</span>::<span class="ident">tcp</span>::{<span class="ident">AddrIncoming</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">tcp</span>::{<span class="ident">AddrIncoming</span>};
 
 <span class="doccomment">/// A listening HTTP server.</span>
 <span class="doccomment">///</span>
@@ -386,6 +394,7 @@
     }
 }
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">AddrIncoming</span>, ()<span class="op">&gt;</span> {
     <span class="doccomment">/// Binds to the provided address, and returns a [`Builder`](Builder).</span>
     <span class="doccomment">///</span>
@@ -408,6 +417,7 @@
     }
 }
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">AddrIncoming</span>, <span class="ident">S</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Returns the local address that this server is bound to.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">local_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">SocketAddr</span> {
@@ -468,7 +478,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # extern crate hyper;</span>
+    <span class="doccomment">/// # fn main() {}</span>
+    <span class="doccomment">/// # #[cfg(feature = &quot;runtime&quot;)]</span>
+    <span class="doccomment">/// # fn run() {</span>
     <span class="doccomment">/// use hyper::{Body, Response, Server};</span>
     <span class="doccomment">/// use hyper::service::service_fn_ok;</span>
     <span class="doccomment">///</span>
@@ -487,6 +501,7 @@
     <span class="doccomment">///     .serve(new_service);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Finally, spawn `server` onto an Executor...</span>
+    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serve</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">new_service</span>: <span class="ident">S</span>) <span class="op">-&gt;</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>
     <span class="kw">where</span>
@@ -507,6 +522,7 @@
     }
 }
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Builder</span><span class="op">&lt;</span><span class="ident">AddrIncoming</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Set whether TCP keepalive messages are enabled on accepted connections.</span>
     <span class="doccomment">///</span>

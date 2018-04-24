@@ -717,6 +717,15 @@
 <span id="661">661</span>
 <span id="662">662</span>
 <span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Client</span>
 
@@ -736,14 +745,15 @@
 <span class="kw">use</span> <span class="ident">common</span>::<span class="ident">Exec</span>;
 <span class="kw">use</span> <span class="self">self</span>::<span class="ident">pool</span>::{<span class="ident">Pool</span>, <span class="ident">Poolable</span>, <span class="ident">Reservation</span>};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">connect</span>::{<span class="ident">Connect</span>, <span class="ident">HttpConnector</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">connect</span>::<span class="ident">Connect</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">connect</span>::<span class="ident">HttpConnector</span>;
 
 <span class="kw">use</span> <span class="self">self</span>::<span class="ident">connect</span>::<span class="ident">Destination</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">conn</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">connect</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">dispatch</span>;
-<span class="kw">mod</span> <span class="ident">dns</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">dns</span>;
 <span class="kw">mod</span> <span class="ident">pool</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span>;
@@ -759,6 +769,7 @@
     <span class="ident">ver</span>: <span class="ident">Ver</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">HttpConnector</span>, <span class="ident">Body</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Create a new Client with the default config.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -767,18 +778,22 @@
     }
 }
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">HttpConnector</span>, <span class="ident">Body</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">HttpConnector</span>, <span class="ident">Body</span><span class="op">&gt;</span> {
         <span class="ident">Client</span>::<span class="ident">new</span>()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">HttpConnector</span>, <span class="ident">Body</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">Client</span><span class="op">&lt;</span>(), <span class="ident">Body</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Configure a Client.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # extern crate hyper;</span>
+    <span class="doccomment">/// # #[cfg(feature  = &quot;runtime&quot;)]</span>
+    <span class="doccomment">/// fn run () {</span>
     <span class="doccomment">/// use hyper::Client;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let client = Client::builder()</span>
@@ -786,6 +801,8 @@
     <span class="doccomment">///     .build_http();</span>
     <span class="doccomment">/// # let infer: Client&lt;_, hyper::Body&gt; = client;</span>
     <span class="doccomment">/// # drop(infer);</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// # fn main() {}</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-&gt;</span> <span class="ident">Builder</span> {
@@ -1323,6 +1340,7 @@
     }
 
     <span class="doccomment">/// Builder a client with this configuration and the default `HttpConnector`.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_http</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">HttpConnector</span>, <span class="ident">B</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">Payload</span> <span class="op">+</span> <span class="ident">Send</span>,
