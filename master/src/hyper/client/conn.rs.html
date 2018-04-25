@@ -635,6 +635,16 @@
 <span id="635">635</span>
 <span id="636">636</span>
 <span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Lower-level client connection API.</span>
 <span class="doccomment">//!</span>
@@ -705,6 +715,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Builder</span> {
     <span class="ident">exec</span>: <span class="ident">Exec</span>,
     <span class="ident">h1_writev</span>: <span class="ident">bool</span>,
+    <span class="ident">h1_title_case_headers</span>: <span class="ident">bool</span>,
     <span class="ident">http2</span>: <span class="ident">bool</span>,
 }
 
@@ -1057,6 +1068,7 @@ impl&lt;T, B&gt; Service for SendRequest&lt;T, B&gt; {
         <span class="ident">Builder</span> {
             <span class="ident">exec</span>: <span class="ident">Exec</span>::<span class="ident">Default</span>,
             <span class="ident">h1_writev</span>: <span class="bool-val">true</span>,
+            <span class="ident">h1_title_case_headers</span>: <span class="bool-val">false</span>,
             <span class="ident">http2</span>: <span class="bool-val">false</span>,
         }
     }
@@ -1070,6 +1082,11 @@ impl&lt;T, B&gt; Service for SendRequest&lt;T, B&gt; {
 
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">h1_writev</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Builder</span> {
         <span class="self">self</span>.<span class="ident">h1_writev</span> <span class="op">=</span> <span class="ident">enabled</span>;
+        <span class="self">self</span>
+    }
+
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">h1_title_case_headers</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Builder</span> {
+        <span class="self">self</span>.<span class="ident">h1_title_case_headers</span> <span class="op">=</span> <span class="ident">enabled</span>;
         <span class="self">self</span>
     }
 
@@ -1187,6 +1204,9 @@ impl&lt;T, B&gt; Service for SendRequest&lt;T, B&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">proto</span>::<span class="ident">Conn</span>::<span class="ident">new</span>(<span class="ident">io</span>);
             <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">h1_writev</span> {
                 <span class="ident">conn</span>.<span class="ident">set_write_strategy_flatten</span>();
+            }
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">h1_title_case_headers</span> {
+                <span class="ident">conn</span>.<span class="ident">set_title_case_headers</span>();
             }
             <span class="kw">let</span> <span class="ident">cd</span> <span class="op">=</span> <span class="ident">proto</span>::<span class="ident">h1</span>::<span class="ident">dispatch</span>::<span class="ident">Client</span>::<span class="ident">new</span>(<span class="ident">rx</span>);
             <span class="kw">let</span> <span class="ident">dispatch</span> <span class="op">=</span> <span class="ident">proto</span>::<span class="ident">h1</span>::<span class="ident">Dispatcher</span>::<span class="ident">new</span>(<span class="ident">cd</span>, <span class="ident">conn</span>);

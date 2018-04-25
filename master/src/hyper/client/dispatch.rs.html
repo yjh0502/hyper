@@ -316,11 +316,7 @@
 <span id="316">316</span>
 <span id="317">317</span>
 <span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
 </pre><pre class="rust ">
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
-
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Poll</span>, <span class="ident">Stream</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">sync</span>::{<span class="ident">mpsc</span>, <span class="ident">oneshot</span>};
 <span class="kw">use</span> <span class="ident">want</span>;
@@ -368,8 +364,8 @@
 <span class="doccomment">/// Cannot poll the Giver, but can still use it to determine if the Receiver</span>
 <span class="doccomment">/// has been dropped. However, this version can be cloned.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnboundedSender</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="comment">// Only used for `is_closed`, since mpsc::UnboundedSender cannot be checked.</span>
-    <span class="ident">giver</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">want</span>::<span class="ident">Giver</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Only used for `is_closed`, since mpsc::UnboundedSender cannot be checked.</span>
+    <span class="ident">giver</span>: <span class="ident">want</span>::<span class="ident">SharedGiver</span>,
     <span class="ident">inner</span>: <span class="ident">mpsc</span>::<span class="ident">UnboundedSender</span><span class="op">&lt;</span><span class="ident">Envelope</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;&gt;</span>,
 }
 
@@ -422,7 +418,7 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unbound</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">UnboundedSender</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
         <span class="ident">UnboundedSender</span> {
-            <span class="ident">giver</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">giver</span>),
+            <span class="ident">giver</span>: <span class="self">self</span>.<span class="ident">giver</span>.<span class="ident">shared</span>(),
             <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">inner</span>,
         }
     }

@@ -695,6 +695,24 @@
 <span id="695">695</span>
 <span id="696">696</span>
 <span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
+<span id="703">703</span>
+<span id="704">704</span>
+<span id="705">705</span>
+<span id="706">706</span>
+<span id="707">707</span>
+<span id="708">708</span>
+<span id="709">709</span>
+<span id="710">710</span>
+<span id="711">711</span>
+<span id="712">712</span>
+<span id="713">713</span>
+<span id="714">714</span>
+<span id="715">715</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Client</span>
 
@@ -732,6 +750,7 @@
     <span class="ident">connector</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
     <span class="ident">executor</span>: <span class="ident">Exec</span>,
     <span class="ident">h1_writev</span>: <span class="ident">bool</span>,
+    <span class="ident">h1_title_case_headers</span>: <span class="ident">bool</span>,
     <span class="ident">pool</span>: <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">PoolClient</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;&gt;</span>,
     <span class="ident">retry_canceled_requests</span>: <span class="ident">bool</span>,
     <span class="ident">set_host</span>: <span class="ident">bool</span>,
@@ -884,6 +903,7 @@
             <span class="kw">let</span> <span class="ident">executor</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">executor</span>.<span class="ident">clone</span>();
             <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">clone</span>();
             <span class="kw">let</span> <span class="ident">h1_writev</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">h1_writev</span>;
+            <span class="kw">let</span> <span class="ident">h1_title_case_headers</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">h1_title_case_headers</span>;
             <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">clone</span>();
             <span class="kw">let</span> <span class="ident">dst</span> <span class="op">=</span> <span class="ident">Destination</span> {
                 <span class="ident">uri</span>: <span class="ident">url</span>,
@@ -895,6 +915,7 @@
                         .<span class="ident">and_then</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">io</span>, <span class="ident">connected</span>)<span class="op">|</span> {
                             <span class="ident">conn</span>::<span class="ident">Builder</span>::<span class="ident">new</span>()
                                 .<span class="ident">h1_writev</span>(<span class="ident">h1_writev</span>)
+                                .<span class="ident">h1_title_case_headers</span>(<span class="ident">h1_title_case_headers</span>)
                                 .<span class="ident">http2_only</span>(<span class="ident">pool_key</span>.<span class="number">1</span> <span class="op">==</span> <span class="ident">Ver</span>::<span class="ident">Http2</span>)
                                 .<span class="ident">handshake_no_upgrades</span>(<span class="ident">io</span>)
                                 .<span class="ident">and_then</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">tx</span>, <span class="ident">conn</span>)<span class="op">|</span> {
@@ -1033,6 +1054,7 @@
             <span class="ident">connector</span>: <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">clone</span>(),
             <span class="ident">executor</span>: <span class="self">self</span>.<span class="ident">executor</span>.<span class="ident">clone</span>(),
             <span class="ident">h1_writev</span>: <span class="self">self</span>.<span class="ident">h1_writev</span>,
+            <span class="ident">h1_title_case_headers</span>: <span class="self">self</span>.<span class="ident">h1_title_case_headers</span>,
             <span class="ident">pool</span>: <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">clone</span>(),
             <span class="ident">retry_canceled_requests</span>: <span class="self">self</span>.<span class="ident">retry_canceled_requests</span>,
             <span class="ident">set_host</span>: <span class="self">self</span>.<span class="ident">set_host</span>,
@@ -1224,6 +1246,7 @@
     <span class="ident">keep_alive</span>: <span class="ident">bool</span>,
     <span class="ident">keep_alive_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
     <span class="ident">h1_writev</span>: <span class="ident">bool</span>,
+    <span class="ident">h1_title_case_headers</span>: <span class="ident">bool</span>,
     <span class="comment">//TODO: make use of max_idle config</span>
     <span class="ident">max_idle</span>: <span class="ident">usize</span>,
     <span class="ident">retry_canceled_requests</span>: <span class="ident">bool</span>,
@@ -1238,6 +1261,7 @@
             <span class="ident">keep_alive</span>: <span class="bool-val">true</span>,
             <span class="ident">keep_alive_timeout</span>: <span class="prelude-val">Some</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">90</span>)),
             <span class="ident">h1_writev</span>: <span class="bool-val">true</span>,
+            <span class="ident">h1_title_case_headers</span>: <span class="bool-val">false</span>,
             <span class="ident">max_idle</span>: <span class="number">5</span>,
             <span class="ident">retry_canceled_requests</span>: <span class="bool-val">true</span>,
             <span class="ident">set_host</span>: <span class="bool-val">true</span>,
@@ -1278,6 +1302,17 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_writev</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">h1_writev</span> <span class="op">=</span> <span class="ident">val</span>;
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Set whether HTTP/1 connections will write header names as title case at</span>
+    <span class="doccomment">/// the socket level.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that this setting does not affect HTTP/2.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Default is false.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_title_case_headers</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">h1_title_case_headers</span> <span class="op">=</span> <span class="ident">val</span>;
         <span class="self">self</span>
     }
 
@@ -1360,6 +1395,7 @@
             <span class="ident">connector</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">connector</span>),
             <span class="ident">executor</span>: <span class="self">self</span>.<span class="ident">exec</span>.<span class="ident">clone</span>(),
             <span class="ident">h1_writev</span>: <span class="self">self</span>.<span class="ident">h1_writev</span>,
+            <span class="ident">h1_title_case_headers</span>: <span class="self">self</span>.<span class="ident">h1_title_case_headers</span>,
             <span class="ident">pool</span>: <span class="ident">Pool</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">keep_alive</span>, <span class="self">self</span>.<span class="ident">keep_alive_timeout</span>),
             <span class="ident">retry_canceled_requests</span>: <span class="self">self</span>.<span class="ident">retry_canceled_requests</span>,
             <span class="ident">set_host</span>: <span class="self">self</span>.<span class="ident">set_host</span>,
