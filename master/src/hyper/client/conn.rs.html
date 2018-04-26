@@ -643,8 +643,6 @@
 <span id="643">643</span>
 <span id="644">644</span>
 <span id="645">645</span>
-<span id="646">646</span>
-<span id="647">647</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Lower-level client connection API.</span>
 <span class="doccomment">//!</span>
@@ -1073,12 +1071,10 @@ impl&lt;T, B&gt; Service for SendRequest&lt;T, B&gt; {
         }
     }
 
-    <span class="comment">/*
-    pub(super) fn exec(&amp;mut self, exec: Exec) -&gt; &amp;mut Builder {
-        self.exec = exec;
-        self
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">exec</span>: <span class="ident">Exec</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Builder</span> {
+        <span class="self">self</span>.<span class="ident">exec</span> <span class="op">=</span> <span class="ident">exec</span>;
+        <span class="self">self</span>
     }
-    */</span>
 
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">h1_writev</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Builder</span> {
         <span class="self">self</span>.<span class="ident">h1_writev</span> <span class="op">=</span> <span class="ident">enabled</span>;
