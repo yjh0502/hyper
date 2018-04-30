@@ -823,21 +823,6 @@
 <span id="823">823</span>
 <span id="824">824</span>
 <span id="825">825</span>
-<span id="826">826</span>
-<span id="827">827</span>
-<span id="828">828</span>
-<span id="829">829</span>
-<span id="830">830</span>
-<span id="831">831</span>
-<span id="832">832</span>
-<span id="833">833</span>
-<span id="834">834</span>
-<span id="835">835</span>
-<span id="836">836</span>
-<span id="837">837</span>
-<span id="838">838</span>
-<span id="839">839</span>
-<span id="840">840</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>, <span class="ident">VecDeque</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
@@ -862,7 +847,7 @@
 <span class="comment">//</span>
 <span class="comment">// See https://github.com/hyperium/hyper/issues/1429</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">trait</span> <span class="ident">Poolable</span>: <span class="ident">Sized</span> {
-    <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">is_open</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span>;
     <span class="doccomment">/// Reserve this connection.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Allows for HTTP/2 to return a shared reservation.</span>
@@ -1077,7 +1062,7 @@
         <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">entry</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">list</span>.<span class="ident">pop</span>() {
             <span class="comment">// If the connection has been closed, or is older than our idle</span>
             <span class="comment">// timeout, simply drop it and keep looking...</span>
-            <span class="kw">if</span> <span class="ident">entry</span>.<span class="ident">value</span>.<span class="ident">is_closed</span>() {
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">entry</span>.<span class="ident">value</span>.<span class="ident">is_open</span>() {
                 <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;removing closed connection for {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">key</span>);
                 <span class="kw">continue</span>;
             }
@@ -1218,7 +1203,7 @@
 
         <span class="self">self</span>.<span class="ident">idle</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">key</span>, <span class="ident">values</span><span class="op">|</span> {
             <span class="ident">values</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">entry</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">entry</span>.<span class="ident">value</span>.<span class="ident">is_closed</span>() {
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">entry</span>.<span class="ident">value</span>.<span class="ident">is_open</span>() {
                     <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;idle interval evicting closed for {:?}&quot;</span>, <span class="ident">key</span>);
                     <span class="kw">return</span> <span class="bool-val">false</span>;
                 }
@@ -1316,7 +1301,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Poolable</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Pooled</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">take</span>() {
-            <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">is_closed</span>() {
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">value</span>.<span class="ident">is_open</span>() {
                 <span class="comment">// If we *already* know the connection is done here,</span>
                 <span class="comment">// it shouldn&#39;t be re-inserted back into the pool.</span>
                 <span class="kw">return</span>;
@@ -1360,7 +1345,7 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">rx</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">waiter</span>.<span class="ident">take</span>() {
             <span class="kw">match</span> <span class="ident">rx</span>.<span class="ident">poll</span>() {
                 <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">value</span>)) <span class="op">=&gt;</span> {
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">value</span>.<span class="ident">is_closed</span>() {
+                    <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">is_open</span>() {
                         <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">reuse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>, <span class="ident">value</span>))))
                     } <span class="kw">else</span> {
                         <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">new_canceled</span>(<span class="prelude-val">Some</span>(<span class="ident">CANCELED</span>)))
@@ -1503,29 +1488,14 @@
     <span class="kw">struct</span> <span class="ident">Uniq</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">T</span>);
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Poolable</span> <span class="kw">for</span> <span class="ident">Uniq</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-            <span class="bool-val">false</span>
+        <span class="kw">fn</span> <span class="ident">is_open</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+            <span class="bool-val">true</span>
         }
 
         <span class="kw">fn</span> <span class="ident">reserve</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Reservation</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
             <span class="ident">Reservation</span>::<span class="ident">Unique</span>(<span class="self">self</span>)
         }
     }
-
-    <span class="comment">/*
-    #[derive(Debug, PartialEq, Eq, Clone, Copy)]
-    struct Share&lt;T&gt;(T);
-
-    impl&lt;T&gt; Poolable for Share&lt;T&gt; {
-        fn is_closed(&amp;self) -&gt; bool {
-            false
-        }
-
-        fn reserve(self) -&gt; Reservation&lt;Self&gt; {
-            Reservation::Shared(self.clone(), self)
-        }
-    }
-    */</span>
 
     <span class="kw">fn</span> <span class="ident">c</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Poolable</span><span class="op">&gt;</span>(<span class="ident">key</span>: <span class="ident">Key</span>) <span class="op">-&gt;</span> <span class="ident">Connecting</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Connecting</span> {
@@ -1658,8 +1628,8 @@
     }
 
     <span class="kw">impl</span> <span class="ident">Poolable</span> <span class="kw">for</span> <span class="ident">CanClose</span> {
-        <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-            <span class="self">self</span>.<span class="ident">closed</span>
+        <span class="kw">fn</span> <span class="ident">is_open</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+            <span class="op">!</span><span class="self">self</span>.<span class="ident">closed</span>
         }
 
         <span class="kw">fn</span> <span class="ident">reserve</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Reservation</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
