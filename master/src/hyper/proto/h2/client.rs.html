@@ -143,11 +143,26 @@
 <span id="143">143</span>
 <span id="144">144</span>
 <span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">IntoBuf</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Future</span>, <span class="ident">Poll</span>, <span class="ident">Stream</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">future</span>::{<span class="self">self</span>, <span class="ident">Either</span>};
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">sync</span>::<span class="ident">oneshot</span>;
+<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">sync</span>::<span class="ident">mpsc</span>;
 <span class="kw">use</span> <span class="ident">h2</span>::<span class="ident">client</span>::{<span class="ident">Builder</span>, <span class="ident">Handshake</span>, <span class="ident">SendRequest</span>};
 <span class="kw">use</span> <span class="ident">tokio_io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
 
@@ -157,6 +172,9 @@
 <span class="kw">use</span> ::{<span class="ident">Body</span>, <span class="ident">Request</span>, <span class="ident">Response</span>};
 
 <span class="kw">type</span> <span class="ident">ClientRx</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="op">=</span> ::<span class="ident">client</span>::<span class="ident">dispatch</span>::<span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;&gt;</span>;
+<span class="doccomment">/// An mpsc channel is used to help notify the `Connection` task when *all*</span>
+<span class="doccomment">/// other handles to it have been dropped, so that it can shutdown.</span>
+<span class="kw">type</span> <span class="ident">ConnDropRef</span> <span class="op">=</span> <span class="ident">mpsc</span>::<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Never</span><span class="op">&gt;</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>
 <span class="kw">where</span>
@@ -169,7 +187,7 @@
 
 <span class="kw">enum</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">B</span>: <span class="ident">IntoBuf</span> {
     <span class="ident">Handshaking</span>(<span class="ident">Handshake</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>),
-    <span class="ident">Ready</span>(<span class="ident">SendRequest</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">oneshot</span>::<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Never</span><span class="op">&gt;</span>),
+    <span class="ident">Ready</span>(<span class="ident">SendRequest</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">ConnDropRef</span>),
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>
@@ -204,11 +222,17 @@
             <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
                 <span class="ident">State</span>::<span class="ident">Handshaking</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">h</span>) <span class="op">=&gt;</span> {
                     <span class="kw">let</span> (<span class="ident">request_tx</span>, <span class="ident">conn</span>) <span class="op">=</span> <span class="macro">try_ready</span><span class="macro">!</span>(<span class="ident">h</span>.<span class="ident">poll</span>().<span class="ident">map_err</span>(::<span class="ident">Error</span>::<span class="ident">new_h2</span>));
-                    <span class="comment">// A oneshot channel is used entirely to detect when the</span>
+                    <span class="comment">// An mpsc channel is used entirely to detect when the</span>
                     <span class="comment">// &#39;Client&#39; has been dropped. This is to get around a bug</span>
                     <span class="comment">// in h2 where dropping all SendRequests won&#39;t notify a</span>
                     <span class="comment">// parked Connection.</span>
-                    <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">oneshot</span>::<span class="ident">channel</span>();
+                    <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">mpsc</span>::<span class="ident">channel</span>(<span class="number">0</span>);
+                    <span class="kw">let</span> <span class="ident">rx</span> <span class="op">=</span> <span class="ident">rx</span>.<span class="ident">into_future</span>()
+                        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">msg</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">msg</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">never</span>) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">never</span> {},
+                            <span class="prelude-val">None</span> <span class="op">=&gt;</span> (),
+                        })
+                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="op">-&gt;</span> <span class="ident">Never</span> { <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;mpsc cannot error&quot;</span>) });
                     <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">conn</span>
                         .<span class="ident">inspect</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;connection complete&quot;</span>))
                         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;connection error: {}&quot;</span>, <span class="ident">e</span>))
@@ -219,19 +243,19 @@
                                 <span class="comment">// conn has finished either way</span>
                                 <span class="ident">Either</span>::<span class="ident">A</span>(<span class="ident">future</span>::<span class="ident">ok</span>(()))
                             },
-                            <span class="prelude-val">Err</span>(<span class="ident">Either</span>::<span class="ident">B</span>((<span class="kw">_</span>, <span class="ident">conn</span>))) <span class="op">=&gt;</span> {
-                                <span class="comment">// oneshot has been dropped, hopefully polling</span>
+                            <span class="prelude-val">Ok</span>(<span class="ident">Either</span>::<span class="ident">B</span>(((), <span class="ident">conn</span>))) <span class="op">=&gt;</span> {
+                                <span class="comment">// mpsc has been dropped, hopefully polling</span>
                                 <span class="comment">// the connection some more should start shutdown</span>
                                 <span class="comment">// and then close</span>
                                 <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;send_request dropped, starting conn shutdown&quot;</span>);
                                 <span class="ident">Either</span>::<span class="ident">B</span>(<span class="ident">conn</span>)
                             }
-                            <span class="prelude-val">Ok</span>(<span class="ident">Either</span>::<span class="ident">B</span>((<span class="ident">never</span>, <span class="kw">_</span>))) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">never</span> {},
+                            <span class="prelude-val">Err</span>(<span class="ident">Either</span>::<span class="ident">B</span>((<span class="ident">never</span>, <span class="kw">_</span>))) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">never</span> {},
                         });
                     <span class="self">self</span>.<span class="ident">executor</span>.<span class="ident">execute</span>(<span class="ident">fut</span>);
                     <span class="ident">State</span>::<span class="ident">Ready</span>(<span class="ident">request_tx</span>, <span class="ident">tx</span>)
                 },
-                <span class="ident">State</span>::<span class="ident">Ready</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">tx</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> {
+                <span class="ident">State</span>::<span class="ident">Ready</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">tx</span>, <span class="kw-2">ref</span> <span class="ident">conn_dropper</span>) <span class="op">=&gt;</span> {
                     <span class="macro">try_ready</span><span class="macro">!</span>(<span class="ident">tx</span>.<span class="ident">poll_ready</span>().<span class="ident">map_err</span>(::<span class="ident">Error</span>::<span class="ident">new_h2</span>));
                     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">poll</span>() {
                         <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>((<span class="ident">req</span>, <span class="kw-2">mut</span> <span class="ident">cb</span>)))) <span class="op">=&gt;</span> {
@@ -253,8 +277,14 @@
                                 }
                             };
                             <span class="kw">if</span> <span class="op">!</span><span class="ident">eos</span> {
-                                <span class="kw">let</span> <span class="ident">pipe</span> <span class="op">=</span> <span class="ident">PipeToSendStream</span>::<span class="ident">new</span>(<span class="ident">body</span>, <span class="ident">body_tx</span>);
-                                <span class="self">self</span>.<span class="ident">executor</span>.<span class="ident">execute</span>(<span class="ident">pipe</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;client request body error: {}&quot;</span>, <span class="ident">e</span>)));
+                                <span class="kw">let</span> <span class="ident">conn_drop_ref</span> <span class="op">=</span> <span class="ident">conn_dropper</span>.<span class="ident">clone</span>();
+                                <span class="kw">let</span> <span class="ident">pipe</span> <span class="op">=</span> <span class="ident">PipeToSendStream</span>::<span class="ident">new</span>(<span class="ident">body</span>, <span class="ident">body_tx</span>)
+                                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;client request body error: {}&quot;</span>, <span class="ident">e</span>))
+                                    .<span class="ident">then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">x</span><span class="op">|</span> {
+                                        <span class="ident">drop</span>(<span class="ident">conn_drop_ref</span>);
+                                        <span class="ident">x</span>
+                                    });
+                                <span class="self">self</span>.<span class="ident">executor</span>.<span class="ident">execute</span>(<span class="ident">pipe</span>);
                             }
 
                             <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">fut</span>
