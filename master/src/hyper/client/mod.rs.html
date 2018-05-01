@@ -721,18 +721,6 @@
 <span id="721">721</span>
 <span id="722">722</span>
 <span id="723">723</span>
-<span id="724">724</span>
-<span id="725">725</span>
-<span id="726">726</span>
-<span id="727">727</span>
-<span id="728">728</span>
-<span id="729">729</span>
-<span id="730">730</span>
-<span id="731">731</span>
-<span id="732">732</span>
-<span id="733">733</span>
-<span id="734">734</span>
-<span id="735">735</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Client</span>
 
@@ -849,14 +837,6 @@
 
     <span class="doccomment">/// Send a constructed Request using this Client.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">FutureResponse</span> {
-        <span class="comment">// TODO(0.12): do this at construction time.</span>
-        <span class="comment">//</span>
-        <span class="comment">// It cannot be done in the constructor because the Client::configured</span>
-        <span class="comment">// does not have `B: &#39;static` bounds, which are required to spawn</span>
-        <span class="comment">// the interval. In 0.12, add a static bounds to the constructor,</span>
-        <span class="comment">// and move this.</span>
-        <span class="self">self</span>.<span class="ident">schedule_pool_timer</span>();
-
         <span class="kw">match</span> <span class="ident">req</span>.<span class="ident">version</span>() {
             <span class="ident">Version</span>::<span class="ident">HTTP_10</span> <span class="op">|</span>
             <span class="ident">Version</span>::<span class="ident">HTTP_11</span> <span class="op">=&gt;</span> (),
@@ -1038,7 +1018,7 @@
                         <span class="comment">// for a new request to start.</span>
                         <span class="comment">//</span>
                         <span class="comment">// It won&#39;t be ready if there is a body to stream.</span>
-                        <span class="kw">if</span> <span class="ident">ver</span> <span class="op">==</span> <span class="ident">Ver</span>::<span class="ident">Http2</span> <span class="op">||</span> <span class="ident">pooled</span>.<span class="ident">is_ready</span>() {
+                        <span class="kw">if</span> <span class="ident">ver</span> <span class="op">==</span> <span class="ident">Ver</span>::<span class="ident">Http2</span> <span class="op">||</span> <span class="op">!</span><span class="ident">pooled</span>.<span class="ident">is_pool_enabled</span>() <span class="op">||</span> <span class="ident">pooled</span>.<span class="ident">is_ready</span>() {
                             <span class="ident">drop</span>(<span class="ident">pooled</span>);
                         } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">res</span>.<span class="ident">body</span>().<span class="ident">is_empty</span>() {
                             <span class="kw">let</span> (<span class="ident">delayed_tx</span>, <span class="ident">delayed_rx</span>) <span class="op">=</span> <span class="ident">oneshot</span>::<span class="ident">channel</span>();
@@ -1071,10 +1051,6 @@
         });
 
         <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">resp</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">schedule_pool_timer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">spawn_expired_interval</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">executor</span>);
     }
 }
 
@@ -1210,7 +1186,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Poolable</span> <span class="kw">for</span> <span class="ident">PoolClient</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">B</span>: <span class="lifetime">&#39;static</span>,
+    <span class="ident">B</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
     <span class="kw">fn</span> <span class="ident">is_open</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tx</span> {
@@ -1436,7 +1412,7 @@
             <span class="ident">executor</span>: <span class="self">self</span>.<span class="ident">exec</span>.<span class="ident">clone</span>(),
             <span class="ident">h1_writev</span>: <span class="self">self</span>.<span class="ident">h1_writev</span>,
             <span class="ident">h1_title_case_headers</span>: <span class="self">self</span>.<span class="ident">h1_title_case_headers</span>,
-            <span class="ident">pool</span>: <span class="ident">Pool</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">keep_alive</span>, <span class="self">self</span>.<span class="ident">keep_alive_timeout</span>),
+            <span class="ident">pool</span>: <span class="ident">Pool</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">keep_alive</span>, <span class="self">self</span>.<span class="ident">keep_alive_timeout</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">exec</span>),
             <span class="ident">retry_canceled_requests</span>: <span class="self">self</span>.<span class="ident">retry_canceled_requests</span>,
             <span class="ident">set_host</span>: <span class="self">self</span>.<span class="ident">set_host</span>,
             <span class="ident">ver</span>: <span class="self">self</span>.<span class="ident">ver</span>,
