@@ -721,8 +721,155 @@
 <span id="721">721</span>
 <span id="722">722</span>
 <span id="723">723</span>
+<span id="724">724</span>
+<span id="725">725</span>
+<span id="726">726</span>
+<span id="727">727</span>
+<span id="728">728</span>
+<span id="729">729</span>
+<span id="730">730</span>
+<span id="731">731</span>
+<span id="732">732</span>
+<span id="733">733</span>
+<span id="734">734</span>
+<span id="735">735</span>
+<span id="736">736</span>
+<span id="737">737</span>
+<span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Client</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! There are two levels of APIs provided for construct HTTP clients:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - The higher-level [`Client`](Client) type.</span>
+<span class="doccomment">//! - The lower-level [conn](conn) module.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Client</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The [`Client`](Client) is the main way to send HTTP requests to a server.</span>
+<span class="doccomment">//! The default `Client` provides these things on top of the lower-level API:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - A default **connector**, able to resolve hostnames and connect to</span>
+<span class="doccomment">//!   destinations over plain-text TCP.</span>
+<span class="doccomment">//! - A **pool** of existing connections, allowing better performance when</span>
+<span class="doccomment">//!   making multiple requests to the same hostname.</span>
+<span class="doccomment">//! - Automatic setting of the `Host` header, based on the request `Uri`.</span>
+<span class="doccomment">//! - Automatic request **retries** when a pooled connection is closed by the</span>
+<span class="doccomment">//!   server before any bytes have been written.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Many of these features can configured, by making use of</span>
+<span class="doccomment">//! [`Client::builder`](Client::builder).</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Example</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```no_run</span>
+<span class="doccomment">//! extern crate hyper;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! use hyper::Client;</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;runtime&quot;)]</span>
+<span class="doccomment">//! use hyper::rt::{self, lazy, Future, Stream};</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;runtime&quot;)]</span>
+<span class="doccomment">//! fn main() {</span>
+<span class="doccomment">//!     // A runtime is needed to execute our asynchronous code.</span>
+<span class="doccomment">//!     rt::run(lazy(|| {</span>
+<span class="doccomment">//!         let client = Client::new();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!         client</span>
+<span class="doccomment">//!             // Make a GET /ip to &#39;http://httpbin.org&#39;</span>
+<span class="doccomment">//!             .get(&quot;http://httpbin.org/ip&quot;.parse().unwrap())</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!             // And then, if the request gets a response...</span>
+<span class="doccomment">//!             .and_then(|res| {</span>
+<span class="doccomment">//!                 println!(&quot;status: {}&quot;, res.status());</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!                 // Concatenate the body stream into a single buffer...</span>
+<span class="doccomment">//!                 // This returns a new future, since we must stream body.</span>
+<span class="doccomment">//!                 res.into_body().concat2()</span>
+<span class="doccomment">//!             })</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!             // And then, if reading the full body succeeds...</span>
+<span class="doccomment">//!             .and_then(|body| {</span>
+<span class="doccomment">//!                 // The body is just bytes, but let&#39;s print a string...</span>
+<span class="doccomment">//!                 let s = ::std::str::from_utf8(&amp;body)</span>
+<span class="doccomment">//!                     .expect(&quot;httpbin sends utf-8 JSON&quot;);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!                 println!(&quot;body: {}&quot;, s);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!                 // and_then requires we return a new Future, and it turns</span>
+<span class="doccomment">//!                 // out that Result is a Future that is ready immediately.</span>
+<span class="doccomment">//!                 Ok(())</span>
+<span class="doccomment">//!             })</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!             // Map any errors that might have happened...</span>
+<span class="doccomment">//!             .map_err(|err| {</span>
+<span class="doccomment">//!                 println!(&quot;error: {}&quot;, err);</span>
+<span class="doccomment">//!             })</span>
+<span class="doccomment">//!     }));</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! # #[cfg(not(feature = &quot;runtime&quot;))]</span>
+<span class="doccomment">//! # fn main () {}</span>
+<span class="doccomment">//! ```</span>
 
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
@@ -738,12 +885,10 @@
 
 <span class="kw">use</span> <span class="ident">body</span>::{<span class="ident">Body</span>, <span class="ident">Payload</span>};
 <span class="kw">use</span> <span class="ident">common</span>::<span class="ident">Exec</span>;
+<span class="kw">use</span> <span class="self">self</span>::<span class="ident">connect</span>::{<span class="ident">Connect</span>, <span class="ident">Destination</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="ident">pool</span>::{<span class="ident">Pool</span>, <span class="ident">Poolable</span>, <span class="ident">Reservation</span>};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">connect</span>::<span class="ident">Connect</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">connect</span>::<span class="ident">HttpConnector</span>;
-
-<span class="kw">use</span> <span class="self">self</span>::<span class="ident">connect</span>::<span class="ident">Destination</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">conn</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">connect</span>;
@@ -768,6 +913,11 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">HttpConnector</span>, <span class="ident">Body</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Create a new Client with the default config.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Note</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The default connector does **not** handle TLS. Speaking to `https`</span>
+    <span class="doccomment">/// destinations will require configuring a connector that implements TLS.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">HttpConnector</span>, <span class="ident">Body</span><span class="op">&gt;</span> {
         <span class="ident">Builder</span>::<span class="ident">default</span>().<span class="ident">build_http</span>()
