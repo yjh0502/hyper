@@ -1000,7 +1000,7 @@ impl&lt;T, B&gt; Service for SendRequest&lt;T, B&gt; {
     <span class="doccomment">///</span>
     <span class="doccomment">/// Only works for HTTP/1 connections. HTTP/2 connections will panic.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_parts</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Parts</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">io</span>, <span class="ident">read_buf</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
+        <span class="kw">let</span> (<span class="ident">io</span>, <span class="ident">read_buf</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
             <span class="ident">Either</span>::<span class="ident">A</span>(<span class="ident">h1</span>) <span class="op">=&gt;</span> <span class="ident">h1</span>.<span class="ident">into_inner</span>(),
             <span class="ident">Either</span>::<span class="ident">B</span>(<span class="ident">_h2</span>) <span class="op">=&gt;</span> {
                 <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;http2 cannot into_inner&quot;</span>);
