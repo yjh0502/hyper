@@ -796,6 +796,16 @@
 <span id="796">796</span>
 <span id="797">797</span>
 <span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Client</span>
 <span class="doccomment">//!</span>
@@ -971,7 +981,7 @@
     <span class="doccomment">/// This requires that the `Payload` type have a `Default` implementation.</span>
     <span class="doccomment">/// It *should* return an &quot;empty&quot; version of itself, such that</span>
     <span class="doccomment">/// `Payload::is_end_stream` is `true`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="ident">Uri</span>) <span class="op">-&gt;</span> <span class="ident">FutureResponse</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="ident">Uri</span>) <span class="op">-&gt;</span> <span class="ident">ResponseFuture</span>
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">Default</span>,
     {
@@ -986,20 +996,20 @@
     }
 
     <span class="doccomment">/// Send a constructed Request using this Client.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">FutureResponse</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">ResponseFuture</span> {
         <span class="kw">match</span> <span class="ident">req</span>.<span class="ident">version</span>() {
             <span class="ident">Version</span>::<span class="ident">HTTP_10</span> <span class="op">|</span>
             <span class="ident">Version</span>::<span class="ident">HTTP_11</span> <span class="op">=&gt;</span> (),
             <span class="ident">other</span> <span class="op">=&gt;</span> {
                 <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;Request has unsupported version \&quot;{:?}\&quot;&quot;</span>, <span class="ident">other</span>);
                 <span class="comment">//TODO: replace this with a proper variant</span>
-                <span class="kw">return</span> <span class="ident">FutureResponse</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">future</span>::<span class="ident">err</span>(::<span class="ident">Error</span>::<span class="ident">new_user_unsupported_version</span>())));
+                <span class="kw">return</span> <span class="ident">ResponseFuture</span>::<span class="ident">new</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">future</span>::<span class="ident">err</span>(::<span class="ident">Error</span>::<span class="ident">new_user_unsupported_version</span>())));
             }
         }
 
         <span class="kw">if</span> <span class="ident">req</span>.<span class="ident">method</span>() <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">Method</span>::<span class="ident">CONNECT</span> {
             <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Client does not support CONNECT requests&quot;</span>);
-            <span class="kw">return</span> <span class="ident">FutureResponse</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">future</span>::<span class="ident">err</span>(::<span class="ident">Error</span>::<span class="ident">new_user_unsupported_request_method</span>())));
+            <span class="kw">return</span> <span class="ident">ResponseFuture</span>::<span class="ident">new</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">future</span>::<span class="ident">err</span>(::<span class="ident">Error</span>::<span class="ident">new_user_unsupported_request_method</span>())));
         }
 
         <span class="kw">let</span> <span class="ident">uri</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">uri</span>().<span class="ident">clone</span>();
@@ -1009,7 +1019,7 @@
             }
             <span class="kw">_</span> <span class="op">=&gt;</span> {
                 <span class="comment">//TODO: replace this with a proper variant</span>
-                <span class="kw">return</span> <span class="ident">FutureResponse</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">future</span>::<span class="ident">err</span>(::<span class="ident">Error</span>::<span class="ident">new_io</span>(
+                <span class="kw">return</span> <span class="ident">ResponseFuture</span>::<span class="ident">new</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">future</span>::<span class="ident">err</span>(::<span class="ident">Error</span>::<span class="ident">new_io</span>(
                     <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
                         <span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">InvalidInput</span>,
                         <span class="string">&quot;invalid URI for Client Request&quot;</span>
@@ -1040,7 +1050,7 @@
             <span class="ident">domain</span>: <span class="ident">domain</span>,
             <span class="ident">uri</span>: <span class="ident">uri</span>,
         };
-        <span class="ident">FutureResponse</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">fut</span>))
+        <span class="ident">ResponseFuture</span>::<span class="ident">new</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">fut</span>))
     }
 
     <span class="comment">//TODO: replace with `impl Future` when stable</span>
@@ -1228,20 +1238,30 @@
 
 <span class="doccomment">/// A `Future` that will resolve to an HTTP Response.</span>
 <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless polled&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FutureResponse</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ResponseFuture</span> {
+    <span class="ident">inner</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>,
+}
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">FutureResponse</span> {
+<span class="kw">impl</span> <span class="ident">ResponseFuture</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">fut</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">=</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">inner</span>: <span class="ident">fut</span>,
+        }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ResponseFuture</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;Future&lt;Response&gt;&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">FutureResponse</span> {
+<span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">ResponseFuture</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span>;
 
     <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">poll</span>()
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll</span>()
     }
 }
 
@@ -1503,7 +1523,7 @@
     <span class="doccomment">/// connection, and then encounters an error immediately as the idle</span>
     <span class="doccomment">/// connection was found to be unusable.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// When this is set to `false`, the related `FutureResponse` would instead</span>
+    <span class="doccomment">/// When this is set to `false`, the related `ResponseFuture` would instead</span>
     <span class="doccomment">/// resolve to an `Error::Cancel`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is `true`.</span>
