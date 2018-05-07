@@ -129,7 +129,6 @@
 <span id="129">129</span>
 <span id="130">130</span>
 <span id="131">131</span>
-<span id="132">132</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">Buf</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Future</span>, <span class="ident">Poll</span>};
@@ -138,7 +137,6 @@
 <span class="kw">use</span> <span class="ident">http</span>::<span class="ident">header</span>::{<span class="ident">CONNECTION</span>, <span class="ident">TRANSFER_ENCODING</span>};
 
 <span class="kw">use</span> ::<span class="ident">body</span>::<span class="ident">Payload</span>;
-<span class="kw">use</span> ::<span class="ident">proto</span>::<span class="ident">h1</span>::<span class="ident">Cursor</span>;
 
 <span class="kw">mod</span> <span class="ident">client</span>;
 <span class="kw">mod</span> <span class="ident">server</span>;
@@ -207,11 +205,11 @@
                     <span class="kw">let</span> <span class="ident">is_eos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">is_end_stream</span>();
                     <span class="macro">trace</span><span class="macro">!</span>(
                         <span class="string">&quot;send body chunk: {} bytes, eos={}&quot;</span>,
-                        <span class="ident">chunk</span>.<span class="ident">as_ref</span>().<span class="ident">len</span>(),
+                        <span class="ident">chunk</span>.<span class="ident">remaining</span>(),
                         <span class="ident">is_eos</span>,
                     );
 
-                    <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">SendBuf</span>(<span class="prelude-val">Some</span>(<span class="ident">Cursor</span>::<span class="ident">new</span>(<span class="ident">chunk</span>)));
+                    <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">SendBuf</span>(<span class="prelude-val">Some</span>(<span class="ident">chunk</span>));
                     <span class="self">self</span>.<span class="ident">body_tx</span>.<span class="ident">send_data</span>(<span class="ident">buf</span>, <span class="ident">is_eos</span>)
                         .<span class="ident">map_err</span>(::<span class="ident">Error</span>::<span class="ident">new_body_write</span>)<span class="question-mark">?</span>;
 
@@ -237,9 +235,9 @@
     }
 }
 
-<span class="kw">struct</span> <span class="ident">SendBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;&gt;</span>);
+<span class="kw">struct</span> <span class="ident">SendBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;&gt;</span> <span class="ident">Buf</span> <span class="kw">for</span> <span class="ident">SendBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Buf</span><span class="op">&gt;</span> <span class="ident">Buf</span> <span class="kw">for</span> <span class="ident">SendBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">remaining</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="number">0</span>

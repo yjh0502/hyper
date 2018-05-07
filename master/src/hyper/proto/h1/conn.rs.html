@@ -1129,23 +1129,12 @@
 <span id="1129">1129</span>
 <span id="1130">1130</span>
 <span id="1131">1131</span>
-<span id="1132">1132</span>
-<span id="1133">1133</span>
-<span id="1134">1134</span>
-<span id="1135">1135</span>
-<span id="1136">1136</span>
-<span id="1137">1137</span>
-<span id="1138">1138</span>
-<span id="1139">1139</span>
-<span id="1140">1140</span>
-<span id="1141">1141</span>
-<span id="1142">1142</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="self">self</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
 
-<span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">Bytes</span>;
+<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">Bytes</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">AsyncSink</span>, <span class="ident">Poll</span>, <span class="ident">StartSend</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">task</span>::<span class="ident">Task</span>;
 <span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">Method</span>, <span class="ident">Version</span>};
@@ -1153,7 +1142,7 @@
 
 <span class="kw">use</span> ::<span class="ident">Chunk</span>;
 <span class="kw">use</span> <span class="ident">proto</span>::{<span class="ident">BodyLength</span>, <span class="ident">Decode</span>, <span class="ident">Http1Transaction</span>, <span class="ident">MessageHead</span>};
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">io</span>::{<span class="ident">Cursor</span>, <span class="ident">Buffered</span>};
+<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">io</span>::{<span class="ident">Buffered</span>};
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">EncodedBuf</span>, <span class="ident">Encoder</span>, <span class="ident">Decoder</span>};
 
 
@@ -1165,25 +1154,14 @@
 <span class="doccomment">/// determine if this connection can be kept alive after the message,</span>
 <span class="doccomment">/// or if it is complete.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">B</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">io</span>: <span class="ident">Buffered</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">EncodedBuf</span><span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">io</span>: <span class="ident">Buffered</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">EncodedBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;&gt;</span>,
     <span class="ident">state</span>: <span class="ident">State</span>,
     <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 }
 
-<span class="comment">/*
-impl&lt;I, B&gt; Conn&lt;I, B, ClientTransaction&gt;
-where I: AsyncRead + AsyncWrite,
-      B: AsRef&lt;[u8]&gt;,
-{
-    pub fn new_client(io: I) -&gt; Conn&lt;I, B, ClientTransaction&gt; {
-        Conn::new(io)
-    }
-}
-*/</span>
-
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">B</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">B</span>, <span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span> <span class="ident">I</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span>,
-      <span class="ident">B</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+      <span class="ident">B</span>: <span class="ident">Buf</span>,
       <span class="ident">T</span>: <span class="ident">Http1Transaction</span>,
 {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">io</span>: <span class="ident">I</span>) <span class="op">-&gt;</span> <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">B</span>, <span class="ident">T</span><span class="op">&gt;</span> {
@@ -1631,7 +1609,7 @@ where I: AsyncRead + AsyncWrite,
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">can_buffer_body</span>() {
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Async</span>::<span class="ident">NotReady</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flush</span>()<span class="question-mark">?</span> {
                 <span class="comment">// if chunk is Some(&amp;[]), aka empty, whatever, just skip it</span>
-                <span class="kw">if</span> <span class="ident">chunk</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">as_ref</span>().<span class="ident">is_empty</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
+                <span class="kw">if</span> <span class="ident">chunk</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">remaining</span>() <span class="op">==</span> <span class="number">0</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">AsyncSink</span>::<span class="ident">Ready</span>);
                 } <span class="kw">else</span> {
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">AsyncSink</span>::<span class="ident">NotReady</span>(<span class="ident">chunk</span>));
@@ -1642,11 +1620,11 @@ where I: AsyncRead + AsyncWrite,
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> {
             <span class="ident">Writing</span>::<span class="ident">Body</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>) <span class="op">=&gt;</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">chunk</span>) <span class="op">=</span> <span class="ident">chunk</span> {
-                    <span class="kw">if</span> <span class="ident">chunk</span>.<span class="ident">as_ref</span>().<span class="ident">is_empty</span>() {
+                    <span class="kw">if</span> <span class="ident">chunk</span>.<span class="ident">remaining</span>() <span class="op">==</span> <span class="number">0</span> {
                         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">AsyncSink</span>::<span class="ident">Ready</span>);
                     }
 
-                    <span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="ident">Cursor</span>::<span class="ident">new</span>(<span class="ident">chunk</span>));
+                    <span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="ident">chunk</span>);
                     <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">buffer</span>(<span class="ident">encoded</span>);
 
                     <span class="kw">if</span> <span class="ident">encoder</span>.<span class="ident">is_eof</span>() {
@@ -1755,7 +1733,7 @@ where I: AsyncRead + AsyncWrite,
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">B</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">B</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">B</span>: <span class="ident">Buf</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">B</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Conn&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;state&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>)

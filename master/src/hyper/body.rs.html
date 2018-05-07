@@ -530,7 +530,7 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 
-<span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">Bytes</span>;
+<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">Bytes</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Future</span>, <span class="ident">Poll</span>, <span class="ident">Stream</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">sync</span>::{<span class="ident">mpsc</span>, <span class="ident">oneshot</span>};
 <span class="kw">use</span> <span class="ident">h2</span>;
@@ -547,7 +547,7 @@
 <span class="doccomment">/// don&#39;t need to customize a send stream for your own application.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Payload</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
     <span class="doccomment">/// A buffer of bytes representing a single chunk of a body.</span>
-    <span class="kw">type</span> <span class="ident">Data</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>;
+    <span class="kw">type</span> <span class="ident">Data</span>: <span class="ident">Buf</span> <span class="op">+</span> <span class="ident">Send</span>;
 
     <span class="doccomment">/// The error type of this stream.</span>
     <span class="kw">type</span> <span class="ident">Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>;
