@@ -1123,20 +1123,13 @@
 <span id="1123">1123</span>
 <span id="1124">1124</span>
 <span id="1125">1125</span>
-<span id="1126">1126</span>
-<span id="1127">1127</span>
-<span id="1128">1128</span>
-<span id="1129">1129</span>
-<span id="1130">1130</span>
-<span id="1131">1131</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="self">self</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
 
 <span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">Bytes</span>};
-<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">AsyncSink</span>, <span class="ident">Poll</span>, <span class="ident">StartSend</span>};
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">task</span>::<span class="ident">Task</span>;
+<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Poll</span>};
 <span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">Method</span>, <span class="ident">Version</span>};
 <span class="kw">use</span> <span class="ident">tokio_io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
 
@@ -1172,7 +1165,7 @@
                 <span class="ident">keep_alive</span>: <span class="ident">KA</span>::<span class="ident">Busy</span>,
                 <span class="ident">method</span>: <span class="prelude-val">None</span>,
                 <span class="ident">title_case_headers</span>: <span class="bool-val">false</span>,
-                <span class="ident">read_task</span>: <span class="prelude-val">None</span>,
+                <span class="ident">notify_read</span>: <span class="bool-val">false</span>,
                 <span class="ident">reading</span>: <span class="ident">Reading</span>::<span class="ident">Init</span>,
                 <span class="ident">writing</span>: <span class="ident">Writing</span>::<span class="ident">Init</span>,
                 <span class="comment">// We assume a modern world where the remote speaks HTTP/1.1.</span>
@@ -1370,9 +1363,7 @@
 
         <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;read_keep_alive; is_mid_message={}&quot;</span>, <span class="self">self</span>.<span class="ident">is_mid_message</span>());
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_mid_message</span>() {
-            <span class="self">self</span>.<span class="ident">maybe_park_read</span>();
-        } <span class="kw">else</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_mid_message</span>() {
             <span class="self">self</span>.<span class="ident">require_empty_read</span>().<span class="ident">map_err</span>(::<span class="ident">Error</span>::<span class="ident">new_io</span>)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
@@ -1385,20 +1376,11 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">maybe_park_read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">io</span>.<span class="ident">is_read_blocked</span>() {
-            <span class="comment">// the Io object is ready to read, which means it will never alert</span>
-            <span class="comment">// us that it is ready until we drain it. However, we&#39;re currently</span>
-            <span class="comment">// finished reading, so we need to park the task to be able to</span>
-            <span class="comment">// wake back up later when more reading should happen.</span>
-            <span class="kw">let</span> <span class="ident">park</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">read_task</span>.<span class="ident">as_ref</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="op">!</span><span class="ident">t</span>.<span class="ident">will_notify_current</span>())
-                .<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>);
-            <span class="kw">if</span> <span class="ident">park</span> {
-                <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;parking current task&quot;</span>);
-                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">read_task</span> <span class="op">=</span> <span class="prelude-val">Some</span>(::<span class="ident">futures</span>::<span class="ident">task</span>::<span class="ident">current</span>());
-            }
-        }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wants_read_again</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">notify_read</span>;
+        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">notify_read</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;wants_read_again? {}&quot;</span>, <span class="ident">ret</span>);
+        <span class="ident">ret</span>
     }
 
     <span class="comment">// This will check to make sure the io object read is empty.</span>
@@ -1472,17 +1454,14 @@
         <span class="comment">// exhausted the underlying Io. We would have done this when we</span>
         <span class="comment">// determined we couldn&#39;t keep reading until we knew how writing</span>
         <span class="comment">// would finish.</span>
-        <span class="comment">//</span>
-        <span class="comment">// When writing finishes, we need to wake the task up in case there</span>
-        <span class="comment">// is more reading that can be done, to start a new message.</span>
 
 
 
-        <span class="kw">let</span> <span class="ident">wants_read</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> {
             <span class="ident">Reading</span>::<span class="ident">Body</span>(..) <span class="op">|</span>
-            <span class="ident">Reading</span>::<span class="ident">KeepAlive</span> <span class="op">=&gt;</span> <span class="kw">return</span>,
-            <span class="ident">Reading</span>::<span class="ident">Init</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">Reading</span>::<span class="ident">Closed</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Reading</span>::<span class="ident">KeepAlive</span> <span class="op">|</span>
+            <span class="ident">Reading</span>::<span class="ident">Closed</span> <span class="op">=&gt;</span> <span class="kw">return</span>,
+            <span class="ident">Reading</span>::<span class="ident">Init</span> <span class="op">=&gt;</span> (),
         };
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> {
@@ -1493,7 +1472,7 @@
         }
 
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">io</span>.<span class="ident">is_read_blocked</span>() {
-            <span class="kw">if</span> <span class="ident">wants_read</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">read_buf</span>().<span class="ident">is_empty</span>() {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">read_buf</span>().<span class="ident">is_empty</span>() {
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">read_from_io</span>() {
                     <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="kw">_</span>)) <span class="op">=&gt;</span> (),
                     <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> {
@@ -1506,12 +1485,7 @@
                     }
                 }
             }
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">task</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">read_task</span> {
-                <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;maybe_notify; notifying task&quot;</span>);
-                <span class="ident">task</span>.<span class="ident">notify</span>();
-            } <span class="kw">else</span> {
-                <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;maybe_notify; no task to notify&quot;</span>);
-            }
+            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">notify_read</span> <span class="op">=</span> <span class="bool-val">true</span>;
         }
     }
 
@@ -1603,61 +1577,77 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_body</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">chunk</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">StartSend</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">can_write_body</span>());
-
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">can_buffer_body</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Async</span>::<span class="ident">NotReady</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flush</span>()<span class="question-mark">?</span> {
-                <span class="comment">// if chunk is Some(&amp;[]), aka empty, whatever, just skip it</span>
-                <span class="kw">if</span> <span class="ident">chunk</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">remaining</span>() <span class="op">==</span> <span class="number">0</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">AsyncSink</span>::<span class="ident">Ready</span>);
-                } <span class="kw">else</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">AsyncSink</span>::<span class="ident">NotReady</span>(<span class="ident">chunk</span>));
-                }
-            }
-        }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_body</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">chunk</span>: <span class="ident">B</span>) {
+        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">can_write_body</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">can_buffer_body</span>());
+        <span class="comment">// empty chunks should be discarded at Dispatcher level</span>
+        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">chunk</span>.<span class="ident">remaining</span>() <span class="op">!=</span> <span class="number">0</span>);
 
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> {
             <span class="ident">Writing</span>::<span class="ident">Body</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>) <span class="op">=&gt;</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">chunk</span>) <span class="op">=</span> <span class="ident">chunk</span> {
-                    <span class="kw">if</span> <span class="ident">chunk</span>.<span class="ident">remaining</span>() <span class="op">==</span> <span class="number">0</span> {
-                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">AsyncSink</span>::<span class="ident">Ready</span>);
-                    }
+                <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">buffer</span>(<span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="ident">chunk</span>));
 
-                    <span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="ident">chunk</span>);
-                    <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">buffer</span>(<span class="ident">encoded</span>);
-
-                    <span class="kw">if</span> <span class="ident">encoder</span>.<span class="ident">is_eof</span>() {
-                        <span class="kw">if</span> <span class="ident">encoder</span>.<span class="ident">is_last</span>() {
-                            <span class="ident">Writing</span>::<span class="ident">Closed</span>
-                        } <span class="kw">else</span> {
-                            <span class="ident">Writing</span>::<span class="ident">KeepAlive</span>
-                        }
+                <span class="kw">if</span> <span class="ident">encoder</span>.<span class="ident">is_eof</span>() {
+                    <span class="kw">if</span> <span class="ident">encoder</span>.<span class="ident">is_last</span>() {
+                        <span class="ident">Writing</span>::<span class="ident">Closed</span>
                     } <span class="kw">else</span> {
-                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">AsyncSink</span>::<span class="ident">Ready</span>);
+                        <span class="ident">Writing</span>::<span class="ident">KeepAlive</span>
                     }
                 } <span class="kw">else</span> {
-                    <span class="comment">// end of stream, that means we should try to eof</span>
-                    <span class="kw">match</span> <span class="ident">encoder</span>.<span class="ident">end</span>() {
-                        <span class="prelude-val">Ok</span>(<span class="ident">end</span>) <span class="op">=&gt;</span> {
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">end</span>) <span class="op">=</span> <span class="ident">end</span> {
-                                <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">buffer</span>(<span class="ident">end</span>);
-                            }
-                            <span class="kw">if</span> <span class="ident">encoder</span>.<span class="ident">is_last</span>() {
-                                <span class="ident">Writing</span>::<span class="ident">Closed</span>
-                            } <span class="kw">else</span> {
-                                <span class="ident">Writing</span>::<span class="ident">KeepAlive</span>
-                            }
-                        },
-                        <span class="prelude-val">Err</span>(<span class="ident">_not_eof</span>) <span class="op">=&gt;</span> <span class="ident">Writing</span>::<span class="ident">Closed</span>,
-                    }
+                    <span class="kw">return</span>;
                 }
             },
             <span class="kw">_</span> <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;write_body invalid state: {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span>),
         };
 
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> <span class="op">=</span> <span class="ident">state</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">AsyncSink</span>::<span class="ident">Ready</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_body_and_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">chunk</span>: <span class="ident">B</span>) {
+        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">can_write_body</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">can_buffer_body</span>());
+        <span class="comment">// empty chunks should be discarded at Dispatcher level</span>
+        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">chunk</span>.<span class="ident">remaining</span>() <span class="op">!=</span> <span class="number">0</span>);
+
+        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> {
+            <span class="ident">Writing</span>::<span class="ident">Body</span>(<span class="kw-2">ref</span> <span class="ident">encoder</span>) <span class="op">=&gt;</span> {
+                <span class="kw">let</span> (<span class="ident">encoded</span>, <span class="ident">can_keep_alive</span>) <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode_and_end</span>(<span class="ident">chunk</span>);
+                <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">buffer</span>(<span class="ident">encoded</span>);
+                <span class="kw">if</span> <span class="ident">can_keep_alive</span> {
+                    <span class="ident">Writing</span>::<span class="ident">KeepAlive</span>
+                } <span class="kw">else</span> {
+                    <span class="ident">Writing</span>::<span class="ident">Closed</span>
+                }
+            },
+            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;write_body invalid state: {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span>),
+        };
+
+        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> <span class="op">=</span> <span class="ident">state</span>;
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">end_body</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">can_write_body</span>());
+
+        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> {
+            <span class="ident">Writing</span>::<span class="ident">Body</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>) <span class="op">=&gt;</span> {
+                <span class="comment">// end of stream, that means we should try to eof</span>
+                <span class="kw">match</span> <span class="ident">encoder</span>.<span class="ident">end</span>() {
+                    <span class="prelude-val">Ok</span>(<span class="ident">end</span>) <span class="op">=&gt;</span> {
+                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">end</span>) <span class="op">=</span> <span class="ident">end</span> {
+                            <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">buffer</span>(<span class="ident">end</span>);
+                        }
+                        <span class="kw">if</span> <span class="ident">encoder</span>.<span class="ident">is_last</span>() {
+                            <span class="ident">Writing</span>::<span class="ident">Closed</span>
+                        } <span class="kw">else</span> {
+                            <span class="ident">Writing</span>::<span class="ident">KeepAlive</span>
+                        }
+                    },
+                    <span class="prelude-val">Err</span>(<span class="ident">_not_eof</span>) <span class="op">=&gt;</span> <span class="ident">Writing</span>::<span class="ident">Closed</span>,
+                }
+            },
+            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="kw">return</span>,
+        };
+
+        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> <span class="op">=</span> <span class="ident">state</span>;
+
     }
 
     <span class="comment">// When we get a parse error, depending on what side we are, we might be able</span>
@@ -1747,7 +1737,7 @@
     <span class="ident">keep_alive</span>: <span class="ident">KA</span>,
     <span class="ident">method</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Method</span><span class="op">&gt;</span>,
     <span class="ident">title_case_headers</span>: <span class="ident">bool</span>,
-    <span class="ident">read_task</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Task</span><span class="op">&gt;</span>,
+    <span class="ident">notify_read</span>: <span class="ident">bool</span>,
     <span class="ident">reading</span>: <span class="ident">Reading</span>,
     <span class="ident">writing</span>: <span class="ident">Writing</span>,
     <span class="ident">version</span>: <span class="ident">Version</span>,
@@ -1777,7 +1767,6 @@
             .<span class="ident">field</span>(<span class="string">&quot;error&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">error</span>)
             <span class="comment">//.field(&quot;method&quot;, &amp;self.method)</span>
             <span class="comment">//.field(&quot;title_case_headers&quot;, &amp;self.title_case_headers)</span>
-            .<span class="ident">field</span>(<span class="string">&quot;read_task&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">read_task</span>)
             .<span class="ident">finish</span>()
     }
 }
@@ -1845,7 +1834,6 @@
     <span class="kw">fn</span> <span class="ident">close_read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;State::close_read()&quot;</span>);
         <span class="self">self</span>.<span class="ident">reading</span> <span class="op">=</span> <span class="ident">Reading</span>::<span class="ident">Closed</span>;
-        <span class="self">self</span>.<span class="ident">read_task</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="self">self</span>.<span class="ident">keep_alive</span>.<span class="ident">disable</span>();
     }
 
