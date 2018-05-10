@@ -333,6 +333,12 @@
 <span id="333">333</span>
 <span id="334">334</span>
 <span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Error and Result module.</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
@@ -405,6 +411,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">Parse</span> {
     <span class="ident">Method</span>,
     <span class="ident">Version</span>,
+    <span class="ident">VersionH2</span>,
     <span class="ident">Uri</span>,
     <span class="ident">Header</span>,
     <span class="ident">TooLarge</span>,
@@ -500,6 +507,10 @@ pub(crate) enum User {
         <span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">Parse</span>(<span class="ident">Parse</span>::<span class="ident">Version</span>), <span class="prelude-val">None</span>)
     }
 
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_version_h2</span>() <span class="op">-&gt;</span> <span class="ident">Error</span> {
+        <span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">Parse</span>(<span class="ident">Parse</span>::<span class="ident">VersionH2</span>), <span class="prelude-val">None</span>)
+    }
+
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_mismatched_response</span>() <span class="op">-&gt;</span> <span class="ident">Error</span> {
         <span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">MismatchedResponse</span>, <span class="prelude-val">None</span>)
     }
@@ -586,6 +597,7 @@ pub(crate) enum User {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">kind</span> {
             <span class="ident">Kind</span>::<span class="ident">Parse</span>(<span class="ident">Parse</span>::<span class="ident">Method</span>) <span class="op">=&gt;</span> <span class="string">&quot;invalid Method specified&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">Parse</span>(<span class="ident">Parse</span>::<span class="ident">Version</span>) <span class="op">=&gt;</span> <span class="string">&quot;invalid HTTP version specified&quot;</span>,
+            <span class="ident">Kind</span>::<span class="ident">Parse</span>(<span class="ident">Parse</span>::<span class="ident">VersionH2</span>) <span class="op">=&gt;</span> <span class="string">&quot;invalid HTTP version specified (Http2)&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">Parse</span>(<span class="ident">Parse</span>::<span class="ident">Uri</span>) <span class="op">=&gt;</span> <span class="string">&quot;invalid URI&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">Parse</span>(<span class="ident">Parse</span>::<span class="ident">Header</span>) <span class="op">=&gt;</span> <span class="string">&quot;invalid Header provided&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">Parse</span>(<span class="ident">Parse</span>::<span class="ident">TooLarge</span>) <span class="op">=&gt;</span> <span class="string">&quot;message head is too large&quot;</span>,

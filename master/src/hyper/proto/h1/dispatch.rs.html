@@ -562,6 +562,9 @@
 <span id="562">562</span>
 <span id="563">563</span>
 <span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">Bytes</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Future</span>, <span class="ident">Poll</span>, <span class="ident">Stream</span>};
@@ -896,6 +899,9 @@
             <span class="ident">in_flight</span>: <span class="prelude-val">None</span>,
             <span class="ident">service</span>: <span class="ident">service</span>,
         }
+    }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_service</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">S</span> {
+        <span class="self">self</span>.<span class="ident">service</span>
     }
 }
 
