@@ -1428,30 +1428,6 @@
 <span id="1428">1428</span>
 <span id="1429">1429</span>
 <span id="1430">1430</span>
-<span id="1431">1431</span>
-<span id="1432">1432</span>
-<span id="1433">1433</span>
-<span id="1434">1434</span>
-<span id="1435">1435</span>
-<span id="1436">1436</span>
-<span id="1437">1437</span>
-<span id="1438">1438</span>
-<span id="1439">1439</span>
-<span id="1440">1440</span>
-<span id="1441">1441</span>
-<span id="1442">1442</span>
-<span id="1443">1443</span>
-<span id="1444">1444</span>
-<span id="1445">1445</span>
-<span id="1446">1446</span>
-<span id="1447">1447</span>
-<span id="1448">1448</span>
-<span id="1449">1449</span>
-<span id="1450">1450</span>
-<span id="1451">1451</span>
-<span id="1452">1452</span>
-<span id="1453">1453</span>
-<span id="1454">1454</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
@@ -1636,34 +1612,6 @@
             <span class="ident">keep_alive</span>,
         }))
     }
-
-    <span class="comment">/*
-    fn decoder(head: &amp;MessageHead&lt;Self::Incoming&gt;, method: &amp;mut Option&lt;Method&gt;) -&gt; ::Result&lt;Decode&gt; {
-        *method = Some(head.subject.0.clone());
-        if head.headers.contains_key(TRANSFER_ENCODING) {
-            // https://tools.ietf.org/html/rfc7230#section-3.3.3
-            // If Transfer-Encoding header is present, and &#39;chunked&#39; is
-            // not the final encoding, and this is a Request, then it is
-            // mal-formed. A server should respond with 400 Bad Request.
-            if head.version == Version::HTTP_10 {
-                debug!(&quot;HTTP/1.0 cannot have Transfer-Encoding header&quot;);
-                Err(::Error::new_header())
-            } else if headers::transfer_encoding_is_chunked(&amp;head.headers) {
-                Ok(Decode::Normal(Decoder::chunked()))
-            } else {
-                debug!(&quot;request with transfer-encoding header, but not chunked, bad request&quot;);
-                Err(::Error::new_header())
-            }
-        } else if let Some(len) = headers::content_length_parse(&amp;head.headers) {
-            Ok(Decode::Normal(Decoder::length(len)))
-        } else if head.headers.contains_key(CONTENT_LENGTH) {
-            debug!(&quot;illegal Content-Length header&quot;);
-            Err(::Error::new_header())
-        } else {
-            Ok(Decode::Normal(Decoder::length(0)))
-        }
-    }*/</span>
-
 
     <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">mut</span> <span class="ident">msg</span>: <span class="ident">Encode</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Outgoing</span><span class="op">&gt;</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Encoder</span><span class="op">&gt;</span> {
         <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Server::encode body={:?}, method={:?}&quot;</span>, <span class="ident">msg</span>.<span class="ident">body</span>, <span class="ident">msg</span>.<span class="ident">req_method</span>);
@@ -1918,6 +1866,10 @@
 
     <span class="kw">fn</span> <span class="ident">should_read_first</span>() <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="bool-val">true</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">update_date</span>() {
+        <span class="ident">date</span>::<span class="ident">update</span>();
     }
 }
 
