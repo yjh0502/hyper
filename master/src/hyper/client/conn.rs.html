@@ -1176,7 +1176,7 @@ impl&lt;T, B&gt; Service for SendRequest&lt;T, B&gt; {
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">B</span>: <span class="ident">Payload</span>,
-    <span class="ident">R</span>: <span class="ident">proto</span>::<span class="ident">Http1Transaction</span><span class="op">&lt;</span>
+    <span class="ident">R</span>: <span class="ident">proto</span>::<span class="ident">h1</span>::<span class="ident">Http1Transaction</span><span class="op">&lt;</span>
         <span class="ident">Incoming</span><span class="op">=</span><span class="ident">StatusCode</span>,
         <span class="ident">Outgoing</span><span class="op">=</span><span class="ident">proto</span>::<span class="ident">RequestLine</span>,
     <span class="op">&gt;</span>,

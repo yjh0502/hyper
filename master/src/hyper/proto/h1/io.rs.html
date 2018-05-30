@@ -746,6 +746,14 @@
 <span id="746">746</span>
 <span id="747">747</span>
 <span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cell</span>::<span class="ident">Cell</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">VecDeque</span>;
@@ -757,7 +765,7 @@
 <span class="kw">use</span> <span class="ident">iovec</span>::<span class="ident">IoVec</span>;
 <span class="kw">use</span> <span class="ident">tokio_io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
 
-<span class="kw">use</span> <span class="ident">proto</span>::{<span class="ident">Http1Transaction</span>, <span class="ident">MessageHead</span>};
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Http1Transaction</span>, <span class="ident">ParseContext</span>, <span class="ident">ParsedMessage</span>};
 
 <span class="doccomment">/// The initial buffer size allocated before trying to read from IO.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">INIT_BUFFER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8192</span>;
@@ -875,12 +883,16 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Http1Transaction</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="ident">Incoming</span><span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ctx</span>: <span class="ident">ParseContext</span>)
+        <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">ParsedMessage</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="ident">Incoming</span><span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Http1Transaction</span>,
+    {
         <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">S</span>::<span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">read_buf</span>)) {
-                <span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">len</span>)) <span class="op">=&gt;</span> {
-                    <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;parsed {} headers ({} bytes)&quot;</span>, <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">len</span>(), <span class="ident">len</span>);
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">head</span>))
+            <span class="kw">match</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">S</span>::<span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">read_buf</span>, <span class="ident">ParseContext</span> { <span class="ident">cached_headers</span>: <span class="ident">ctx</span>.<span class="ident">cached_headers</span>, <span class="ident">req_method</span>: <span class="ident">ctx</span>.<span class="ident">req_method</span>, })) {
+                <span class="prelude-val">Some</span>(<span class="ident">msg</span>) <span class="op">=&gt;</span> {
+                    <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;parsed {} headers&quot;</span>, <span class="ident">msg</span>.<span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">len</span>());
+                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">msg</span>))
                 },
                 <span class="prelude-val">None</span> <span class="op">=&gt;</span> {
                     <span class="kw">if</span> <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">capacity</span>() <span class="op">&gt;=</span> <span class="self">self</span>.<span class="ident">max_buf_size</span> {
@@ -1366,7 +1378,11 @@
 
         <span class="kw">let</span> <span class="ident">mock</span> <span class="op">=</span> <span class="ident">AsyncIo</span>::<span class="ident">new_buf</span>(<span class="ident">raw</span>, <span class="ident">raw</span>.<span class="ident">len</span>());
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffered</span> <span class="op">=</span> <span class="ident">Buffered</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>::<span class="ident">new</span>(<span class="ident">mock</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">buffered</span>.<span class="ident">parse</span>::<span class="op">&lt;</span>::<span class="ident">proto</span>::<span class="ident">ClientTransaction</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(), <span class="ident">Async</span>::<span class="ident">NotReady</span>);
+        <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">ParseContext</span> {
+            <span class="ident">cached_headers</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-val">None</span>,
+            <span class="ident">req_method</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-val">None</span>,
+        };
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">buffered</span>.<span class="ident">parse</span>::<span class="op">&lt;</span>::<span class="ident">proto</span>::<span class="ident">ClientTransaction</span><span class="op">&gt;</span>(<span class="ident">ctx</span>).<span class="ident">unwrap</span>().<span class="ident">is_not_ready</span>());
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">buffered</span>.<span class="ident">io</span>.<span class="ident">blocked</span>());
     }
 

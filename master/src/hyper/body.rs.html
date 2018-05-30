@@ -494,22 +494,6 @@
 <span id="494">494</span>
 <span id="495">495</span>
 <span id="496">496</span>
-<span id="497">497</span>
-<span id="498">498</span>
-<span id="499">499</span>
-<span id="500">500</span>
-<span id="501">501</span>
-<span id="502">502</span>
-<span id="503">503</span>
-<span id="504">504</span>
-<span id="505">505</span>
-<span id="506">506</span>
-<span id="507">507</span>
-<span id="508">508</span>
-<span id="509">509</span>
-<span id="510">510</span>
-<span id="511">511</span>
-<span id="512">512</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Streaming bodies for Requests and Responses</span>
 <span class="doccomment">//!</span>
@@ -737,24 +721,6 @@
         <span class="ident">Body</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">Wrapped</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">mapped</span>)))
     }
 
-    <span class="doccomment">/// Returns if this body was constructed via `Body::empty()`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This does **not** detect if the body stream may be at the end, or</span>
-    <span class="doccomment">/// if the stream will not yield any chunks, in all cases. For instance,</span>
-    <span class="doccomment">/// a streaming body using `chunked` encoding is not able to tell if</span>
-    <span class="doccomment">/// there are more chunks immediately.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See [`is_end_stream`](Payload::is_end_stream) for a dynamic version.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">Kind</span>::<span class="ident">Empty</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>,
-        }
-    }
-
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kind</span>: <span class="ident">Kind</span>) <span class="op">-&gt;</span> <span class="ident">Body</span> {
         <span class="ident">Body</span> {
             <span class="ident">kind</span>: <span class="ident">kind</span>,
@@ -934,15 +900,17 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Body</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Stream</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">S</span>::<span class="ident">Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>,
-    <span class="ident">Chunk</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="ident">Item</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>
+    <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Chunk</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;&gt;</span>
+    <span class="kw">for</span> <span class="ident">Body</span>
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">stream</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Body</span> {
-        <span class="ident">Body</span>::<span class="ident">wrap_stream</span>(<span class="ident">stream</span>)
+    <span class="kw">fn</span> <span class="ident">from</span>(
+        <span class="ident">stream</span>: <span class="ident">Box</span><span class="op">&lt;</span>
+            <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Chunk</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="op">&gt;</span>,
+    ) <span class="op">-&gt;</span> <span class="ident">Body</span> {
+        <span class="ident">Body</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">Wrapped</span>(<span class="ident">stream</span>))
     }
 }
 
