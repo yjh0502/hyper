@@ -490,6 +490,7 @@
 <span id="490">490</span>
 <span id="491">491</span>
 <span id="492">492</span>
+<span id="493">493</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Streaming bodies for Requests and Responses</span>
 <span class="doccomment">//!</span>
@@ -783,7 +784,8 @@
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">async</span><span class="op">|</span> {
                         <span class="ident">async</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">opt</span><span class="op">|</span> {
                             <span class="ident">opt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">bytes</span><span class="op">|</span> {
-                                <span class="ident">Chunk</span>::<span class="ident">h2</span>(<span class="ident">bytes</span>, <span class="ident">h2</span>.<span class="ident">release_capacity</span>())
+                                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">h2</span>.<span class="ident">release_capacity</span>().<span class="ident">release_capacity</span>(<span class="ident">bytes</span>.<span class="ident">len</span>());
+                                <span class="ident">Chunk</span>::<span class="ident">from</span>(<span class="ident">bytes</span>)
                             })
                         })
                     })
