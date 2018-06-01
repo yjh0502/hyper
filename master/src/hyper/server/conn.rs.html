@@ -585,7 +585,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// This structure is used to configure options for an HTTP server connection.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If don&#39;t have need to manage connections yourself, consider using the</span>
+<span class="doccomment">/// If you don&#39;t have need to manage connections yourself, consider using the</span>
 <span class="doccomment">/// higher-level [Server](super) API.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Http</span> {
@@ -607,7 +607,7 @@
     <span class="ident">protocol</span>: <span class="ident">Http</span>,
 }
 
-<span class="doccomment">/// A future binding a `Service` to a `Connection`.</span>
+<span class="doccomment">/// A future building a new `Service` to a `Connection`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Wraps the future returned from `NewService` into one that returns</span>
 <span class="doccomment">/// a `Connection`.</span>
