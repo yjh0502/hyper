@@ -1132,6 +1132,28 @@
 <span id="1132">1132</span>
 <span id="1133">1133</span>
 <span id="1134">1134</span>
+<span id="1135">1135</span>
+<span id="1136">1136</span>
+<span id="1137">1137</span>
+<span id="1138">1138</span>
+<span id="1139">1139</span>
+<span id="1140">1140</span>
+<span id="1141">1141</span>
+<span id="1142">1142</span>
+<span id="1143">1143</span>
+<span id="1144">1144</span>
+<span id="1145">1145</span>
+<span id="1146">1146</span>
+<span id="1147">1147</span>
+<span id="1148">1148</span>
+<span id="1149">1149</span>
+<span id="1150">1150</span>
+<span id="1151">1151</span>
+<span id="1152">1152</span>
+<span id="1153">1153</span>
+<span id="1154">1154</span>
+<span id="1155">1155</span>
+<span id="1156">1156</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="self">self</span>};
@@ -1523,7 +1545,35 @@
         <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">can_buffer</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_head</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">head</span>: <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Outgoing</span><span class="op">&gt;</span>, <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BodyLength</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_head</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">head</span>: <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Outgoing</span><span class="op">&gt;</span>, <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BodyLength</span><span class="op">&gt;</span>) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">encoder</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">encode_head</span>(<span class="ident">head</span>, <span class="ident">body</span>) {
+            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">encoder</span>.<span class="ident">is_eof</span>() {
+                <span class="ident">Writing</span>::<span class="ident">Body</span>(<span class="ident">encoder</span>)
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">encoder</span>.<span class="ident">is_last</span>() {
+                <span class="ident">Writing</span>::<span class="ident">Closed</span>
+            } <span class="kw">else</span> {
+                <span class="ident">Writing</span>::<span class="ident">KeepAlive</span>
+            };
+        }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_full_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">head</span>: <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Outgoing</span><span class="op">&gt;</span>, <span class="ident">body</span>: <span class="ident">B</span>) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">encoder</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">encode_head</span>(<span class="ident">head</span>, <span class="prelude-val">Some</span>(<span class="ident">BodyLength</span>::<span class="ident">Known</span>(<span class="ident">body</span>.<span class="ident">remaining</span>() <span class="kw">as</span> <span class="ident">u64</span>))) {
+            <span class="kw">let</span> <span class="ident">is_last</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">is_last</span>();
+            <span class="comment">// Make sure we don&#39;t write a body if we weren&#39;t actually allowed</span>
+            <span class="comment">// to do so, like because its a HEAD request.</span>
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">encoder</span>.<span class="ident">is_eof</span>() {
+                <span class="ident">encoder</span>.<span class="ident">danger_full_buf</span>(<span class="ident">body</span>, <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">write_buf</span>());
+            }
+            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_last</span> {
+                <span class="ident">Writing</span>::<span class="ident">Closed</span>
+            } <span class="kw">else</span> {
+                <span class="ident">Writing</span>::<span class="ident">KeepAlive</span>
+            }
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">encode_head</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">head</span>: <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Outgoing</span><span class="op">&gt;</span>, <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BodyLength</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Encoder</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">can_write_head</span>());
 
         <span class="kw">if</span> <span class="op">!</span><span class="ident">T</span>::<span class="ident">should_read_first</span>() {
@@ -1533,7 +1583,7 @@
         <span class="self">self</span>.<span class="ident">enforce_version</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">head</span>);
 
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">headers_buf</span>();
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">T</span>::<span class="ident">encode</span>(<span class="ident">Encode</span> {
+        <span class="kw">match</span> <span class="ident">T</span>::<span class="ident">encode</span>(<span class="ident">Encode</span> {
             <span class="ident">head</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">head</span>,
             <span class="ident">body</span>,
             <span class="ident">keep_alive</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">wants_keep_alive</span>(),
@@ -1544,19 +1594,14 @@
                 <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cached_headers</span>.<span class="ident">is_none</span>());
                 <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">is_empty</span>());
                 <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cached_headers</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">head</span>.<span class="ident">headers</span>);
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">encoder</span>.<span class="ident">is_eof</span>() {
-                    <span class="ident">Writing</span>::<span class="ident">Body</span>(<span class="ident">encoder</span>)
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">encoder</span>.<span class="ident">is_last</span>() {
-                    <span class="ident">Writing</span>::<span class="ident">Closed</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">Writing</span>::<span class="ident">KeepAlive</span>
-                }
+                <span class="prelude-val">Some</span>(<span class="ident">encoder</span>)
             },
             <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=&gt;</span> {
                 <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
-                <span class="ident">Writing</span>::<span class="ident">Closed</span>
-            }
-        };
+                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> <span class="op">=</span> <span class="ident">Writing</span>::<span class="ident">Closed</span>;
+                <span class="prelude-val">None</span>
+            },
+        }
     }
 
     <span class="comment">// If we know the remote speaks an older version, we try to fix up any messages</span>
@@ -1609,8 +1654,7 @@
 
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> {
             <span class="ident">Writing</span>::<span class="ident">Body</span>(<span class="kw-2">ref</span> <span class="ident">encoder</span>) <span class="op">=&gt;</span> {
-                <span class="kw">let</span> (<span class="ident">encoded</span>, <span class="ident">can_keep_alive</span>) <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode_and_end</span>(<span class="ident">chunk</span>);
-                <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">buffer</span>(<span class="ident">encoded</span>);
+                <span class="kw">let</span> <span class="ident">can_keep_alive</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode_and_end</span>(<span class="ident">chunk</span>, <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">write_buf</span>());
                 <span class="kw">if</span> <span class="ident">can_keep_alive</span> {
                     <span class="ident">Writing</span>::<span class="ident">KeepAlive</span>
                 } <span class="kw">else</span> {

@@ -567,6 +567,8 @@
 <span id="567">567</span>
 <span id="568">568</span>
 <span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">Bytes</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Future</span>, <span class="ident">Poll</span>, <span class="ident">Stream</span>};
@@ -574,6 +576,7 @@
 <span class="kw">use</span> <span class="ident">tokio_io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
 
 <span class="kw">use</span> <span class="ident">body</span>::{<span class="ident">Body</span>, <span class="ident">Payload</span>};
+<span class="kw">use</span> <span class="ident">body</span>::<span class="ident">internal</span>::<span class="ident">FullDataArg</span>;
 <span class="kw">use</span> <span class="ident">proto</span>::{<span class="ident">BodyLength</span>, <span class="ident">Conn</span>, <span class="ident">MessageHead</span>, <span class="ident">RequestHead</span>, <span class="ident">RequestLine</span>, <span class="ident">ResponseHead</span>};
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Http1Transaction</span>;
 <span class="kw">use</span> <span class="ident">service</span>::<span class="ident">Service</span>;
@@ -590,7 +593,7 @@
     <span class="kw">type</span> <span class="ident">PollItem</span>;
     <span class="kw">type</span> <span class="ident">PollBody</span>;
     <span class="kw">type</span> <span class="ident">RecvItem</span>;
-    <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">PollBody</span><span class="op">&gt;</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="self">Self</span>::<span class="ident">PollBody</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span>;
     <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">RecvItem</span>, <span class="ident">Body</span>)<span class="op">&gt;</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
     <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span>;
     <span class="kw">fn</span> <span class="ident">should_poll</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span>;
@@ -792,14 +795,26 @@
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
             } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">body_rx</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">can_write_head</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">should_poll</span>() {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">body</span>)) <span class="op">=</span> <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">poll_msg</span>()) {
-                    <span class="kw">let</span> <span class="ident">body_type</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">body</span><span class="op">|</span> {
-                        <span class="ident">body</span>.<span class="ident">content_length</span>()
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="kw-2">mut</span> <span class="ident">body</span>)) <span class="op">=</span> <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">poll_msg</span>()) {
+                    <span class="comment">// Check if the body knows its full data immediately.</span>
+                    <span class="comment">//</span>
+                    <span class="comment">// If so, we can skip a bit of bookkeeping that streaming</span>
+                    <span class="comment">// bodies need to do.</span>
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">full</span>) <span class="op">=</span> <span class="ident">body</span>.<span class="ident">__hyper_full_data</span>(<span class="ident">FullDataArg</span>(())).<span class="number">0</span> {
+                        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">write_full_msg</span>(<span class="ident">head</span>, <span class="ident">full</span>);
+                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
+                    }
+                    <span class="kw">let</span> <span class="ident">body_type</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">body</span>.<span class="ident">is_end_stream</span>() {
+                        <span class="self">self</span>.<span class="ident">body_rx</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+                        <span class="prelude-val">None</span>
+                    } <span class="kw">else</span> {
+                        <span class="kw">let</span> <span class="ident">btype</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">content_length</span>()
                             .<span class="ident">map</span>(<span class="ident">BodyLength</span>::<span class="ident">Known</span>)
-                            .<span class="ident">unwrap_or</span>(<span class="ident">BodyLength</span>::<span class="ident">Unknown</span>)
-                    });
+                            .<span class="ident">or_else</span>(<span class="op">||</span> <span class="prelude-val">Some</span>(<span class="ident">BodyLength</span>::<span class="ident">Unknown</span>));
+                        <span class="self">self</span>.<span class="ident">body_rx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">body</span>);
+                        <span class="ident">btype</span>
+                    };
                     <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">write_head</span>(<span class="ident">head</span>, <span class="ident">body_type</span>);
-                    <span class="self">self</span>.<span class="ident">body_rx</span> <span class="op">=</span> <span class="ident">body</span>;
                 } <span class="kw">else</span> {
                     <span class="self">self</span>.<span class="ident">close</span>();
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
@@ -919,7 +934,7 @@
     <span class="kw">type</span> <span class="ident">PollBody</span> <span class="op">=</span> <span class="ident">Bs</span>;
     <span class="kw">type</span> <span class="ident">RecvItem</span> <span class="op">=</span> <span class="ident">RequestHead</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">PollBody</span><span class="op">&gt;</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="self">Self</span>::<span class="ident">PollBody</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">fut</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">in_flight</span>.<span class="ident">take</span>() {
             <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">fut</span>.<span class="ident">poll</span>().<span class="ident">map_err</span>(::<span class="ident">Error</span>::<span class="ident">new_user_service</span>)<span class="question-mark">?</span> {
                 <span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">res</span>) <span class="op">=&gt;</span> <span class="ident">res</span>,
@@ -933,11 +948,6 @@
                 <span class="ident">version</span>: <span class="ident">parts</span>.<span class="ident">version</span>,
                 <span class="ident">subject</span>: <span class="ident">parts</span>.<span class="ident">status</span>,
                 <span class="ident">headers</span>: <span class="ident">parts</span>.<span class="ident">headers</span>,
-            };
-            <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">body</span>.<span class="ident">is_end_stream</span>() {
-                <span class="prelude-val">None</span>
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">body</span>)
             };
             <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">body</span>))))
         } <span class="kw">else</span> {
@@ -989,7 +999,7 @@
     <span class="kw">type</span> <span class="ident">PollBody</span> <span class="op">=</span> <span class="ident">B</span>;
     <span class="kw">type</span> <span class="ident">RecvItem</span> <span class="op">=</span> <span class="ident">ResponseHead</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">PollBody</span><span class="op">&gt;</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="self">Self</span>::<span class="ident">PollBody</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">poll</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>((<span class="ident">req</span>, <span class="kw-2">mut</span> <span class="ident">cb</span>)))) <span class="op">=&gt;</span> {
                 <span class="comment">// check that future hasn&#39;t been canceled already</span>
@@ -1004,12 +1014,6 @@
                             <span class="ident">version</span>: <span class="ident">parts</span>.<span class="ident">version</span>,
                             <span class="ident">subject</span>: <span class="ident">RequestLine</span>(<span class="ident">parts</span>.<span class="ident">method</span>, <span class="ident">parts</span>.<span class="ident">uri</span>),
                             <span class="ident">headers</span>: <span class="ident">parts</span>.<span class="ident">headers</span>,
-                        };
-
-                        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">body</span>.<span class="ident">is_end_stream</span>() {
-                            <span class="prelude-val">None</span>
-                        } <span class="kw">else</span> {
-                            <span class="prelude-val">Some</span>(<span class="ident">body</span>)
                         };
                         <span class="self">self</span>.<span class="ident">callback</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cb</span>);
                         <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">body</span>))))

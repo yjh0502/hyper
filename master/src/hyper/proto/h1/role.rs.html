@@ -1437,33 +1437,6 @@
 <span id="1437">1437</span>
 <span id="1438">1438</span>
 <span id="1439">1439</span>
-<span id="1440">1440</span>
-<span id="1441">1441</span>
-<span id="1442">1442</span>
-<span id="1443">1443</span>
-<span id="1444">1444</span>
-<span id="1445">1445</span>
-<span id="1446">1446</span>
-<span id="1447">1447</span>
-<span id="1448">1448</span>
-<span id="1449">1449</span>
-<span id="1450">1450</span>
-<span id="1451">1451</span>
-<span id="1452">1452</span>
-<span id="1453">1453</span>
-<span id="1454">1454</span>
-<span id="1455">1455</span>
-<span id="1456">1456</span>
-<span id="1457">1457</span>
-<span id="1458">1458</span>
-<span id="1459">1459</span>
-<span id="1460">1460</span>
-<span id="1461">1461</span>
-<span id="1462">1462</span>
-<span id="1463">1463</span>
-<span id="1464">1464</span>
-<span id="1465">1465</span>
-<span id="1466">1466</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
@@ -1898,6 +1871,11 @@
             };
         }
 
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">Server</span>::<span class="ident">can_have_body</span>(<span class="ident">msg</span>.<span class="ident">req_method</span>, <span class="ident">msg</span>.<span class="ident">head</span>.<span class="ident">subject</span>) {
+            <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;body not allowed for {:?} {:?}&quot;</span>, <span class="ident">msg</span>.<span class="ident">req_method</span>, <span class="ident">msg</span>.<span class="ident">head</span>.<span class="ident">subject</span>);
+            <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">Encoder</span>::<span class="ident">length</span>(<span class="number">0</span>);
+        }
+
         <span class="comment">// cached date is much faster than formatting every request</span>
         <span class="kw">if</span> <span class="op">!</span><span class="ident">wrote_date</span> {
             <span class="ident">dst</span>.<span class="ident">reserve</span>(<span class="ident">date</span>::<span class="ident">DATE_VALUE_LENGTH</span> <span class="op">+</span> <span class="number">8</span>);
@@ -1946,41 +1924,9 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Server</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="comment">/*
-    fn set_length(head: &amp;mut MessageHead&lt;StatusCode&gt;, body: Option&lt;BodyLength&gt;, method: Option&lt;&amp;Method&gt;) -&gt; Encoder {
-        // these are here thanks to borrowck
-        // `if method == Some(&amp;Method::Get)` says the RHS doesn&#39;t live long enough
-        const HEAD: Option&lt;&amp;&#39;static Method&gt; = Some(&amp;Method::HEAD);
-        const CONNECT: Option&lt;&amp;&#39;static Method&gt; = Some(&amp;Method::CONNECT);
-
-        let can_have_body = {
-            if method == HEAD {
-                false
-            } else if method == CONNECT &amp;&amp; head.subject.is_success() {
-                false
-            } else {
-                match head.subject {
-                    // TODO: support for 1xx codes needs improvement everywhere
-                    // would be 100...199 =&gt; false
-                    StatusCode::SWITCHING_PROTOCOLS |
-                    StatusCode::NO_CONTENT |
-                    StatusCode::NOT_MODIFIED =&gt; false,
-                    _ =&gt; true,
-                }
-            }
-        };
-
-        if let (Some(body), true) = (body, can_have_body) {
-            set_length(&amp;mut head.headers, body, head.version == Version::HTTP_11)
-        } else {
-            head.headers.remove(header::TRANSFER_ENCODING);
-            if can_have_body {
-                headers::content_length_zero(&amp;mut head.headers);
-            }
-            Encoder::length(0)
-        }
+    <span class="kw">fn</span> <span class="ident">can_have_body</span>(<span class="ident">method</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Method</span><span class="op">&gt;</span>, <span class="ident">status</span>: <span class="ident">StatusCode</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="ident">Server</span>::<span class="ident">can_chunked</span>(<span class="ident">method</span>, <span class="ident">status</span>)
     }
-    */</span>
 
     <span class="kw">fn</span> <span class="ident">can_chunked</span>(<span class="ident">method</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Method</span><span class="op">&gt;</span>, <span class="ident">status</span>: <span class="ident">StatusCode</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="ident">method</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="ident">Method</span>::<span class="ident">HEAD</span>) {
