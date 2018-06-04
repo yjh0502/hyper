@@ -564,7 +564,7 @@
 }
 
 <span class="doccomment">/// A set of properties to describe where and how to try to connect.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Destination</span> {
     <span class="comment">//pub(super) alpn: Alpn,</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">uri</span>: <span class="ident">Uri</span>,
