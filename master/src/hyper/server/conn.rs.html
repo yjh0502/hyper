@@ -572,6 +572,38 @@
 <span id="572">572</span>
 <span id="573">573</span>
 <span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Lower-level Server connection API.</span>
 <span class="doccomment">//!</span>
@@ -612,10 +644,21 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Http</span> {
     <span class="ident">exec</span>: <span class="ident">Exec</span>,
-    <span class="ident">http2</span>: <span class="ident">bool</span>,
+    <span class="ident">mode</span>: <span class="ident">ConnectionMode</span>,
     <span class="ident">keep_alive</span>: <span class="ident">bool</span>,
     <span class="ident">max_buf_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
     <span class="ident">pipeline_flush</span>: <span class="ident">bool</span>,
+}
+
+<span class="doccomment">/// The internal mode of HTTP protocol which indicates the behavior when an parse error occurs.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">enum</span> <span class="ident">ConnectionMode</span> {
+    <span class="doccomment">/// Always use HTTP/1 and do not upgrade when an parse error occurs.</span>
+    <span class="ident">H1Only</span>,
+    <span class="doccomment">/// Always use HTTP/2.</span>
+    <span class="ident">H2Only</span>,
+    <span class="doccomment">/// Use HTTP/1 and try to upgrade to h2 when an parse error occurs.</span>
+    <span class="ident">Fallback</span>,
 }
 
 <span class="doccomment">/// A stream mapping incoming IOs to new services.</span>
@@ -669,6 +712,7 @@
             <span class="ident">S</span>::<span class="ident">ResBody</span>,
         <span class="op">&gt;</span>,
     <span class="op">&gt;&gt;</span>,
+    <span class="ident">fallback</span>: <span class="ident">bool</span>,
 }
 
 <span class="doccomment">/// Deconstructed parts of a `Connection`.</span>
@@ -701,18 +745,34 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="ident">Http</span> {
         <span class="ident">Http</span> {
             <span class="ident">exec</span>: <span class="ident">Exec</span>::<span class="ident">Default</span>,
-            <span class="ident">http2</span>: <span class="bool-val">false</span>,
+            <span class="ident">mode</span>: <span class="ident">ConnectionMode</span>::<span class="ident">Fallback</span>,
             <span class="ident">keep_alive</span>: <span class="bool-val">true</span>,
             <span class="ident">max_buf_size</span>: <span class="prelude-val">None</span>,
             <span class="ident">pipeline_flush</span>: <span class="bool-val">false</span>,
         }
     }
 
+    <span class="doccomment">/// Sets whether HTTP1 is required.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Default is false</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_only</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="kw">if</span> <span class="ident">val</span> {
+            <span class="self">self</span>.<span class="ident">mode</span> <span class="op">=</span> <span class="ident">ConnectionMode</span>::<span class="ident">H1Only</span>;
+        } <span class="kw">else</span> {
+            <span class="self">self</span>.<span class="ident">mode</span> <span class="op">=</span> <span class="ident">ConnectionMode</span>::<span class="ident">Fallback</span>;
+        }
+        <span class="self">self</span>
+    }
+
     <span class="doccomment">/// Sets whether HTTP2 is required.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is false</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_only</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">http2</span> <span class="op">=</span> <span class="ident">val</span>;
+        <span class="kw">if</span> <span class="ident">val</span> {
+            <span class="self">self</span>.<span class="ident">mode</span> <span class="op">=</span> <span class="ident">ConnectionMode</span>::<span class="ident">H2Only</span>;
+        } <span class="kw">else</span> {
+            <span class="self">self</span>.<span class="ident">mode</span> <span class="op">=</span> <span class="ident">ConnectionMode</span>::<span class="ident">Fallback</span>;
+        }
         <span class="self">self</span>
     }
 
@@ -805,25 +865,29 @@
         <span class="ident">Bd</span>: <span class="ident">Payload</span>,
         <span class="ident">I</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span>,
     {
-        <span class="kw">let</span> <span class="ident">either</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">http2</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">proto</span>::<span class="ident">Conn</span>::<span class="ident">new</span>(<span class="ident">io</span>);
-            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">keep_alive</span> {
-                <span class="ident">conn</span>.<span class="ident">disable_keep_alive</span>();
+        <span class="kw">let</span> <span class="ident">either</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">mode</span> {
+            <span class="ident">ConnectionMode</span>::<span class="ident">H1Only</span> <span class="op">|</span> <span class="ident">ConnectionMode</span>::<span class="ident">Fallback</span> <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">proto</span>::<span class="ident">Conn</span>::<span class="ident">new</span>(<span class="ident">io</span>);
+                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">keep_alive</span> {
+                    <span class="ident">conn</span>.<span class="ident">disable_keep_alive</span>();
+                }
+                <span class="ident">conn</span>.<span class="ident">set_flush_pipeline</span>(<span class="self">self</span>.<span class="ident">pipeline_flush</span>);
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_buf_size</span> {
+                    <span class="ident">conn</span>.<span class="ident">set_max_buf_size</span>(<span class="ident">max</span>);
+                }
+                <span class="kw">let</span> <span class="ident">sd</span> <span class="op">=</span> <span class="ident">proto</span>::<span class="ident">h1</span>::<span class="ident">dispatch</span>::<span class="ident">Server</span>::<span class="ident">new</span>(<span class="ident">service</span>);
+                <span class="ident">Either</span>::<span class="ident">A</span>(<span class="ident">proto</span>::<span class="ident">h1</span>::<span class="ident">Dispatcher</span>::<span class="ident">new</span>(<span class="ident">sd</span>, <span class="ident">conn</span>))
             }
-            <span class="ident">conn</span>.<span class="ident">set_flush_pipeline</span>(<span class="self">self</span>.<span class="ident">pipeline_flush</span>);
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_buf_size</span> {
-                <span class="ident">conn</span>.<span class="ident">set_max_buf_size</span>(<span class="ident">max</span>);
+            <span class="ident">ConnectionMode</span>::<span class="ident">H2Only</span> <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="ident">rewind_io</span> <span class="op">=</span> <span class="ident">Rewind</span>::<span class="ident">new</span>(<span class="ident">io</span>);
+                <span class="kw">let</span> <span class="ident">h2</span> <span class="op">=</span> <span class="ident">proto</span>::<span class="ident">h2</span>::<span class="ident">Server</span>::<span class="ident">new</span>(<span class="ident">rewind_io</span>, <span class="ident">service</span>, <span class="self">self</span>.<span class="ident">exec</span>.<span class="ident">clone</span>());
+                <span class="ident">Either</span>::<span class="ident">B</span>(<span class="ident">h2</span>)
             }
-            <span class="kw">let</span> <span class="ident">sd</span> <span class="op">=</span> <span class="ident">proto</span>::<span class="ident">h1</span>::<span class="ident">dispatch</span>::<span class="ident">Server</span>::<span class="ident">new</span>(<span class="ident">service</span>);
-            <span class="ident">Either</span>::<span class="ident">A</span>(<span class="ident">proto</span>::<span class="ident">h1</span>::<span class="ident">Dispatcher</span>::<span class="ident">new</span>(<span class="ident">sd</span>, <span class="ident">conn</span>))
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">rewind_io</span> <span class="op">=</span> <span class="ident">Rewind</span>::<span class="ident">new</span>(<span class="ident">io</span>);
-            <span class="kw">let</span> <span class="ident">h2</span> <span class="op">=</span> <span class="ident">proto</span>::<span class="ident">h2</span>::<span class="ident">Server</span>::<span class="ident">new</span>(<span class="ident">rewind_io</span>, <span class="ident">service</span>, <span class="self">self</span>.<span class="ident">exec</span>.<span class="ident">clone</span>());
-            <span class="ident">Either</span>::<span class="ident">B</span>(<span class="ident">h2</span>)
         };
 
         <span class="ident">Connection</span> {
             <span class="ident">conn</span>: <span class="prelude-val">Some</span>(<span class="ident">either</span>),
+            <span class="ident">fallback</span>: <span class="self">self</span>.<span class="ident">mode</span> <span class="op">==</span> <span class="ident">ConnectionMode</span>::<span class="ident">Fallback</span>,
         }
     }
 
@@ -960,7 +1024,7 @@
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> {
                     <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;error polling connection protocol without shutdown: {}&quot;</span>, <span class="ident">e</span>);
                     <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">kind</span>() {
-                        <span class="ident">Kind</span>::<span class="ident">Parse</span>(<span class="ident">Parse</span>::<span class="ident">VersionH2</span>) <span class="op">=&gt;</span> {
+                        <span class="ident">Kind</span>::<span class="ident">Parse</span>(<span class="ident">Parse</span>::<span class="ident">VersionH2</span>) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fallback</span> <span class="op">=&gt;</span> {
                             <span class="self">self</span>.<span class="ident">upgrade_h2</span>();
                             <span class="kw">continue</span>;
                         }
@@ -1010,7 +1074,7 @@
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> {
                     <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;error polling connection protocol: {}&quot;</span>, <span class="ident">e</span>);
                     <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">kind</span>() {
-                        <span class="ident">Kind</span>::<span class="ident">Parse</span>(<span class="ident">Parse</span>::<span class="ident">VersionH2</span>) <span class="op">=&gt;</span> {
+                        <span class="ident">Kind</span>::<span class="ident">Parse</span>(<span class="ident">Parse</span>::<span class="ident">VersionH2</span>) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fallback</span> <span class="op">=&gt;</span> {
                             <span class="self">self</span>.<span class="ident">upgrade_h2</span>();
                             <span class="kw">continue</span>;
                         }
