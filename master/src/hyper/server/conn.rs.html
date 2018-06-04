@@ -604,6 +604,25 @@
 <span id="604">604</span>
 <span id="605">605</span>
 <span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Lower-level Server connection API.</span>
 <span class="doccomment">//!</span>
@@ -644,6 +663,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Http</span> {
     <span class="ident">exec</span>: <span class="ident">Exec</span>,
+    <span class="ident">h1_writev</span>: <span class="ident">bool</span>,
     <span class="ident">mode</span>: <span class="ident">ConnectionMode</span>,
     <span class="ident">keep_alive</span>: <span class="ident">bool</span>,
     <span class="ident">max_buf_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
@@ -745,6 +765,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="ident">Http</span> {
         <span class="ident">Http</span> {
             <span class="ident">exec</span>: <span class="ident">Exec</span>::<span class="ident">Default</span>,
+            <span class="ident">h1_writev</span>: <span class="bool-val">true</span>,
             <span class="ident">mode</span>: <span class="ident">ConnectionMode</span>::<span class="ident">Fallback</span>,
             <span class="ident">keep_alive</span>: <span class="bool-val">true</span>,
             <span class="ident">max_buf_size</span>: <span class="prelude-val">None</span>,
@@ -761,6 +782,20 @@
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="ident">mode</span> <span class="op">=</span> <span class="ident">ConnectionMode</span>::<span class="ident">Fallback</span>;
         }
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Set whether HTTP/1 connections should try to use vectored writes,</span>
+    <span class="doccomment">/// or always flatten into a single buffer.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that setting this to false may mean more copies of body data,</span>
+    <span class="doccomment">/// but may also improve performance when an IO transport doesn&#39;t</span>
+    <span class="doccomment">/// support vectored writes well, such as most TLS implementations.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Default is `true`.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_writev</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">h1_writev</span> <span class="op">=</span> <span class="ident">val</span>;
         <span class="self">self</span>
     }
 
@@ -870,6 +905,9 @@
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">proto</span>::<span class="ident">Conn</span>::<span class="ident">new</span>(<span class="ident">io</span>);
                 <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">keep_alive</span> {
                     <span class="ident">conn</span>.<span class="ident">disable_keep_alive</span>();
+                }
+                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">h1_writev</span> {
+                    <span class="ident">conn</span>.<span class="ident">set_write_strategy_flatten</span>();
                 }
                 <span class="ident">conn</span>.<span class="ident">set_flush_pipeline</span>(<span class="self">self</span>.<span class="ident">pipeline_flush</span>);
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_buf_size</span> {

@@ -717,7 +717,6 @@
 <span id="717">717</span>
 <span id="718">718</span>
 <span id="719">719</span>
-<span id="720">720</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cell</span>::<span class="ident">Cell</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">VecDeque</span>;
@@ -787,12 +786,11 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_flush_pipeline</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) {
+        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">has_remaining</span>());
         <span class="self">self</span>.<span class="ident">flush_pipeline</span> <span class="op">=</span> <span class="ident">enabled</span>;
-        <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">set_strategy</span>(<span class="kw">if</span> <span class="ident">enabled</span> {
-            <span class="ident">Strategy</span>::<span class="ident">Flatten</span>
-        } <span class="kw">else</span> {
-            <span class="ident">Strategy</span>::<span class="ident">Auto</span>
-        });
+        <span class="kw">if</span> <span class="ident">enabled</span> {
+            <span class="self">self</span>.<span class="ident">set_write_strategy_flatten</span>();
+        }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_max_buf_size</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">usize</span>) {
