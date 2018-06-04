@@ -184,8 +184,6 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 
@@ -351,8 +349,6 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
     <span class="kw">use</span> <span class="ident">test</span>::<span class="ident">Bencher</span>;
 
@@ -367,7 +363,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="number">128</span>);
 
         <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">||</span> {
-            <span class="kw">let</span> <span class="ident">chunk</span> <span class="op">=</span> <span class="ident">Chunk</span>::<span class="ident">from</span>(<span class="ident">s</span>);
+            <span class="kw">let</span> <span class="ident">chunk</span> <span class="op">=</span> ::<span class="ident">Chunk</span>::<span class="ident">from</span>(<span class="ident">s</span>);
             <span class="ident">dst</span>.<span class="ident">put</span>(<span class="ident">chunk</span>);
             ::<span class="ident">test</span>::<span class="ident">black_box</span>(<span class="kw-2">&amp;</span><span class="ident">dst</span>);
             <span class="kw">unsafe</span> { <span class="ident">dst</span>.<span class="ident">set_len</span>(<span class="number">0</span>); }
