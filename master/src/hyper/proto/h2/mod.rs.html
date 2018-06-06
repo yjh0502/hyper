@@ -129,6 +129,31 @@
 <span id="129">129</span>
 <span id="130">130</span>
 <span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">Buf</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Future</span>, <span class="ident">Poll</span>};
@@ -162,6 +187,7 @@
     <span class="ident">S</span>: <span class="ident">Payload</span>,
 {
     <span class="ident">body_tx</span>: <span class="ident">SendStream</span><span class="op">&lt;</span><span class="ident">SendBuf</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="ident">Data</span><span class="op">&gt;&gt;</span>,
+    <span class="ident">data_done</span>: <span class="ident">bool</span>,
     <span class="ident">stream</span>: <span class="ident">S</span>,
 }
 
@@ -172,8 +198,22 @@
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream</span>: <span class="ident">S</span>, <span class="ident">tx</span>: <span class="ident">SendStream</span><span class="op">&lt;</span><span class="ident">SendBuf</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="ident">Data</span><span class="op">&gt;&gt;</span>) <span class="op">-&gt;</span> <span class="ident">PipeToSendStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
         <span class="ident">PipeToSendStream</span> {
             <span class="ident">body_tx</span>: <span class="ident">tx</span>,
+            <span class="ident">data_done</span>: <span class="bool-val">false</span>,
             <span class="ident">stream</span>: <span class="ident">stream</span>,
         }
+    }
+
+    <span class="kw">fn</span> <span class="ident">on_err</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">err</span>: <span class="ident">S</span>::<span class="ident">Error</span>) <span class="op">-&gt;</span> ::<span class="ident">Error</span> {
+        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> ::<span class="ident">Error</span>::<span class="ident">new_user_body</span>(<span class="ident">err</span>);
+        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;send body user stream error: {}&quot;</span>, <span class="ident">err</span>);
+        <span class="self">self</span>.<span class="ident">body_tx</span>.<span class="ident">send_reset</span>(<span class="ident">Reason</span>::<span class="ident">INTERNAL_ERROR</span>);
+        <span class="ident">err</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">send_eos_frame</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;send body eos&quot;</span>);
+        <span class="self">self</span>.<span class="ident">body_tx</span>.<span class="ident">send_data</span>(<span class="ident">SendBuf</span>(<span class="prelude-val">None</span>), <span class="bool-val">true</span>)
+            .<span class="ident">map_err</span>(::<span class="ident">Error</span>::<span class="ident">new_body_write</span>)
     }
 }
 
@@ -186,49 +226,59 @@
 
     <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
-            <span class="comment">// TODO: make use of flow control on SendStream</span>
-            <span class="comment">// If you&#39;re looking at this and thinking of trying to fix this TODO,</span>
-            <span class="comment">// you may want to look at:</span>
-            <span class="comment">// https://docs.rs/h2/0.1.*/h2/struct.SendStream.html</span>
-            <span class="comment">//</span>
-            <span class="comment">// With that doc open, we&#39;d want to do these things:</span>
-            <span class="comment">// - check self.body_tx.capacity() to see if we can send *any* data</span>
-            <span class="comment">// - if &gt; 0:</span>
-            <span class="comment">// -   poll self.stream</span>
-            <span class="comment">// -   reserve chunk.len() more capacity (because its about to be used)?</span>
-            <span class="comment">// -   send the chunk</span>
-            <span class="comment">// - else:</span>
-            <span class="comment">// -   try reserve a smallish amount of capacity</span>
-            <span class="comment">// -   call self.body_tx.poll_capacity(), return if NotReady</span>
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">poll_data</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">chunk</span>))) <span class="op">=&gt;</span> {
-                    <span class="kw">let</span> <span class="ident">is_eos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">is_end_stream</span>();
-                    <span class="macro">trace</span><span class="macro">!</span>(
-                        <span class="string">&quot;send body chunk: {} bytes, eos={}&quot;</span>,
-                        <span class="ident">chunk</span>.<span class="ident">remaining</span>(),
-                        <span class="ident">is_eos</span>,
-                    );
+            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">data_done</span> {
+                <span class="comment">// TODO: make use of flow control on SendStream</span>
+                <span class="comment">// If you&#39;re looking at this and thinking of trying to fix this TODO,</span>
+                <span class="comment">// you may want to look at:</span>
+                <span class="comment">// https://docs.rs/h2/0.1.*/h2/struct.SendStream.html</span>
+                <span class="comment">//</span>
+                <span class="comment">// With that doc open, we&#39;d want to do these things:</span>
+                <span class="comment">// - check self.body_tx.capacity() to see if we can send *any* data</span>
+                <span class="comment">// - if &gt; 0:</span>
+                <span class="comment">// -   poll self.stream</span>
+                <span class="comment">// -   reserve chunk.len() more capacity (because its about to be used)?</span>
+                <span class="comment">// -   send the chunk</span>
+                <span class="comment">// - else:</span>
+                <span class="comment">// -   try reserve a smallish amount of capacity</span>
+                <span class="comment">// -   call self.body_tx.poll_capacity(), return if NotReady</span>
+                <span class="kw">match</span> <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">poll_data</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">on_err</span>(<span class="ident">e</span>))) {
+                    <span class="prelude-val">Some</span>(<span class="ident">chunk</span>) <span class="op">=&gt;</span> {
+                        <span class="kw">let</span> <span class="ident">is_eos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">is_end_stream</span>();
+                        <span class="macro">trace</span><span class="macro">!</span>(
+                            <span class="string">&quot;send body chunk: {} bytes, eos={}&quot;</span>,
+                            <span class="ident">chunk</span>.<span class="ident">remaining</span>(),
+                            <span class="ident">is_eos</span>,
+                        );
 
-                    <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">SendBuf</span>(<span class="prelude-val">Some</span>(<span class="ident">chunk</span>));
-                    <span class="self">self</span>.<span class="ident">body_tx</span>.<span class="ident">send_data</span>(<span class="ident">buf</span>, <span class="ident">is_eos</span>)
-                        .<span class="ident">map_err</span>(::<span class="ident">Error</span>::<span class="ident">new_body_write</span>)<span class="question-mark">?</span>;
+                        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">SendBuf</span>(<span class="prelude-val">Some</span>(<span class="ident">chunk</span>));
+                        <span class="self">self</span>.<span class="ident">body_tx</span>.<span class="ident">send_data</span>(<span class="ident">buf</span>, <span class="ident">is_eos</span>)
+                            .<span class="ident">map_err</span>(::<span class="ident">Error</span>::<span class="ident">new_body_write</span>)<span class="question-mark">?</span>;
 
-                    <span class="kw">if</span> <span class="ident">is_eos</span> {
-                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()))
-                    }
-                },
-                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>)) <span class="op">=&gt;</span> {
-                    <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;send body eos&quot;</span>);
-                    <span class="self">self</span>.<span class="ident">body_tx</span>.<span class="ident">send_data</span>(<span class="ident">SendBuf</span>(<span class="prelude-val">None</span>), <span class="bool-val">true</span>)
-                        .<span class="ident">map_err</span>(::<span class="ident">Error</span>::<span class="ident">new_body_write</span>)<span class="question-mark">?</span>;
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
-                },
-                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=&gt;</span> {
-                    <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> ::<span class="ident">Error</span>::<span class="ident">new_user_body</span>(<span class="ident">err</span>);
-                    <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;send body user stream error: {}&quot;</span>, <span class="ident">err</span>);
-                    <span class="self">self</span>.<span class="ident">body_tx</span>.<span class="ident">send_reset</span>(<span class="ident">Reason</span>::<span class="ident">INTERNAL_ERROR</span>);
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>);
+                        <span class="kw">if</span> <span class="ident">is_eos</span> {
+                            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()))
+                        }
+                    },
+                    <span class="prelude-val">None</span> <span class="op">=&gt;</span> {
+                        <span class="kw">let</span> <span class="ident">is_eos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">is_end_stream</span>();
+                        <span class="kw">if</span> <span class="ident">is_eos</span> {
+                            <span class="kw">return</span> <span class="self">self</span>.<span class="ident">send_eos_frame</span>().<span class="ident">map</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>);
+                        } <span class="kw">else</span> {
+                            <span class="self">self</span>.<span class="ident">data_done</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                            <span class="comment">// loop again to poll_trailers</span>
+                        }
+                    },
+                }
+            } <span class="kw">else</span> {
+                <span class="kw">match</span> <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">poll_trailers</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">on_err</span>(<span class="ident">e</span>))) {
+                    <span class="prelude-val">Some</span>(<span class="ident">trailers</span>) <span class="op">=&gt;</span> {
+                        <span class="self">self</span>.<span class="ident">body_tx</span>.<span class="ident">send_trailers</span>(<span class="ident">trailers</span>)
+                            .<span class="ident">map_err</span>(::<span class="ident">Error</span>::<span class="ident">new_body_write</span>)<span class="question-mark">?</span>;
+                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
+                    },
+                    <span class="prelude-val">None</span> <span class="op">=&gt;</span> {
+                        <span class="comment">// There were no trailers, so send an empty DATA frame...</span>
+                        <span class="kw">return</span> <span class="self">self</span>.<span class="ident">send_eos_frame</span>().<span class="ident">map</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>);
+                    },
                 }
             }
         }
