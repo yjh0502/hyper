@@ -1154,6 +1154,9 @@
 <span id="1154">1154</span>
 <span id="1155">1155</span>
 <span id="1156">1156</span>
+<span id="1157">1157</span>
+<span id="1158">1158</span>
+<span id="1159">1159</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="self">self</span>};
@@ -1707,6 +1710,9 @@
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">new_version_h2</span>())
                 }
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">msg</span>) <span class="op">=</span> <span class="ident">T</span>::<span class="ident">on_error</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>) {
+                    <span class="comment">// Drop the cached headers so as to not trigger a debug</span>
+                    <span class="comment">// assert in `write_head`...</span>
+                    <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cached_headers</span>.<span class="ident">take</span>();
                     <span class="self">self</span>.<span class="ident">write_head</span>(<span class="ident">msg</span>, <span class="prelude-val">None</span>);
                     <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
