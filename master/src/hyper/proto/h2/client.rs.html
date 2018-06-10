@@ -158,6 +158,10 @@
 <span id="158">158</span>
 <span id="159">159</span>
 <span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">IntoBuf</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Future</span>, <span class="ident">Poll</span>, <span class="ident">Stream</span>};
@@ -168,6 +172,7 @@
 
 <span class="kw">use</span> <span class="ident">body</span>::<span class="ident">Payload</span>;
 <span class="kw">use</span> ::<span class="ident">common</span>::{<span class="ident">Exec</span>, <span class="ident">Never</span>};
+<span class="kw">use</span> <span class="ident">headers</span>;
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PipeToSendStream</span>, <span class="ident">SendBuf</span>};
 <span class="kw">use</span> ::{<span class="ident">Body</span>, <span class="ident">Request</span>, <span class="ident">Response</span>};
 
@@ -267,6 +272,9 @@
                             <span class="kw">let</span> (<span class="ident">head</span>, <span class="ident">body</span>) <span class="op">=</span> <span class="ident">req</span>.<span class="ident">into_parts</span>();
                             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">req</span> <span class="op">=</span> ::<span class="ident">http</span>::<span class="ident">Request</span>::<span class="ident">from_parts</span>(<span class="ident">head</span>, ());
                             <span class="kw">super</span>::<span class="ident">strip_connection_headers</span>(<span class="ident">req</span>.<span class="ident">headers_mut</span>());
+                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="op">=</span> <span class="ident">body</span>.<span class="ident">content_length</span>() {
+                                <span class="ident">headers</span>::<span class="ident">set_content_length_if_missing</span>(<span class="ident">req</span>.<span class="ident">headers_mut</span>(), <span class="ident">len</span>);
+                            }
                             <span class="kw">let</span> <span class="ident">eos</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">is_end_stream</span>();
                             <span class="kw">let</span> (<span class="ident">fut</span>, <span class="ident">body_tx</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">tx</span>.<span class="ident">send_request</span>(<span class="ident">req</span>, <span class="ident">eos</span>) {
                                 <span class="prelude-val">Ok</span>(<span class="ident">ok</span>) <span class="op">=&gt;</span> <span class="ident">ok</span>,
