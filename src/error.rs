@@ -73,6 +73,7 @@ pub(crate) enum Kind {
     ManualUpgrade,
 
     /// Error trying to call `Executor::execute`.
+    #[allow(unused)]
     Execute,
 }
 
@@ -258,6 +259,7 @@ impl Error {
         Error::new(Kind::Shutdown, Some(Box::new(cause)))
     }
 
+    #[allow(unused)]
     pub(crate) fn new_execute() -> Error {
         Error::new(Kind::Execute, None)
     }

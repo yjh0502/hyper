@@ -289,7 +289,7 @@ impl Http {
     where
         S: Service<ReqBody=Body, ResBody=Bd>,
         S::Error: Into<Box<::std::error::Error + Send + Sync>>,
-        S::Future: Send + 'static,
+        S::Future: 'static,
         Bd: Payload,
         I: AsyncRead + AsyncWrite,
     {
@@ -391,7 +391,6 @@ impl<I, B, S> Connection<I, S>
 where
     S: Service<ReqBody=Body, ResBody=B> + 'static,
     S::Error: Into<Box<::std::error::Error + Send + Sync>>,
-    S::Future: Send,
     I: AsyncRead + AsyncWrite + 'static,
     B: Payload + 'static,
 {
@@ -511,7 +510,6 @@ impl<I, B, S> Future for Connection<I, S>
 where
     S: Service<ReqBody=Body, ResBody=B> + 'static,
     S::Error: Into<Box<::std::error::Error + Send + Sync>>,
-    S::Future: Send,
     I: AsyncRead + AsyncWrite + 'static,
     B: Payload + 'static,
 {
@@ -584,7 +582,7 @@ where
     I::Error: Into<Box<::std::error::Error + Send + Sync>>,
     S: NewService<ReqBody=Body, ResBody=B>,
     S::Error: Into<Box<::std::error::Error + Send + Sync>>,
-    <S::Service as Service>::Future: Send + 'static,
+    <S::Service as Service>::Future: 'static,
     B: Payload,
 {
     type Item = Connecting<I::Item, S::Future>;
@@ -611,7 +609,7 @@ where
     I: AsyncRead + AsyncWrite,
     F: Future<Item=S>,
     S: Service<ReqBody=Body, ResBody=B>,
-    S::Future: Send + 'static,
+    S::Future: 'static,
     B: Payload,
 {
     type Item = Connection<I, S>;
@@ -644,18 +642,17 @@ where
     I: Stream,
     I::Error: Into<Box<::std::error::Error + Send + Sync>>,
     I::Item: AsyncRead + AsyncWrite + Send + 'static,
-    S: NewService<ReqBody=Body, ResBody=B> + Send + 'static,
+    S: NewService<ReqBody=Body, ResBody=B> + 'static,
     S::Error: Into<Box<::std::error::Error + Send + Sync>>,
-    S::Service: Send,
-    S::Future: Send + 'static,
-    <S::Service as Service>::Future: Send + 'static,
+    S::Future: 'static,
+    <S::Service as Service>::Future: 'static,
     B: Payload,
 {
     pub(super) fn poll_with<F1, F2, R>(&mut self, per_connection: F1) -> Poll<(), ::Error>
     where
         F1: Fn() -> F2,
-        F2: FnOnce(UpgradeableConnection<I::Item, S::Service>) -> R + Send + 'static,
-        R: Future<Item=(), Error=::Error> + Send + 'static,
+        F2: FnOnce(UpgradeableConnection<I::Item, S::Service>) -> R + 'static,
+        R: Future<Item=(), Error=::Error> + 'static,
     {
         loop {
             if let Some(connecting) = try_ready!(self.serve.poll()) {
@@ -693,7 +690,6 @@ mod upgrades {
     where
         S: Service<ReqBody=Body, ResBody=B> + 'static,
         S::Error: Into<Box<::std::error::Error + Send + Sync>>,
-        S::Future: Send,
         I: AsyncRead + AsyncWrite + Send + 'static,
         B: Payload + 'static,
     {
@@ -710,7 +706,6 @@ mod upgrades {
     where
         S: Service<ReqBody=Body, ResBody=B> + 'static,
         S::Error: Into<Box<::std::error::Error + Send + Sync>>,
-        S::Future: Send,
         I: AsyncRead + AsyncWrite + Send + 'static,
         B: Payload + 'static,
     {

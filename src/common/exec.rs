@@ -15,34 +15,10 @@ pub(crate) enum Exec {
 impl Exec {
     pub(crate) fn execute<F>(&self, fut: F) -> ::Result<()>
     where
-        F: Future<Item=(), Error=()> + Send + 'static,
+        F: Future<Item=(), Error=()> + 'static,
     {
-        match *self {
-            Exec::Default => {
-                #[cfg(feature = "runtime")]
-                {
-                    use ::tokio_executor::Executor;
-                    ::tokio_executor::DefaultExecutor::current()
-                        .spawn(Box::new(fut))
-                        .map_err(|err| {
-                            warn!("executor error: {:?}", err);
-                            ::Error::new_execute()
-                        })
-                }
-                #[cfg(not(feature = "runtime"))]
-                {
-                    // If no runtime, we need an executor!
-                    panic!("executor must be set")
-                }
-            },
-            Exec::Executor(ref e) => {
-                e.execute(Box::new(fut))
-                    .map_err(|err| {
-                        warn!("executor error: {:?}", err.kind());
-                        ::Error::new_execute()
-                    })
-            },
-        }
+        ::tokio::executor::current_thread::spawn(fut);
+        Ok(())
     }
 }
 

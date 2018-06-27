@@ -45,7 +45,7 @@ where
     T: AsyncRead + AsyncWrite,
     S: Service<ReqBody=Body, ResBody=B>,
     S::Error: Into<Box<::std::error::Error + Send + Sync>>,
-    S::Future: Send + 'static,
+    S::Future: 'static,
     B: Payload,
 {
     pub(crate) fn new(io: T, service: S, exec: Exec) -> Server<T, S, B> {
@@ -81,7 +81,7 @@ where
     T: AsyncRead + AsyncWrite,
     S: Service<ReqBody=Body, ResBody=B>,
     S::Error: Into<Box<::std::error::Error + Send + Sync>>,
-    S::Future: Send + 'static,
+    S::Future: 'static,
     B: Payload,
 {
     type Item = Dispatched;
@@ -123,7 +123,7 @@ where
             ResBody=B,
         >,
         S::Error: Into<Box<::std::error::Error + Send + Sync>>,
-        S::Future: Send + 'static,
+        S::Future: 'static,
     {
         while let Some((req, respond)) = try_ready!(self.conn.poll().map_err(::Error::new_h2)) {
             trace!("incoming request");

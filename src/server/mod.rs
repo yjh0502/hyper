@@ -202,11 +202,10 @@ where
     I: Stream,
     I::Error: Into<Box<::std::error::Error + Send + Sync>>,
     I::Item: AsyncRead + AsyncWrite + Send + 'static,
-    S: NewService<ReqBody=Body, ResBody=B> + Send + 'static,
+    S: NewService<ReqBody=Body, ResBody=B> + 'static,
     S::Error: Into<Box<::std::error::Error + Send + Sync>>,
-    S::Service: Send,
-    S::Future: Send + 'static,
-    <S::Service as Service>::Future: Send + 'static,
+    S::Future: 'static,
+    <S::Service as Service>::Future: 'static,
     B: Payload,
 {
     type Item = ();
@@ -320,11 +319,10 @@ impl<I> Builder<I> {
     where
         I: Stream,
         I::Error: Into<Box<::std::error::Error + Send + Sync>>,
-        I::Item: AsyncRead + AsyncWrite + Send + 'static,
-        S: NewService<ReqBody=Body, ResBody=B> + Send + 'static,
+        I::Item: AsyncRead + AsyncWrite + 'static,
+        S: NewService<ReqBody = Body, ResBody = B> + 'static,
         S::Error: Into<Box<::std::error::Error + Send + Sync>>,
-        S::Service: Send,
-        <S::Service as Service>::Future: Send + 'static,
+        <S::Service as Service>::Future: 'static,
         B: Payload,
     {
         let serve = self.protocol.serve_incoming(self.incoming, new_service);
